@@ -1,0 +1,479 @@
+<title>Sitecraft Experience Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,400;0,500;1,400&display=swap">
+<style>
+:root{
+  --paper:#F1F3F4; --surface:#FFFFFF; --sunk:#E7EAEC; --sunk-warm:#EDE9E6;
+  --ink:#14181C; --ink-2:#39434B; --muted:#66727C; --faint:#96A2AC;
+  --rule:#D6DBDF; --rule-soft:#E4E8EA;
+  --accent:#B23A2E; --accent-bg:#F3E2DF; --accent-line:#E2C4BF;
+  --gap1:#B4632A; --gap1-bg:#F7E8DC;
+  --gap2:#5E7A8C; --gap2-bg:#E4EBF0;
+  --gap3:#8A929A; --gap3-bg:#E9ECEE;
+  --ok:#3E6B4F; --ok-bg:#E2ECE5;
+  --sans:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
+  --serif:"IBM Plex Serif",Georgia,serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --maxw:78rem;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#101417; --surface:#171C20; --sunk:#1E252A; --sunk-warm:#231F1D;
+  --ink:#E8ECEE; --ink-2:#BAC4CB; --muted:#8B979F; --faint:#69757D;
+  --rule:#2B3238; --rule-soft:#232A2F;
+  --accent:#E4796B; --accent-bg:#3A2320; --accent-line:#5A342E;
+  --gap1:#D79A63; --gap1-bg:#332721;
+  --gap2:#8FB2C6; --gap2-bg:#1F2A31;
+  --gap3:#8A939B; --gap3-bg:#232A2E;
+  --ok:#7FB08F; --ok-bg:#1E2A22;
+}}
+:root[data-theme="dark"]{
+  --paper:#101417; --surface:#171C20; --sunk:#1E252A; --sunk-warm:#231F1D;
+  --ink:#E8ECEE; --ink-2:#BAC4CB; --muted:#8B979F; --faint:#69757D;
+  --rule:#2B3238; --rule-soft:#232A2F;
+  --accent:#E4796B; --accent-bg:#3A2320; --accent-line:#5A342E;
+  --gap1:#D79A63; --gap1-bg:#332721;
+  --gap2:#8FB2C6; --gap2-bg:#1F2A31;
+  --gap3:#8A939B; --gap3-bg:#232A2E;
+  --ok:#7FB08F; --ok-bg:#1E2A22;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4,.ui{font-family:var(--sans)}
+h1,h2,h3,h4{margin:0;text-wrap:balance;font-weight:600;letter-spacing:-.014em}
+p{margin:0}
+a{color:var(--accent)}
+code,.mono{font-family:var(--mono)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 1.75rem}
+
+/* masthead */
+.mast{border-bottom:1px solid var(--rule);background:var(--surface)}
+.mast-in{max-width:var(--maxw);margin:0 auto;padding:2.9rem 1.75rem 2.1rem;display:grid;gap:1.35rem}
+.eyebrow{font-family:var(--mono);font-size:.72rem;letter-spacing:.13em;text-transform:uppercase;color:var(--accent)}
+.mast h1{font-size:clamp(2rem,4.4vw,3rem);line-height:1.05}
+.dek{font-family:var(--serif);font-size:1.09rem;color:var(--ink-2);max-width:64ch}
+.mast-meta{display:flex;flex-wrap:wrap;gap:.45rem 1.6rem;font-family:var(--mono);font-size:.74rem;color:var(--muted);border-top:1px solid var(--rule-soft);padding-top:1.05rem}
+.mast-meta b{color:var(--ink);font-weight:500}
+
+/* sections */
+.sec{padding:3.4rem 0 0}
+.sec-h{display:grid;gap:.55rem;max-width:66ch;margin-bottom:1.6rem}
+.sec-n{font-family:var(--mono);font-size:.7rem;letter-spacing:.13em;text-transform:uppercase;color:var(--faint)}
+.sec-h h2{font-size:1.55rem}
+.sec-h p{color:var(--ink-2)}
+
+/* thesis */
+.thesis{background:var(--surface);border:1px solid var(--rule);border-left:3px solid var(--accent);padding:1.6rem 1.75rem;display:grid;gap:.9rem;margin-top:2.6rem}
+.thesis p{font-size:1.06rem;max-width:70ch;color:var(--ink-2)}
+.thesis strong{color:var(--ink);font-weight:500}
+
+/* legend */
+.legend{display:flex;flex-wrap:wrap;gap:.5rem .9rem;font-family:var(--sans);font-size:.78rem;color:var(--muted);align-items:center;margin-bottom:.9rem}
+.chip{font-family:var(--mono);font-size:.68rem;font-weight:500;padding:.1rem .38rem;border-radius:2px;letter-spacing:.02em;white-space:nowrap;display:inline-block}
+.c1{background:var(--gap1-bg);color:var(--gap1)}
+.c2{background:var(--gap2-bg);color:var(--gap2)}
+.c3{background:var(--gap3-bg);color:var(--gap3)}
+.cm{background:var(--accent-bg);color:var(--accent)}
+
+/* map */
+.scroll{overflow-x:auto;border:1px solid var(--rule);background:var(--surface);-webkit-overflow-scrolling:touch}
+.map{display:grid;grid-template-columns:8.5rem repeat(9,minmax(13.5rem,1fr));min-width:135rem}
+.map>*{border-right:1px solid var(--rule-soft);border-bottom:1px solid var(--rule-soft);padding:.7rem .8rem}
+.map>.lane-l{border-right:1px solid var(--rule)}
+.stage-h{background:var(--sunk);display:grid;gap:.25rem;align-content:start;position:relative}
+.stage-h .sn{font-family:var(--mono);font-size:.66rem;color:var(--faint);letter-spacing:.1em}
+.stage-h .st{font-family:var(--sans);font-size:.86rem;font-weight:600;line-height:1.25}
+.corner{background:var(--sunk)}
+.lane-l{font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);background:var(--sunk);align-content:start;display:grid;gap:.2rem;position:sticky;left:0;z-index:2}
+.lane-l b{font-family:var(--sans);font-size:.78rem;font-weight:600;text-transform:none;letter-spacing:0;color:var(--ink);line-height:1.2}
+.cell{font-size:.83rem;line-height:1.45;color:var(--ink-2);display:grid;gap:.45rem;align-content:start}
+.cell.sys{background:color-mix(in srgb,var(--sunk) 60%,transparent)}
+.cell.ops{background:var(--sunk-warm)}
+.cell.money{background:var(--surface);min-height:4.4rem}
+.cell.money.has{background:var(--accent-bg)}
+.cell.money .amt{font-family:var(--sans);font-size:.84rem;font-weight:600;color:var(--accent);line-height:1.3}
+.cell.money .none{font-family:var(--mono);font-size:.72rem;color:var(--faint);letter-spacing:.04em}
+.marks{display:flex;flex-wrap:wrap;gap:.25rem}
+
+/* register */
+.reg{display:grid;gap:1px;background:var(--rule-soft);border:1px solid var(--rule)}
+.item{background:var(--surface);padding:1.15rem 1.3rem;display:grid;gap:.6rem;grid-template-columns:minmax(0,1fr);}
+@media(min-width:900px){.item{grid-template-columns:16rem minmax(0,1fr);gap:.6rem 1.8rem;align-items:start}}
+.item-h{display:grid;gap:.4rem;align-content:start}
+.item-h h3{font-size:.98rem;line-height:1.3}
+.item-h .marks{margin-top:.1rem}
+.rows{display:grid;gap:.55rem}
+.row{display:grid;grid-template-columns:5.2rem minmax(0,1fr);gap:.9rem;align-items:baseline}
+.row dt{font-family:var(--mono);font-size:.68rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);padding-top:.14rem}
+.row dd{margin:0;font-size:.92rem;color:var(--ink-2)}
+.row.fix dd{color:var(--ink)}
+.row.fix dt{color:var(--ok)}
+
+/* score bars */
+.bars{display:grid;gap:1.4rem;background:var(--surface);border:1px solid var(--rule);padding:1.5rem 1.6rem}
+.bar-set{display:grid;gap:.5rem}
+.bar-lbl{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;font-family:var(--sans);font-size:.82rem;font-weight:600}
+.bar-lbl span:last-child{font-family:var(--mono);font-size:.74rem;font-weight:400;color:var(--muted);font-variant-numeric:tabular-nums}
+.bar{display:flex;height:2.1rem;border:1px solid var(--rule);overflow:hidden}
+.seg{display:flex;align-items:center;padding:0 .55rem;font-family:var(--mono);font-size:.7rem;letter-spacing:.02em;white-space:nowrap;overflow:hidden}
+.seg-fixed{background:var(--ok);color:var(--surface)}
+.seg-ach{background:var(--gap2-bg);color:var(--gap2)}
+.seg-lock{background:repeating-linear-gradient(135deg,var(--accent-bg),var(--accent-bg) 5px,transparent 5px,transparent 10px);color:var(--accent);border-left:1px solid var(--accent-line)}
+.seg-one{background:var(--gap3-bg);color:var(--gap3);flex:1}
+.bar-note{font-size:.86rem;color:var(--muted);max-width:70ch}
+
+/* triggers */
+.trig{display:grid;gap:1px;background:var(--rule-soft);border:1px solid var(--rule)}
+@media(min-width:840px){.trig{grid-template-columns:repeat(3,1fr)}}
+.trig>div{background:var(--surface);padding:1.15rem 1.25rem;display:grid;gap:.5rem;align-content:start}
+.trig .tn{font-family:var(--mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.trig h4{font-size:.95rem;line-height:1.3}
+.trig p{font-size:.88rem;color:var(--ink-2)}
+.trig .say{font-family:var(--serif);font-style:italic;font-size:.9rem;color:var(--ink);border-left:2px solid var(--accent-line);padding-left:.75rem}
+
+/* ordered build */
+.build{display:grid;gap:1px;background:var(--rule-soft);border:1px solid var(--rule);counter-reset:b}
+.build>div{background:var(--surface);padding:1.2rem 1.35rem;display:grid;grid-template-columns:2.1rem minmax(0,1fr);gap:.15rem 1rem;align-items:start}
+.build>div::before{counter-increment:b;content:counter(b);font-family:var(--mono);font-size:1.5rem;color:var(--accent);line-height:1;grid-row:span 2;padding-top:.1rem}
+.build h4{font-size:1rem}
+.build p{font-size:.92rem;color:var(--ink-2);max-width:74ch}
+
+/* assumptions */
+.assume{background:var(--sunk);border:1px solid var(--rule);padding:1.4rem 1.55rem;display:grid;gap:.75rem;margin-bottom:4rem}
+.assume h3{font-size:.95rem}
+.assume ul{margin:0;padding-left:1.1rem;display:grid;gap:.4rem}
+.assume li{font-size:.9rem;color:var(--ink-2)}
+.assume li b{color:var(--ink);font-weight:500}
+.rule{height:1px;background:var(--rule);margin:3.4rem 0 0}
+</style>
+
+<header class="mast">
+  <div class="mast-in">
+    <p class="eyebrow ui">Sitecraft · UX audit</p>
+    <h1>Sitecraft Experience Map</h1>
+    <p class="dek">Nine stages of the client journey, four lanes deep, with every point where the experience stalls or the commercial path goes missing. Built against the 52-check AEO rubric; the flow detail is a strawman to be red-lined.</p>
+    <div class="mast-meta ui">
+      <span>Primary user <b>Site owner</b></span>
+      <span>Surface <b>ReadTomato-hosted dashboard</b></span>
+      <span>Goal 1 <b>Boost content</b></span>
+      <span>Goal 2 <b>Attach RT services</b></span>
+      <span>Gaps <b>12 client · 7 back office</b></span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="thesis">
+    <p><strong>The diagnostic is finished. The commerce is missing.</strong> The rubric stops exactly where the money starts. Class&nbsp;C — <em>“content the site does not have”</em> — is the product’s own machine-generated name for a content gap, itemised per page and already prioritised by severity. A content gap is precisely what Boost sells. Today it renders as an apology.</p>
+    <p>Everything below is downstream of that one inversion: <strong>the findings Sitecraft can’t fix are the product’s best sales asset, not its limitation.</strong></p>
+  </div>
+
+  <section class="sec">
+    <div class="sec-h">
+      <p class="sec-n ui">The map</p>
+      <h2>Four lanes across nine stages</h2>
+      <p>Read the bottom lane first. It is empty through six of nine stages — the client passes through discovery, audit, review, publish and proof without ever meeting an offer, then hits a plateau with nothing waiting there.</p>
+    </div>
+    <div class="legend ui">
+      <span class="chip c1">F1</span><span>critical gap</span>
+      <span class="chip c2">F5</span><span>important gap</span>
+      <span class="chip c3">B1</span><span>back-office gap</span>
+      <span class="chip cm">$</span><span>commercial moment</span>
+      <span style="color:var(--faint)">— scroll the map sideways —</span>
+    </div>
+    <div class="scroll">
+      <div class="map">
+        <div class="corner"></div>
+        <div class="stage-h"><span class="sn">01</span><span class="st">Discover</span></div>
+        <div class="stage-h"><span class="sn">02</span><span class="st">Teaser score</span></div>
+        <div class="stage-h"><span class="sn">03</span><span class="st">Sign up &amp; connect</span></div>
+        <div class="stage-h"><span class="sn">04</span><span class="st">Full audit</span></div>
+        <div class="stage-h"><span class="sn">05</span><span class="st">Review queue</span></div>
+        <div class="stage-h"><span class="sn">06</span><span class="st">Publish</span></div>
+        <div class="stage-h"><span class="sn">07</span><span class="st">Prove it worked</span></div>
+        <div class="stage-h"><span class="sn">08</span><span class="st">Hit the ceiling</span></div>
+        <div class="stage-h"><span class="sn">09</span><span class="st">Monitor &amp; renew</span></div>
+
+        <div class="lane-l ui"><b>Client does</b><span>owner / office mgr</span></div>
+        <div class="cell">Arrives from search, an ad, or a ReadTomato call. Pastes their URL. No account yet.</div>
+        <div class="cell">Reads one number. Decides in about twenty seconds whether this is real.</div>
+        <div class="cell">Creates an account, picks a plan, then is asked to install a plugin or paste a script tag into a live business site.<div class="marks"><span class="chip c2">F5</span></div></div>
+        <div class="cell">Waits for the crawl. Comes back to a long list.</div>
+        <div class="cell">Approves Class B diffs one at a time. Reads Class C flags and finds no action on any of them.<div class="marks"><span class="chip c1">F1</span><span class="chip c2">F6</span></div></div>
+        <div class="cell">Watches changes land on their real site. Wonders what else moved.<div class="marks"><span class="chip c2">F8</span></div></div>
+        <div class="cell">Asks the only question that matters: is anyone finding me now?<div class="marks"><span class="chip c1">F4</span></div></div>
+        <div class="cell">Applies everything available. Score stops moving. No explanation given.<div class="marks"><span class="chip c1">F2</span></div></div>
+        <div class="cell">Stops logging in. Renews or churns on feel, not evidence.<div class="marks"><span class="chip c2">F12</span></div></div>
+
+        <div class="lane-l ui"><b>Sitecraft shows</b><span>the dashboard</span></div>
+        <div class="cell sys">URL field, one promise line. Homepage-only crawl.</div>
+        <div class="cell sys">A single visibility score. Top findings visible, the rest blurred. No ceiling shown.<div class="marks"><span class="chip c1">F2</span></div></div>
+        <div class="cell sys">Per-platform install steps and a verification poll. Six fields of business facts never asked for.<div class="marks"><span class="chip c1">F3</span></div></div>
+        <div class="cell sys">All pages scored. 52 checks, P0–P3, Class A/B/C. Ordered by severity, so orphan pages outrank the contact page.<div class="marks"><span class="chip c2">F7</span></div></div>
+        <div class="cell sys">Before/after diffs, one per finding. Class A shown as an applied log. Class C shown as warnings with no next step.<div class="marks"><span class="chip c1">F1</span><span class="chip c2">F6</span></div></div>
+        <div class="cell sys">An “applied” state and a re-parse. No consolidated change ledger, no revert.<div class="marks"><span class="chip c2">F8</span></div></div>
+        <div class="cell sys">Re-scan and score delta. JSON-LD still valid, no regressions — correctness, not outcome. Nothing about citations.<div class="marks"><span class="chip c1">F4</span></div></div>
+        <div class="cell sys">Nothing. This screen does not exist.<div class="marks"><span class="chip c1">F1</span><span class="chip c1">F2</span><span class="chip c1">F9</span></div></div>
+        <div class="cell sys">Undefined. No drift detection, so a theme update silently reverts the work.<div class="marks"><span class="chip c2">F12</span></div></div>
+
+        <div class="lane-l ui"><b>Back office</b><span>ReadTomato ops</span></div>
+        <div class="cell ops">Lead captured as a URL. No identity, no qualification signal beyond the score.</div>
+        <div class="cell ops">Score logged. No lead scoring by size of the fixable gap.</div>
+        <div class="cell ops">Account provisioned, billing starts. Billable unit still undefined — page, fix, crawl or site.<div class="marks"><span class="chip c3">B1</span></div></div>
+        <div class="cell ops">Crawl cost metered against nothing. Class C findings land in no queue.<div class="marks"><span class="chip c3">B2</span></div></div>
+        <div class="cell ops">Dental, medspa and legal claims need a human gate. It is a sentence in a doc, not a workflow state.<div class="marks"><span class="chip c3">B4</span></div></div>
+        <div class="cell ops">No audit trail of what an autonomous agent changed on a client’s live property.<div class="marks"><span class="chip c3">B4</span></div></div>
+        <div class="cell ops">No outcome telemetry, so nothing to sell against and nothing to defend a renewal with.<div class="marks"><span class="chip c3">B5</span></div></div>
+        <div class="cell ops">No fulfillment pipeline behind a Boost order: brief, draft, risk review, publish, verify.<div class="marks"><span class="chip c3">B3</span></div></div>
+        <div class="cell ops">Renewal and dunning unmodelled. Multi-location roll-ups absent. No stated policy on lapse.<div class="marks"><span class="chip c3">B6</span><span class="chip c3">B7</span></div></div>
+
+        <div class="lane-l ui"><b>Commercial</b><span>where money happens</span></div>
+        <div class="cell money"><span class="none">— nothing —</span></div>
+        <div class="cell money"><span class="none">— nothing —</span></div>
+        <div class="cell money has"><span class="amt">Subscription starts</span><span style="font-size:.8rem;color:var(--ink-2)">The only revenue event in the whole journey — and it fires before any value is felt.</span></div>
+        <div class="cell money"><span class="none">— nothing —</span></div>
+        <div class="cell money"><span class="none">— nothing —</span></div>
+        <div class="cell money"><span class="none">— nothing —</span></div>
+        <div class="cell money"><span class="none">— nothing —</span></div>
+        <div class="cell money"><span class="amt" style="color:var(--gap1)">Boost belongs here</span><span style="font-size:.8rem;color:var(--ink-2)">The primary goal, at the one moment the client feels the gap. Undefined today.</span><div class="marks"><span class="chip c1">F9</span></div></div>
+        <div class="cell money"><span class="amt" style="color:var(--gap1)">Renewal + service attach</span><span style="font-size:.8rem;color:var(--ink-2)">Secondary goal. No trigger, no evidence to renew on.</span><div class="marks"><span class="chip c1">F4</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <section class="sec">
+    <div class="sec-h">
+      <p class="sec-n ui">The core inversion</p>
+      <h2>One score hides the whole argument</h2>
+      <p>A single number can only go up until it stops. Split into three bands, the same audit makes the case for Boost every time the client opens the page — without a single line of sales copy.</p>
+    </div>
+    <div class="bars">
+      <div class="bar-set">
+        <div class="bar-lbl ui"><span>Today — one number</span><span>a plateau with no explanation</span></div>
+        <div class="bar"><div class="seg seg-one">Visibility score 71 / 100</div></div>
+      </div>
+      <div class="bar-set">
+        <div class="bar-lbl ui"><span>Proposed — three bands, shown from the first scan</span><span>same audit, same data</span></div>
+        <div class="bar">
+          <div class="seg seg-fixed" style="width:44%">Fixed · 44</div>
+          <div class="seg seg-ach" style="width:27%">Achievable now · 27</div>
+          <div class="seg seg-lock" style="width:29%">Locked — needs content · 29</div>
+        </div>
+      </div>
+      <p class="bar-note">The hatched band is Class C: prices, credentials, hours, service areas, FAQs, pages that do not exist yet. It is the honest reason the score caps, and it is the Boost offer, sized in points the client already believes in. Illustrative figures.</p>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-h">
+      <p class="sec-n ui">Client-side gaps</p>
+      <h2>Twelve places the experience leaks</h2>
+      <p>Ordered by what they cost the Boost goal. Each is anchored to a rule in the rubric, not to a screen — so they hold even where my reconstruction of the flow is wrong.</p>
+    </div>
+    <div class="reg">
+
+      <article class="item">
+        <div class="item-h"><h3>Class C reads as a refusal, not an offer</h3><div class="marks"><span class="chip c1">F1 · critical</span></div></div>
+        <div class="rows">
+          <dl class="row"><dt>Today</dt><dd>“Flag only — never auto-edit.” Missing prices, credentials, hours, service areas and anything needing a page that doesn’t exist are reported, and the flow ends.</dd></dl>
+          <dl class="row"><dt>Cost</dt><dd>This is a per-page, severity-ranked list of content gaps generated for free by the audit — the Boost pitch, itemised. It currently presents as the thing Sitecraft can’t do.</dd></dl>
+          <dl class="row fix"><dt>Fix</dt><dd>Rename it “Needs new content.” Give every Class C finding a price and an estimated point gain, with one-click ordering. Bundle them — <em>“Service-page facts pack · 6 pages · +14 pts.”</em> The guardrail is untouched: Sitecraft still invents nothing, it sells the work of sourcing the fact.</dd></dl>
+        </div>
+      </article>
+
+      <article class="item">
+        <div class="item-h"><h3>One score, no visible ceiling</h3><div class="marks"><span class="chip c1">F2 · critical</span></div></div>
+        <div class="rows">
+          <dl class="row"><dt>Today</dt><dd>A single visibility number. Class A and B fixes move it; Class C findings hold points back invisibly.</dd></dl>
+          <dl class="row"><dt>Cost</dt><dd>The client applies everything available, plateaus, and reads the plateau as the product being finished. That is the exact moment they stop paying.</dd></dl>
+          <dl class="row fix"><dt>Fix</dt><dd>Three bands from the first scan: Fixed / Achievable now / Locked. Show the locked band on day one, before any purchase. It is a permanent, honest, zero-pressure Boost argument sitting on the dashboard.</dd></dl>
+        </div>
+      </article>
+
+      <article class="item">
+        <div class="item-h"><h3>No business-facts intake, so the locked band is bigger than it needs to be</h3><div class="marks"><span class="chip c1">F3 · critical</span></div></div>
+        <div class="rows">
+          <dl class="row"><dt>Today</dt><dd>Onboarding collects a URL. Because the guardrail correctly forbids invention, every unstated hour, price, service area and credential becomes Class C.</dd></dl>
+          <dl class="row"><dt>Cost</dt><dd>Much of “we can’t fix this” is really “nobody asked you.” The client is blocked by a question that takes them four minutes to answer.</dd></dl>
+          <dl class="row fix"><dt>Fix</dt><dd>A six-field Business Facts step at signup — legal name, service areas, hours, contact, credentials, price ranges or an explicit “not published” — plus the author registry (F11). Then show the client what they unlocked: <em>“6 answers converted 9 blocked findings.”</em> That single screen teaches the entire premise of Boost before you ever ask for money.</dd></dl>
+        </div>
+      </article>
+
+      <article class="item">
+        <div class="item-h"><h3>Nothing proves the AEO actually worked</h3><div class="marks"><span class="chip c1">F4 · critical</span></div></div>
+        <div class="rows">
+          <dl class="row"><dt>Today</dt><dd>Step 7 of the workflow re-parses the page: JSON-LD still valid, copy claims unchanged, no regressions. That is correctness.</dd></dl>
+          <dl class="row"><dt>Cost</dt><dd>The client bought visibility in answer engines and got back a passing lint. No felt win means no reason to buy more and nothing to renew on.</dd></dl>
+          <dl class="row fix"><dt>Fix</dt><dd>A citation check. Store 10–20 real buying-intent prompts per client — <em>“best pediatric dentist in Ballard,” “Invisalign cost Seattle”</em> — and run them monthly against the answer engines. Log whether the client is named, whether a competitor is, and the delta. This is simultaneously the retention engine, the Boost proof, and the one artifact a client forwards to their business partner.</dd></dl>
+        </div>
+      </article>
+
+      <article class="item">
+        <div class="item-h"><h3>Boost has no earned trigger moment</h3><div class="marks"><span class="chip c1">F9 · critical</span></div></div>
+        <div class="rows">
+          <dl class="row"><dt>Today</dt><dd>The goal exists. The moment doesn’t. An offer with no trigger becomes a nav item, and a nav item is wallpaper.</dd></dl>
+          <dl class="row"><dt>Cost</dt><dd>Pitched at signup it is noise, and it competes with the install you already need them to complete.</dd></dl>
+          <dl class="row fix"><dt>Fix</dt><dd>Three triggers only, in the order they earn the right — detailed in the next section. All three depend on F2 and F4 existing first.</dd></dl>
+        </div>
+      </article>
+
+      <article class="item">
+        <div class="item-h"><h3>Write access is demanded before any value is felt</h3><div class="marks"><span class="chip c2">F5 · important</span></div></div>
+        <div class="rows">
+          <dl class="row"><dt>Today</dt><dd>Signup and install sit between the teaser score and the full audit.</dd></dl>
+          <dl class="row"><dt>Cost</dt><dd>The hardest gate in the funnel sits in front of the aha. A dental office manager will not install a plugin on the practice site to see a list.</dd></dl>
+          <dl class="row fix"><dt>Fix</dt><dd>Audit before install. A read-only crawl needs no permission at all — deliver the entire 52-check audit, every page, on a free account. Ask for write access at the moment they click Approve on their first fix, where the ask explains itself.</dd></dl>
+        </div>
+      </article>
+
+      <article class="item">
+        <div class="item-h"><h3>The approval queue has no bulk path</h3><div class="marks"><span class="chip c2">F6 · important</span></div></div>
+        <div class="rows">
+          <dl class="row"><dt>Today</dt><dd>Class B is one diff, one decision. Twenty-six pages against 52 checks produces hundreds of them.</dd></dl>
+          <dl class="row"><dt>Cost</dt><dd>Abandonment mid-queue. The site ends half-fixed, the score half-moved, the product half-proven — and a half-proven product does not get a second purchase.</dd></dl>
+          <dl class="row fix"><dt>Fix</dt><dd>Group by check rather than by page: <em>“Convert 14 label headings into claim headings”</em>, scrollable diff set, one approve. Add trust escalation — after five approvals of a check type, offer to promote it to automatic for that account. Offer an “apply all safe fixes” on first run so session one ends with a visible jump.</dd></dl>
+        </div>
+      </article>
+
+      <article class="item">
+        <div class="item-h"><h3>Findings are ranked by severity, not by page value</h3><div class="marks"><span class="chip c2">F7 · important</span></div></div>
+        <div class="rows">
+          <dl class="row"><dt>Today</dt><dd>P0 → P1 → P2 → P3, Class A before Class B. Correct for risk.</dd></dl>
+          <dl class="row"><dt>Cost</dt><dd>Wrong for attention. Your own audit found the discipline stops at the blog’s edge — 8 of 26 pages instrumented, every commercial page bare. Client sites will look the same, so the queue fills with findings on pages nobody visits while the contact page waits mid-list.</dd></dl>
+          <dl class="row fix"><dt>Fix</dt><dd>Rank by severity × page value. Page value from analytics where connected, from nav depth and commercial intent where not. P0 stays absolutely first — deception is not negotiable — and everything below it sorts by what the page is worth.</dd></dl>
+        </div>
+      </article>
+
+      <article class="item">
+        <div class="item-h"><h3>Autonomous edits with no visible ledger</h3><div class="marks"><span class="chip c2">F8 · important</span></div></div>
+        <div class="rows">
+          <dl class="row"><dt>Today</dt><dd>Class A applies without asking to a live business website. The safety argument for that is sound and entirely invisible to the client.</dd></dl>
+          <dl class="row"><dt>Cost</dt><dd>One unexplained change on a medical page ends the account, whatever the change actually was.</dd></dl>
+          <dl class="row fix"><dt>Fix</dt><dd>A “What Sitecraft changed” ledger: every change, timestamp, check ID, before/after, one-click revert. Default new accounts to a seven-day dry run where Class A queues instead of applying, so the first week belongs entirely to the client. Weekly digest of what ran.</dd></dl>
+        </div>
+      </article>
+
+      <article class="item">
+        <div class="item-h"><h3>The reviews question has no compliant answer</h3><div class="marks"><span class="chip c2">F10 · important</span></div></div>
+        <div class="rows">
+          <dl class="row"><dt>Today</dt><dd><code>AggregateRating</code> and <code>Review</code> are the rubric’s highest-risk rules and are hard-blocked, correctly.</dd></dl>
+          <dl class="row"><dt>Cost</dt><dd>The first thing a practice owner asks is why a competitor has stars in search and they don’t. “We never touch that” is the right policy and a terrible answer.</dd></dl>
+          <dl class="row fix"><dt>Fix</dt><dd>Give the refusal somewhere to go: connect the real review source, render genuine reviews on the page, then mark up only what is visibly there. Sitecraft still generates nothing. The connection is a natural paid add-on, and it retires your largest legal exposure by replacing a “no” with a path.</dd></dl>
+        </div>
+      </article>
+
+      <article class="item">
+        <div class="item-h"><h3>Author identity has no registry</h3><div class="marks"><span class="chip c2">F11 · important</span></div></div>
+        <div class="rows">
+          <dl class="row"><dt>Today</dt><dd>Correct <code>Person</code> schema per post, but the visible bio is whatever the CMS holds. Your own site carries one bio under six bylines, contradicting the structured data on five of them.</dd></dl>
+          <dl class="row"><dt>Cost</dt><dd>A machine-readable E-E-A-T failure — exactly the one the doctrine warns about — and it will be present on nearly every agency-built client site you onboard.</dd></dl>
+          <dl class="row fix"><dt>Fix</dt><dd>An author registry per account: name, role, bio, credentials, photo, stable <code>@id</code>. Reconcile every byline against it and flag mismatches as P1. A missing author becomes a Boost line item, not a dead end.</dd></dl>
+        </div>
+      </article>
+
+      <article class="item">
+        <div class="item-h"><h3>CMS drift is invisible</h3><div class="marks"><span class="chip c2">F12 · important</span></div></div>
+        <div class="rows">
+          <dl class="row"><dt>Today</dt><dd>Idempotency is guaranteed against a fixed page. It says nothing about a page the client’s theme update or page builder overwrites next Tuesday.</dd></dl>
+          <dl class="row"><dt>Cost</dt><dd>Silent regression. The score the client last saw quietly stops being true, and they hear about it from you never.</dd></dl>
+          <dl class="row fix"><dt>Fix</dt><dd>Scheduled re-crawl with drift detection. When the platform reverts a Sitecraft change, alert with the diff and a one-click reapply. It is also the best re-engagement email you will ever have, because it arrives with a real reason to log in.</dd></dl>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-h">
+      <p class="sec-n ui">Conversion architecture</p>
+      <h2>Three moments to ask, and nowhere else</h2>
+      <p>Boost is the primary goal, so it gets the earned moments. Everything else attaches to the shape of the findings rather than sitting in the navigation.</p>
+    </div>
+    <div class="trig">
+      <div>
+        <p class="tn">Trigger A · strongest available today</p>
+        <h4>Verified score jump after first publish</h4>
+        <p>Fires once, on the visit after the first Class A/B batch goes live and the re-scan confirms the delta. Momentum is at its peak and the client has just watched the product work.</p>
+        <p class="say">“Your structure is clean now. What’s left is what these pages don’t say yet.”</p>
+      </div>
+      <div>
+        <p class="tn">Trigger B · always present</p>
+        <h4>The locked band, on every visit</h4>
+        <p>Not a prompt — a permanent element of the score display (F2). Ambient, honest, and it never wears out because it shrinks as the client buys.</p>
+        <p class="say">“29 points are held by content that doesn’t exist yet. Here are the six pages holding them.”</p>
+      </div>
+      <div>
+        <p class="tn">Trigger C · strongest possible, doesn’t exist yet</p>
+        <h4>A competitor named where they aren’t</h4>
+        <p>Requires the citation check (F4). Per prompt, per page, with the competitor’s name in it. This is the most persuasive sentence this product will ever be able to write.</p>
+        <p class="say">“Asked about implants in your city, ChatGPT named three practices. None of them was yours.”</p>
+      </div>
+    </div>
+    <div class="bars" style="margin-top:1.4rem">
+      <div class="bar-set">
+        <div class="bar-lbl ui"><span>Secondary services — attach to the finding, never to the nav</span></div>
+        <p class="bar-note" style="max-width:74ch"><b style="font-family:var(--sans);font-weight:600;color:var(--ink)">Web Reno</b> — when P1 density per page exceeds what copy-bound fixes can move. The structure is the problem, not the words, and the audit can say so numerically.<br>
+        <b style="font-family:var(--sans);font-weight:600;color:var(--ink)">Hot Take Engine / Instant Take</b> — when the locked band is dominated by topics with no page at all, rather than facts missing from existing pages. That is a velocity problem, and it is a different sale from Boost.<br>
+        <b style="font-family:var(--sans);font-weight:600;color:var(--ink)">Review connection</b> — whenever the account has rating findings (F10). The only compliant answer to the most common question you will get.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-h">
+      <p class="sec-n ui">Back office</p>
+      <h2>Seven things a SaaS needs that a rubric doesn’t</h2>
+      <p>The audit engine is genuinely well specified. The business around it is not yet modelled at all.</p>
+    </div>
+    <div class="reg">
+      <article class="item"><div class="item-h"><h3>The billable unit isn’t defined</h3><div class="marks"><span class="chip c3">B1</span></div></div><div class="rows"><dl class="row fix"><dt>Fix</dt><dd>Pages under management as the subscription unit — it is the thing that grows, the client understands it, and it meters the crawl cost honestly. Boost sells as à-la-carte content units. Citation-prompt count becomes the plan-tier lever, so the thing that proves value is also the thing that upgrades.</dd></dl></div></article>
+      <article class="item"><div class="item-h"><h3>Class C has no operator inbox</h3><div class="marks"><span class="chip c3">B2</span></div></div><div class="rows"><dl class="row fix"><dt>Fix</dt><dd>Flags addressed to “a human” with no human named will rot. Give them assignment, an SLA, and a state machine: open → info requested → converted to Boost order → declined. The conversion rate of that queue is the primary-goal metric.</dd></dl></div></article>
+      <article class="item"><div class="item-h"><h3>Boost sales create delivery debt with no pipeline</h3><div class="marks"><span class="chip c3">B3</span></div></div><div class="rows"><dl class="row fix"><dt>Fix</dt><dd>Order → brief → draft → risk review → client approval → publish → verify, as tracked states with owners. Build this in the same sprint as F1. Selling Boost without it turns the primary revenue goal into the primary support problem.</dd></dl></div></article>
+      <article class="item"><div class="item-h"><h3>Risk review isn’t a workflow state</h3><div class="marks"><span class="chip c3">B4</span></div></div><div class="rows"><dl class="row fix"><dt>Fix</dt><dd>Dental, medspa and senior-living claims need a human gate before publish. Today that is a sentence in a document. It should be a status that disables the publish control until a named reviewer clears it.</dd></dl></div></article>
+      <article class="item"><div class="item-h"><h3>No finding-to-revenue attribution</h3><div class="marks"><span class="chip c3">B5</span></div></div><div class="rows"><dl class="row fix"><dt>Fix</dt><dd>Stamp the originating check ID on every Boost order. Within a quarter you will know which of the 52 checks actually sells, and the audit can start leading with those.</dd></dl></div></article>
+      <article class="item"><div class="item-h"><h3>Multi-location and agency accounts are unmodelled</h3><div class="marks"><span class="chip c3">B6</span></div></div><div class="rows"><dl class="row fix"><dt>Fix</dt><dd>Roles, per-site billing, roll-up score reporting. Dental groups and realtor teams are the natural buyer for this product and they arrive with four to forty sites, not one.</dd></dl></div></article>
+      <article class="item"><div class="item-h"><h3>No stated policy for lapsed accounts</h3><div class="marks"><span class="chip c3">B7</span></div></div><div class="rows"><dl class="row fix"><dt>Fix</dt><dd>If a subscription ends, applied edits stay on the client’s site — they are improvements to property the client owns. Say that plainly at signup. It removes a real objection and costs you nothing, because the monitoring is what they were paying for.</dd></dl></div></article>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-h">
+      <p class="sec-n ui">Sequence</p>
+      <h2>What to build first, and why in this order</h2>
+    </div>
+    <div class="build">
+      <div>
+        <h4>Split the score and ask for the facts</h4>
+        <p>F2 with F3. Together they make the argument that content is the lever, using nothing but the audit the client already ran — before a single offer appears. Cheapest to build, and every later trigger depends on the bands existing.</p>
+      </div>
+      <div>
+        <h4>Turn Class C into an orderable offer, with fulfillment behind it</h4>
+        <p>F1 with B3. This is the primary revenue goal and it needs both halves shipped together. The front half without the back half sells work you cannot deliver; the back half without the front never gets an order.</p>
+      </div>
+      <div>
+        <h4>Ship the citation check</h4>
+        <p>F4, which unlocks F9 Trigger C. It converts a lint report into evidence, gives renewal something to stand on, and produces the single most persuasive sentence available to this product. Everything else in the register is real, and sequenced behind these three.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="rule"></div>
+
+  <section class="sec">
+    <div class="assume">
+      <h3 class="ui">What I assumed — correct these first</h3>
+      <ul>
+        <li><b>Grounded in the repo:</b> the 52-check rubric, the A/B/C action classes, the P0–P3 severities, the eight-step per-page workflow, the never-list, and the worked audit of <code>rt-website-2026</code>. Every gap above is anchored to one of those, so the register survives even where the flow below is wrong.</li>
+        <li><b>Strawman, not read from code:</b> the nine stage names, the screens, the teaser-scan entry point, the install step, and the queue behaviour. No Sitecraft implementation is in this repository — it holds the AEO knowledge base and nothing else.</li>
+        <li><b>Taken from your answers:</b> ReadTomato-hosted dashboard, client owner as primary user, back office as a second lane.</li>
+        <li><b>Assumed definition of Boost:</b> paid production of content Sitecraft identifies but cannot write within existing copy. If Boost means something else — amplification, distribution, ad spend — F1 and the whole locked-band argument need re-pointing, and that is the first thing to tell me.</li>
+        <li><b>Illustrative figures only:</b> the 44 / 27 / 29 score split and the point values in the examples. They demonstrate the mechanism, not a real audit.</li>
+      </ul>
+    </div>
+  </section>
+
+</div>
