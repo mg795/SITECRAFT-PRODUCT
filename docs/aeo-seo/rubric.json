@@ -1,0 +1,527 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "name": "sitecraft-aeo-seo-rubric",
+  "version": "1.0.0",
+  "description": "Machine-readable AEO/SEO visibility rubric for Sitecraft. Derived from the as-built ReadTomato standard (see README.md section 0 for provenance). All fixes are constrained to copy already present on the host page.",
+  "constraints": {
+    "copy_bound": "Every word emitted into user-visible content must be traceable to copy already present on the page.",
+    "no_fabrication": "Never invent facts, numbers, prices, credentials, dates, locations, ratings, or review counts.",
+    "idempotent": "Re-running against a fixed page must produce no further changes.",
+    "voice": "Compressed, high-signal, fragments over blocks. No inflated claims, agency cliche, or trend language."
+  },
+  "action_classes": {
+    "A": "Autonomous. Mechanical, reversible, introduces no new claims. Apply without asking.",
+    "B": "Propose. Involves rewording. Present a before/after diff and wait for approval.",
+    "C": "Flag only. Never auto-edit. Report with reason."
+  },
+  "severities": {
+    "P0": "Actively harmful or deceptive. Fix first.",
+    "P1": "Blocks visibility.",
+    "P2": "Materially weakens AEO.",
+    "P3": "Polish."
+  },
+  "checks": [
+    {
+      "id": "META-01",
+      "layer": "metadata",
+      "name": "Title present",
+      "severity": "P1",
+      "action_class": "A",
+      "detect": "head > title is absent or empty",
+      "fix": "Compose from the page H1, appending the brand suffix used site-wide."
+    },
+    {
+      "id": "META-02",
+      "layer": "metadata",
+      "name": "Title length 50-60 chars",
+      "severity": "P3",
+      "action_class": "A",
+      "detect": "title length < 50 or > 60",
+      "fix": "Reorder and trim existing words. Focus keyphrase near the front. Preserve brand suffix. Never pad with new claims.",
+      "source": "Locked 9-field standard, field 1."
+    },
+    {
+      "id": "META-03",
+      "layer": "metadata",
+      "name": "Focus keyphrase near front of title",
+      "severity": "P2",
+      "action_class": "A",
+      "detect": "focus keyphrase absent from title, or starts beyond character 30",
+      "fix": "Move the keyphrase forward by reordering existing title words."
+    },
+    {
+      "id": "META-04",
+      "layer": "metadata",
+      "name": "Meta description present",
+      "severity": "P1",
+      "action_class": "A",
+      "detect": "meta[name=description] absent or empty",
+      "fix": "Compose ONLY from sentences already on the page."
+    },
+    {
+      "id": "META-05",
+      "layer": "metadata",
+      "name": "Meta description length 140-155 chars",
+      "severity": "P3",
+      "action_class": "A",
+      "detect": "description length < 140 or > 155",
+      "fix": "Compress or extend using on-page sentences only.",
+      "source": "Locked 9-field standard, field 2."
+    },
+    {
+      "id": "META-06",
+      "layer": "metadata",
+      "name": "Focus keyphrase appears once in description",
+      "severity": "P2",
+      "action_class": "A",
+      "detect": "keyphrase count in description != 1",
+      "fix": "Rephrase to include exactly one natural occurrence."
+    },
+    {
+      "id": "META-07",
+      "layer": "metadata",
+      "name": "Canonical present, absolute, self-referencing",
+      "severity": "P1",
+      "action_class": "A",
+      "detect": "link[rel=canonical] absent, relative, or pointing off-page",
+      "fix": "Emit absolute self-referencing canonical matching site trailing-slash convention.",
+      "guard": "If an existing canonical points elsewhere deliberately, downgrade to class C - changing it may de-index a ranking page."
+    },
+    {
+      "id": "META-08",
+      "layer": "metadata",
+      "name": "Slug short, lowercase, keyword-rich",
+      "severity": "P3",
+      "action_class": "C",
+      "detect": "slug contains uppercase, underscores, stop-word runs, or exceeds 6 segments",
+      "fix": "Flag only. URL changes require redirects and are never autonomous.",
+      "source": "Locked 9-field standard, field 3."
+    },
+    {
+      "id": "META-09",
+      "layer": "metadata",
+      "name": "Exactly one focus keyphrase declared",
+      "severity": "P2",
+      "action_class": "B",
+      "detect": "focus keyphrase meta absent, or more than one primary phrase asserted",
+      "fix": "Derive the single dominant phrase from H1 plus first 100 words.",
+      "source": "Locked 9-field standard, field 4."
+    },
+    {
+      "id": "META-10",
+      "layer": "metadata",
+      "name": "Related keyphrases present",
+      "severity": "P3",
+      "action_class": "B",
+      "detect": "related keyphrases meta absent or fewer than 3 terms",
+      "fix": "Extract supporting variations and intent terms already used in the body copy.",
+      "source": "Locked 9-field standard, field 5."
+    },
+    {
+      "id": "META-11",
+      "layer": "metadata",
+      "name": "Excerpt 20-30 words",
+      "severity": "P3",
+      "action_class": "B",
+      "detect": "excerpt absent or word count outside 20-30",
+      "fix": "Compress the lead paragraph.",
+      "source": "Locked 9-field standard, field 6."
+    },
+    {
+      "id": "META-12",
+      "layer": "metadata",
+      "name": "Single primary category",
+      "severity": "P3",
+      "action_class": "B",
+      "detect": "category absent or multiple primary categories asserted",
+      "fix": "Assign one bucket from the site's existing taxonomy.",
+      "source": "Locked 9-field standard, field 7."
+    },
+    {
+      "id": "META-13",
+      "layer": "metadata",
+      "name": "Tags 5-8 terms",
+      "severity": "P3",
+      "action_class": "B",
+      "detect": "tag count outside 5-8",
+      "fix": "Draw from taxonomy terms already used elsewhere on the site.",
+      "source": "Locked 9-field standard, field 8."
+    },
+    {
+      "id": "META-14",
+      "layer": "metadata",
+      "name": "Featured image alt describes image and names topic",
+      "severity": "P2",
+      "action_class": "A",
+      "detect": "og:image:alt absent, or does not reference the page topic",
+      "fix": "Describe the image actually referenced, naming the page topic.",
+      "source": "Locked 9-field standard, field 9."
+    },
+    {
+      "id": "META-15",
+      "layer": "metadata",
+      "name": "Robots directive sane",
+      "severity": "P0",
+      "action_class": "A",
+      "detect": "meta[name=robots] contains noindex or nofollow on a page intended to rank",
+      "fix": "Restore index,follow with max-image-preview:large, max-snippet:-1, max-video-preview:-1.",
+      "guard": "If noindex appears deliberate (staging, thin utility page), flag as class C instead."
+    },
+    {
+      "id": "META-16",
+      "layer": "metadata",
+      "name": "Open Graph block complete",
+      "severity": "P2",
+      "action_class": "A",
+      "detect": "any of og:type, og:title, og:description, og:url, og:image, og:site_name absent",
+      "fix": "Mirror the page's own title, description, canonical URL and hero image."
+    },
+    {
+      "id": "META-17",
+      "layer": "metadata",
+      "name": "Twitter card block complete",
+      "severity": "P3",
+      "action_class": "A",
+      "detect": "twitter:card, twitter:title, twitter:description or twitter:image absent",
+      "fix": "Mirror the Open Graph values. Card type summary_large_image."
+    },
+    {
+      "id": "META-18",
+      "layer": "metadata",
+      "name": "OG/Twitter values match page content",
+      "severity": "P1",
+      "action_class": "A",
+      "detect": "og:title or og:image disagrees with the page H1 or rendered hero image",
+      "fix": "Repoint social metadata at the page's actual title and hero image."
+    },
+    {
+      "id": "SCHEMA-01",
+      "layer": "structured_data",
+      "name": "JSON-LD parses",
+      "severity": "P1",
+      "action_class": "A",
+      "detect": "any script[type='application/ld+json'] fails JSON parse",
+      "fix": "Repair syntax without altering values."
+    },
+    {
+      "id": "SCHEMA-02",
+      "layer": "structured_data",
+      "name": "Primary entity schema present",
+      "severity": "P1",
+      "action_class": "A",
+      "detect": "no Article, WebPage, Service, Product or LocalBusiness node on a substantive page",
+      "fix": "Emit the type matching the page's role, populated strictly from on-page values."
+    },
+    {
+      "id": "SCHEMA-03",
+      "layer": "structured_data",
+      "name": "BreadcrumbList present and correct",
+      "severity": "P2",
+      "action_class": "A",
+      "detect": "BreadcrumbList absent, or positions do not match the site's real nav path",
+      "fix": "Derive from the actual nav hierarchy. Final item carries name without item."
+    },
+    {
+      "id": "SCHEMA-04",
+      "layer": "structured_data",
+      "name": "@id graph internally consistent",
+      "severity": "P1",
+      "action_class": "A",
+      "detect": "author or publisher @id reference does not resolve to a defined node; duplicate @id; orphan node",
+      "fix": "Repoint references to existing nodes. Never invent a node to satisfy a reference.",
+      "source": "As-built pattern: author Person @id with worksFor pointing at #organization."
+    },
+    {
+      "id": "SCHEMA-05",
+      "layer": "structured_data",
+      "name": "Dates ISO-8601 with offset, dateModified >= datePublished",
+      "severity": "P2",
+      "action_class": "A",
+      "detect": "date fields not ISO-8601, missing UTC offset, or dateModified earlier than datePublished",
+      "fix": "Normalise format only. Never invent or advance a date."
+    },
+    {
+      "id": "SCHEMA-06",
+      "layer": "structured_data",
+      "name": "ImageObject dimensions declared",
+      "severity": "P3",
+      "action_class": "A",
+      "detect": "ImageObject lacks width/height",
+      "fix": "Declare the image's real dimensions. Site convention is 1200x630 for social/article images."
+    },
+    {
+      "id": "SCHEMA-07",
+      "layer": "structured_data",
+      "name": "Schema claims match visible content",
+      "severity": "P0",
+      "action_class": "A",
+      "detect": "headline, description, author or date in schema contradicts the rendered page",
+      "fix": "Correct the schema to match the page. Never change the page to match the schema."
+    },
+    {
+      "id": "SCHEMA-08",
+      "layer": "structured_data",
+      "name": "FAQPage schema over visible Q&A",
+      "severity": "P2",
+      "action_class": "B",
+      "detect": "page contains a visible Q&A block with no FAQPage markup",
+      "fix": "Mark up the questions and answers exactly as they appear on the page.",
+      "guard": "Only over Q&A visibly present. Never mark up an FAQ the visitor cannot see."
+    },
+    {
+      "id": "SCHEMA-09",
+      "layer": "structured_data",
+      "name": "Organization node consistent site-wide",
+      "severity": "P2",
+      "action_class": "A",
+      "detect": "org name, telephone, email or logo differs between pages",
+      "fix": "Reconcile against the canonical Organization node."
+    },
+    {
+      "id": "SCHEMA-10",
+      "layer": "structured_data",
+      "name": "AggregateRating and Review integrity",
+      "severity": "P0",
+      "action_class": "C",
+      "detect": "rating markup present without corresponding visible reviews, or counts disagree with visible review count",
+      "fix": "FLAG ONLY. Never generate, extrapolate, alter or inflate rating values or review counts under any circumstance.",
+      "guard": "Highest-risk check in the rubric. Fabricated review markup is a manual-action offence and a legal exposure."
+    },
+    {
+      "id": "AEO-01",
+      "layer": "answer_shaped_content",
+      "name": "Exactly one H1",
+      "severity": "P1",
+      "action_class": "A",
+      "detect": "H1 count != 1",
+      "fix": "Re-tag surplus H1s to H2. Never re-word."
+    },
+    {
+      "id": "AEO-02",
+      "layer": "answer_shaped_content",
+      "name": "No heading level skips",
+      "severity": "P2",
+      "action_class": "A",
+      "detect": "heading tree skips a level (e.g. H2 followed by H4)",
+      "fix": "Re-tag to close the gap. Structural change only."
+    },
+    {
+      "id": "AEO-03",
+      "layer": "answer_shaped_content",
+      "name": "H2s are declarative claims, not labels",
+      "severity": "P2",
+      "action_class": "B",
+      "detect": "H2 is a bare noun phrase under ~4 words, or a generic label such as 'Our Process', 'Services', 'About'",
+      "fix": "Rewrite as a standalone assertion an answer engine can quote, using only claims the page already supports.",
+      "source": "As-built across all 7 blog posts. Example: 'Proof Beats Promises Because It Shortens Research'.",
+      "note": "Highest-leverage AEO pattern in the codebase."
+    },
+    {
+      "id": "AEO-04",
+      "layer": "answer_shaped_content",
+      "name": "Direct answer within first 100 words",
+      "severity": "P2",
+      "action_class": "B",
+      "detect": "opening does not state a definition, answer or thesis before elaborating",
+      "fix": "Assemble a lead from content already present further down the page."
+    },
+    {
+      "id": "AEO-05",
+      "layer": "answer_shaped_content",
+      "name": "Paragraphs under ~80 words",
+      "severity": "P2",
+      "action_class": "A",
+      "detect": "paragraph exceeds 80 words",
+      "fix": "Split at existing sentence boundaries. No re-wording.",
+      "source": "Doctrine: 'short paragraphs'; 'prefer fragments over blocks'."
+    },
+    {
+      "id": "AEO-06",
+      "layer": "answer_shaped_content",
+      "name": "One idea per section",
+      "severity": "P2",
+      "action_class": "B",
+      "detect": "a section under one H2 introduces more than one distinct claim",
+      "fix": "Split into separate sections, each with its own claim H2.",
+      "source": "Doctrine: 'Teach one thing. Then stop.'"
+    },
+    {
+      "id": "AEO-07",
+      "layer": "answer_shaped_content",
+      "name": "FAQ answers 40-60 words",
+      "severity": "P2",
+      "action_class": "B",
+      "detect": "FAQ-shaped answer outside the 40-60 word band",
+      "fix": "Compress or expand using material already on the page.",
+      "source": "Stated verbatim in our own copy: 'Rewrite your top 10 FAQs as 40-60 word answers.'"
+    },
+    {
+      "id": "AEO-08",
+      "layer": "answer_shaped_content",
+      "name": "Execution block present on long-form pages",
+      "severity": "P3",
+      "action_class": "B",
+      "detect": "page over ~700 words with no numbered steps or checklist block",
+      "fix": "Convert steps already described in prose into an ordered list. Never invent steps.",
+      "source": "As-built in every blog post."
+    },
+    {
+      "id": "AEO-09",
+      "layer": "answer_shaped_content",
+      "name": "Specificity over generic advice",
+      "severity": "P2",
+      "action_class": "C",
+      "detect": "page's core claims would apply unchanged to any city, business or vertical",
+      "fix": "FLAG. Adding real specifics requires facts the page does not contain.",
+      "source": "Doctrine: 'If your advice could apply to any city, AI will not pick you.'"
+    },
+    {
+      "id": "AEO-10",
+      "layer": "answer_shaped_content",
+      "name": "Descriptive anchor text",
+      "severity": "P3",
+      "action_class": "A",
+      "detect": "anchor text is 'click here', 'read more', 'learn more' with no context",
+      "fix": "Replace with the destination page's actual topic."
+    },
+    {
+      "id": "EEAT-01",
+      "layer": "entity_trust",
+      "name": "Author byline present",
+      "severity": "P2",
+      "action_class": "C",
+      "detect": "substantive editorial page has no named author",
+      "fix": "FLAG. Author identity is never assigned autonomously."
+    },
+    {
+      "id": "EEAT-02",
+      "layer": "entity_trust",
+      "name": "Author bio describes the named author",
+      "severity": "P1",
+      "action_class": "C",
+      "detect": "bio text names or describes a different person than the byline, or the same bio appears under multiple distinct bylines",
+      "fix": "FLAG. Never rewrite a person's biography.",
+      "note": "Live instance in rt-website-2026: one bio beginning 'Marshall leads new business development...' appears under six different bylines while Person schema declares distinct @ids - structured data and visible content contradict each other."
+    },
+    {
+      "id": "EEAT-03",
+      "layer": "entity_trust",
+      "name": "Author @id stable across pages",
+      "severity": "P2",
+      "action_class": "A",
+      "detect": "the same person carries different @id values on different pages",
+      "fix": "Reconcile to the single canonical Person @id."
+    },
+    {
+      "id": "EEAT-04",
+      "layer": "entity_trust",
+      "name": "Data claims carry a visible source",
+      "severity": "P2",
+      "action_class": "C",
+      "detect": "statistic or data claim appears with no named source",
+      "fix": "FLAG. Sourcing requires facts not present on the page.",
+      "source": "Doctrine: 'Proof beats promises because it shortens research.'"
+    },
+    {
+      "id": "EEAT-05",
+      "layer": "entity_trust",
+      "name": "Regulated-vertical claims reviewed",
+      "severity": "P0",
+      "action_class": "C",
+      "detect": "medical, dental, financial or care claims that imply outcomes, guarantees or clinical results",
+      "fix": "FLAG for legal/clinical review. Never auto-edit."
+    },
+    {
+      "id": "TECH-01",
+      "layer": "technical",
+      "name": "lang attribute present",
+      "severity": "P2",
+      "action_class": "A",
+      "detect": "html element lacks lang",
+      "fix": "Set from the site's declared locale."
+    },
+    {
+      "id": "TECH-02",
+      "layer": "technical",
+      "name": "Single canonical per page",
+      "severity": "P1",
+      "action_class": "A",
+      "detect": "more than one link[rel=canonical]",
+      "fix": "Retain the self-referencing one, remove duplicates."
+    },
+    {
+      "id": "TECH-03",
+      "layer": "technical",
+      "name": "All images carry alt",
+      "severity": "P2",
+      "action_class": "A",
+      "detect": "img element without an alt attribute",
+      "fix": "Describe the image actually referenced. Decorative images take alt=\"\"."
+    },
+    {
+      "id": "TECH-04",
+      "layer": "technical",
+      "name": "Alt text matches the image actually rendered",
+      "severity": "P1",
+      "action_class": "A",
+      "detect": "alt text describes a subject inconsistent with the image src, or duplicated from another page",
+      "fix": "Rewrite alt to describe the referenced image.",
+      "note": "Live instance in rt-website-2026: blog/ai-search-for-seattle-real-estate-leads.html hero src and alt are both carried over from the trust-in-high-ticket-decisions post, contradicting og:image and Article schema."
+    },
+    {
+      "id": "TECH-05",
+      "layer": "technical",
+      "name": "Internal links resolve",
+      "severity": "P2",
+      "action_class": "A",
+      "detect": "internal href returns 404 or points at a non-existent file",
+      "fix": "Repoint to the correct existing page, or flag if no equivalent exists."
+    },
+    {
+      "id": "TECH-06",
+      "layer": "technical",
+      "name": "OG image resolves",
+      "severity": "P2",
+      "action_class": "A",
+      "detect": "og:image URL does not resolve",
+      "fix": "Repoint at the page's real hero image."
+    },
+    {
+      "id": "TECH-07",
+      "layer": "technical",
+      "name": "Heading anchor IDs unique",
+      "severity": "P3",
+      "action_class": "A",
+      "detect": "duplicate id attributes",
+      "fix": "Disambiguate by suffix."
+    },
+    {
+      "id": "TECH-08",
+      "layer": "technical",
+      "name": "Page reachable from nav or hub",
+      "severity": "P2",
+      "action_class": "C",
+      "detect": "page has no inbound internal links",
+      "fix": "FLAG. Adding nav entries is an information-architecture decision."
+    },
+    {
+      "id": "TECH-09",
+      "layer": "technical",
+      "name": "No keyphrase cannibalisation",
+      "severity": "P2",
+      "action_class": "C",
+      "detect": "two or more pages declare the same focus keyphrase",
+      "fix": "FLAG. Re-targeting a ranking page is never autonomous."
+    }
+  ],
+  "workflow": [
+    {"step": 1, "name": "PARSE", "detail": "Extract metadata, schema graph, heading tree, and a copy inventory of every claim on the page."},
+    {"step": 2, "name": "AUDIT", "detail": "Run all checks. Emit findings with check id and severity."},
+    {"step": 3, "name": "CLASSIFY", "detail": "Assign each finding its action class (A/B/C)."},
+    {"step": 4, "name": "APPLY", "detail": "Execute class A automatically, P0 to P3 in order."},
+    {"step": 5, "name": "PROPOSE", "detail": "Present class B as before/after diffs with the check id as rationale."},
+    {"step": 6, "name": "FLAG", "detail": "Report class C with the reason it cannot be auto-fixed."},
+    {"step": 7, "name": "VERIFY", "detail": "Re-parse. Confirm JSON-LD valid, copy claims unchanged, no regressions, changes idempotent."},
+    {"step": 8, "name": "REPORT", "detail": "What changed, what needs a decision, what is blocked."}
+  ]
+}
