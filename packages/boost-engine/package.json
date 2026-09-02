@@ -1,0 +1,15 @@
+{
+  "name": "@sitecraft/boost-engine",
+  "version": "0.1.0",
+  "description": "AEO/SEO audit engine for the Sitecraft edit view. Runs the rubric checks and gates every rewrite through the copy-bound verifier.",
+  "type": "module",
+  "main": "src/audit.js",
+  "exports": {
+    ".": "./src/audit.js",
+    "./checks": "./src/checks.js",
+    "./verify": "./src/verify.js",
+    "./diff": "./src/diff.js"
+  },
+  "scripts": { "test": "node --test test/" },
+  "license": "UNLICENSED"
+}
