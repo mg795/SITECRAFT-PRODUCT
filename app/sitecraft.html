@@ -90,13 +90,8 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .scrim{position:fixed;inset:0;background:rgba(12,18,28,.4);z-index:70;display:none}
 .scrim.open{display:block}
 .pan{position:fixed;left:50%;top:50%;transform:translate(-50%,-48%) scale(.98);width:min(27rem,calc(100vw - 1.5rem));max-height:92vh;height:auto;background:var(--card);border-radius:14px;box-shadow:var(--sh);z-index:80;display:grid;grid-template-rows:auto 1fr;opacity:0;pointer-events:none;transition:opacity .16s,transform .16s;overflow:hidden}
-.pan.open{opacity:1;pointer-events:auto;transform:translate(calc(-50% + var(--swipe,0px)),-50%) scale(1)}
-.pan.open.moved{transform:translate(var(--swipe,0px),0)}
-.pan.swiping{transition:none;cursor:grabbing}
-@keyframes slidein{from{opacity:.35;transform:translate(calc(-50% + var(--from,26px)),-50%)}
-                   to{opacity:1;transform:translate(-50%,-50%)}}
-.pan.open.slide{animation:slidein .22s cubic-bezier(.32,.72,.32,1)}
-.pan.open.moved.slide{animation:none}
+.pan.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+.pan.open.moved{transform:none}
 .pan.moved{transition:opacity .16s}
 .pan.dragging{transition:none}
 .p-hd{position:relative;padding:.85rem 1.1rem .3rem;display:flex;align-items:center;gap:.5rem;cursor:grab;user-select:none}
@@ -108,14 +103,18 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .flagchip.v3{color:var(--red)}
 .flagchip.v2{color:var(--ink-2)}
 .flagchip.v1{color:var(--faint)}
-.qmark{border:1.5px solid var(--green);background:var(--card);color:var(--green-d);width:1.05rem;height:1.05rem;border-radius:50%;font-size:.64rem;font-weight:800;line-height:1;padding:0;display:inline-grid;place-items:center;vertical-align:middle;flex:none;transition:background .12s,color .12s}
+.qmark{border:1.5px solid var(--green);background:var(--card);color:var(--green-d);width:1.05rem;height:1.05rem;border-radius:50%;font-size:.64rem;font-weight:800;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;line-height:1;flex:none;transition:background .12s,color .12s}
+.qmark::before{content:'?';display:block;transform:translateY(0.5px)}
 .qmark:hover,.qmark:focus-visible{background:var(--green);color:#fff}
 .flagchip .qmark{margin-left:.28rem}
 /* the header tooltip, capped at two lines so it can never wreck the panel */
 .headtip{position:absolute;top:2.3rem;left:1.1rem;right:1.1rem;z-index:9;background:var(--bar);color:#fff;font-size:.75rem;line-height:1.4;border-radius:8px;padding:.42rem .6rem;opacity:0;pointer-events:none;transition:opacity .12s;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .headtip.on{opacity:1}
-.p-x{margin-left:auto;border:0;background:transparent;color:var(--green);font-size:1.05rem;line-height:1;font-weight:800;padding:0 .1rem;flex:none}
+.p-back{margin-left:auto;border:0;background:transparent;color:var(--green);font-size:1.05rem;line-height:1;font-weight:800;padding:0 .1rem;flex:none}
+.p-back[hidden]+.p-x{margin-left:auto}
+.p-back:hover,.p-x:hover{color:var(--green-d)}
+.p-x{border:0;background:transparent;color:var(--green);font-size:1.05rem;line-height:1;font-weight:800;padding:0 .1rem 0 .55rem;flex:none}
 .p-bd{overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none;padding:.9rem 1.05rem 1.05rem;display:flex;flex-direction:column;gap:.7rem}
 .p-bd::-webkit-scrollbar{display:none}
 .p-ft{font-size:.68rem;color:var(--faint);text-align:center;padding-top:.35rem}
@@ -209,7 +208,8 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .tipline.on{opacity:1}
 .tipline b{color:#9BD35F;font-weight:700}
-.ca-hd .ca-q{margin-left:auto;flex:none}
+.ca-hd .ca-q{flex:none}
+.ca-hd .ca-nm{flex:none}
 .tile .tl .qmark{width:.88rem;height:.88rem;font-size:.56rem;margin-left:.22rem}
 .tagrow2{display:flex;gap:.3rem;flex-wrap:nowrap;overflow:hidden;align-items:center;min-height:1.35rem}
 .tag0,.tag1,.tagadd{font-size:.7rem;font-weight:600;padding:.14rem .5rem;border-radius:999px;white-space:nowrap;flex:none}
@@ -223,6 +223,17 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .ba.up{padding-top:.55rem;border-top:1px solid var(--rule-2)}
 .lab.up{color:var(--green-ink)}
 .box.upbox{background:var(--green-pale);color:var(--green-x);font-weight:500}
+.rec.quiet{font-size:.74rem;font-weight:500;color:var(--mut)}
+.rec.quiet span{color:var(--mut)}
+/* the previous stage stays on screen, compressed, so the new one reads as growth */
+.ba.squash{display:grid;gap:.25rem;padding:.45rem .55rem;background:var(--sunk);border-radius:9px}
+.ba.squash .cline{display:flex;align-items:center;gap:.5rem;min-width:0}
+.ba.squash .lab{flex:none;font-size:.55rem;color:var(--mut)}
+.ba.squash .ctext{font-size:.76rem;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.tagrow2.mini{min-height:0}
+.tagrow2.mini .tag0,.tagrow2.mini .tag1{font-size:.62rem;padding:.06rem .38rem}
+.tagrow2.mini .tagadd{display:none}
+.tile,.tile .tv,.tile .tl,.tile .tu{transition:background .55s,color .55s}
 .rec{font-size:.83rem;font-weight:700;color:var(--navy);text-align:center;line-height:1.45}
 .rec span{color:var(--red)}
 
@@ -310,7 +321,7 @@ body.editing nav.site{margin-top:1.6rem}
 
 <div class="scrim" id="scrim"></div>
 <div class="pan" id="pan" role="dialog" aria-modal="true">
-  <div class="p-hd"><div class="ttl" id="p-ttl"></div><div class="headtip" id="headtip"></div><button class="p-x" id="p-x" aria-label="Close">✕</button></div>
+  <div class="p-hd"><div class="ttl" id="p-ttl"></div><div class="headtip" id="headtip"></div><button class="p-back" id="p-back" aria-label="Back" hidden>&#8592;</button><button class="p-x" id="p-x" aria-label="Close">✕</button></div>
   <div class="p-bd" id="p-bd"></div>
 </div>
 
@@ -369,19 +380,22 @@ const SITE = {
 };
 const SCORE_NM = ['AI retrieval','AEO optimized','SEO optimized'];
 const TAGS_AFTER = {
-  img:  ['ImageObject', 'Caption', 'Alt text'],
-  h1:   ['Page subject', 'Heading level'],
-  h2:   ['Section subject', 'Heading level'],
-  p:    ['Answer block', 'Article body'],
-  kick: ['Place', 'Category'],
+  img:  ['ImageObject', 'Caption', 'Alt text', 'Subject', 'Location'],
+  h1:   ['Page subject', 'Heading level', 'Service', 'Location'],
+  h2:   ['Section subject', 'Heading level', 'Service'],
+  p:    ['Answer block', 'Article body', 'Topic'],
+  kick: ['Place', 'Category', 'Region'],
   band: [],
 };
+/* a boost must always land at least two tags ahead of whatever is there,
+   so the gap stays visible however many the client adds themselves */
+const maxUserTags = c => Math.max(0, (TAGS_AFTER[c.t] || []).length - 2);
 const TAG_SUGGEST = {
-  img:  ['Interior', 'Team', 'Location'],
-  h1:   ['Service', 'Location'],
+  img:  ['Interior', 'Team', 'Room'],
+  h1:   ['Service', 'Area', 'Practice'],
   h2:   ['Service', 'Treatment'],
   p:    ['Service', 'Practice'],
-  kick: ['Location', 'Category'],
+  kick: ['Area', 'Category'],
   band: [],
 };
 const SCORE_TL = ['AI RETRIEVAL','AEO OPTIMIZED','SEO OPTIMIZED'];
@@ -462,8 +476,11 @@ function bdg(){
 }
 
 /* ═══════════ panel ═══════════ */
-function open({ttl, flag, body}){
-  $('#p-ttl').innerHTML = (ttl||'') + (flag?` <span class="dot">·</span> <span class="flagchip ${flag.cls}">${flag.label}<button class="qmark" data-help="${esc(flag.help)}" aria-label="What is a ${flag.label}?">?</button></span>`:'');
+function open({ttl, flag, body, back}){
+  $('#p-ttl').innerHTML = (ttl||'') + (flag?` <span class="dot">·</span> <span class="flagchip ${flag.cls}">${flag.label}<button class="qmark" data-help="${esc(flag.help)}" aria-label="What is a ${flag.label}?"></button></span>`:'');
+  const bk = $('#p-back');
+  bk.hidden = !back;
+  bk.onclick = () => stepBack();
   $('#p-bd').innerHTML = body || '';
   $('#toast').hidden = true; clearTimeout(toast._t);
   const pan = $('#pan');
@@ -569,7 +586,7 @@ function scores(c, proj){
   const shown = proj && up ? up : cur;
   const badge = (proj ? avg(up) : avg(cur)).toFixed(1);
   const tiles = shown.map((v,i)=>`<div class="tile ${proj?'up':''}">
-      <span class="tl">${SCORE_TL[i]}<button class="qmark" data-tip="${i}" aria-label="What is ${SCORE_NM[i]}?">?</button></span>
+      <span class="tl">${SCORE_TL[i]}<button class="qmark" data-tip="${i}" aria-label="What is ${SCORE_NM[i]}?"></button></span>
       <span class="tv">${v.toFixed(1)}</span><span class="tu">/10</span>${proj?`<span class="tp">was ${cur[i].toFixed(1)}</span><span class="tw">Projected</span>`:''}
     </div>`).join('');
 
@@ -577,7 +594,8 @@ function scores(c, proj){
   const isImg = c.t === 'img';
   const nowText = isImg ? (c.alt || 'No description yet') : c.text;
   const mine = c.userTags || (c.userTags = []);
-  const left = (TAG_SUGGEST[c.t] || []).filter(t => !mine.includes(t)).slice(0, 3 - mine.length);
+  const room = maxUserTags(c) - mine.length;
+  const left = room > 0 ? (TAG_SUGGEST[c.t] || []).filter(t => !mine.includes(t)).slice(0, room) : [];
   const tagsNow = (mine.length ? mine.map(t=>`<span class="tag1 tagmine">${t}</span>`).join('')
                                : '<span class="tag0">None yet</span>')
     + left.map(t=>`<button class="tagadd" data-addtag="${t}">+ ${t}</button>`).join('');
@@ -587,27 +605,53 @@ function scores(c, proj){
     <div class="ca-hd ${proj?'up':''}">
       <span class="ca-sc">${badge}</span>
       <span class="ca-nm"><b>${esc(tc(c.lbl))} Content Analysis</b></span>
-      <button class="qmark ca-q" data-tip="head" aria-label="What is this?">?</button>
+      <button class="qmark ca-q" data-tip="head" aria-label="What is this?"></button>
     </div>
     <div class="ca-bd">
       <div class="tilewrap"><div class="tiles">${tiles}</div>
         <div class="tipline" id="tip"></div></div>
-      ${c.rec?`<div class="rec"><span>Right now:</span> ${esc(c.rec)}</div>`:''}
+      ${c.rec?`<div class="rec ${proj?'quiet':''}"><span>Right now:</span> ${esc(c.rec)}</div>`:''}
 
-      <div class="ba">
+      ${proj ? `<div class="ba squash">
+        <div class="cline"><span class="lab">Current ${isImg?'Description':'Words'}</span><span class="ctext">${esc(nowText)}</span></div>
+        <div class="cline"><span class="lab">Current Tags</span><span class="tagrow2 mini">${tagsNow}</span></div>
+      </div>` : `<div class="ba">
         <div class="lab">Current ${isImg?'Description':'Words'}</div>
         <div class="box">${esc(nowText)}</div>
         <div class="lab">Current Tags</div>
         <div class="tagrow2">${tagsNow}</div>
-      </div>
+      </div>`}
 
       ${proj ? `<div class="ba up">
         <div class="lab up">After the Boost</div>
-        <div class="box upbox">${esc(isImg ? c.up : c.up)}</div>
+        <div class="box upbox">${esc(c.up)}</div>
         <div class="lab up">Tags It Would Get</div>
         <div class="tagrow2">${tagsUp || '<span class="tag1">Structured markup</span>'}</div>
       </div>` : ''}
     </div></div>`;
+}
+
+/* the numbers roll up in place, the way a slot machine settles */
+function rollScores(c){
+  const tv = [...document.querySelectorAll('.tile .tv')];
+  const badge = document.querySelector('.ca-sc');
+  if (!tv.length) return;
+  const from = c.s, to = c.u, a = avg(from), b = avg(to);
+  const clamp = v => Math.max(0, Math.min(10, v)).toFixed(1);
+  const DUR = 780, t0 = performance.now();
+  const tick = now => {
+    const p = Math.min(1, (now - t0) / DUR);
+    const e = 1 - Math.pow(1 - p, 3);
+    const jitter = (1 - e) * 1.7;
+    tv.forEach((el, i) => {
+      el.textContent = p > .84 ? clamp(to[i])
+        : clamp(from[i] + (to[i] - from[i]) * e + (Math.random() - .5) * jitter);
+    });
+    if (badge) badge.textContent = p > .84 ? clamp(b)
+      : clamp(a + (b - a) * e + (Math.random() - .5) * jitter);
+    if (p < 1) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
 }
 
 /* the tooltip line: one place that speaks only when asked */
@@ -639,8 +683,6 @@ function editP(id){
   flow();
 }
 
-let lastStage = '';
-function stageKey(F){ return [F.id, !!F.photo, F.desc !== null, F.words !== null, !!F.analysed, !!F.previewed].join('|'); }
 function flow(){
   const c = comp(S.flow.id), F = S.flow, img = c.t === 'img';
   if (c.blocked) return blockedP(c.id);
@@ -700,14 +742,8 @@ function flow(){
     : ((img && !F.photo && F.desc === null) || (!img && F.words === null)
         ? '' : `<button class="ghost" id="sv">Boost This ${esc(shortOf(c))} Later</button>`);
 
-  const key = stageKey(F), fwd = key > lastStage;
-  open({ ttl: hdr(c), flag: flagOf(c), body: parts.join('') + cta + secondary });
-  if (key !== lastStage){
-    const pan = $('#pan');
-    pan.style.setProperty('--from', (fwd ? 26 : -26) + 'px');
-    pan.classList.remove('slide'); void pan.offsetWidth; pan.classList.add('slide');
-    lastStage = key;
-  }
+  open({ ttl: hdr(c), flag: flagOf(c), back: canStepBack(), body: parts.join('') + cta + secondary });
+  if (F.previewed && !F.rolled){ F.rolled = true; rollScores(c); }
 
   /* ── wiring ── */
   const re = document.querySelector('[data-re]');
@@ -1092,8 +1128,7 @@ function guide(){
   ['pointerup','pointercancel'].forEach(k => hd.addEventListener(k, () => { d = null; pan.classList.remove('dragging'); }));
 })();
 
-/* the stages behave like an iPhone carousel: drag the panel sideways to move
-   between them. Back is always allowed; forward only where a next step exists. */
+/* stage navigation, driven by the back arrow in the header */
 function canStepBack(){
   const F = S.flow; if (!F) return false;
   const c = comp(F.id); if (!c) return false;
@@ -1102,64 +1137,12 @@ function canStepBack(){
 }
 function stepBack(){
   const F = S.flow, c = comp(F.id);
-  if (F.previewed) F.previewed = false;
+  if (F.previewed){ F.previewed = false; F.rolled = false; }
   else if (F.analysed) F.analysed = false;
   else if (c.t === 'img' && F.desc !== null) F.desc = null;
   else if (c.t === 'img' && F.photo) { c.src = F.wasSrc || null; c.fit = F.wasFit || null; F.photo = null; draw(); }
   flow();
 }
-function canStepFwd(){
-  const F = S.flow; if (!F) return false;
-  const c = comp(F.id); if (!c) return false;
-  if (!F.analysed) return true;
-  return !F.previewed && canBoost(c) && !isBoosted(c.id);
-}
-function stepFwd(){
-  const F = S.flow, c = comp(F.id);
-  if (!F.analysed) F.analysed = true;
-  else if (!F.previewed) F.previewed = true;
-  flow();
-}
-
-(function(){
-  const pan = $('#pan');
-  const SKIP = 'button,input,textarea,select,[contenteditable],.crop,.p-hd';
-  let sw = null;
-  const EDGE = 26;   /* an iPhone-style edge zone, so a swipe is always available
-                        even where the panel is wall-to-wall controls */
-  pan.addEventListener('pointerdown', e => {
-    if (!S.flow) return;
-    const r = pan.getBoundingClientRect();
-    const onEdge = (e.clientX - r.left) < EDGE || (r.right - e.clientX) < EDGE;
-    if (!onEdge && e.target.closest(SKIP)) return;
-    if (onEdge) e.stopPropagation();          /* the edge beats whatever sits under it */
-    sw = { x:e.clientX, y:e.clientY, dx:0, live:false };
-  }, true);
-  pan.addEventListener('pointermove', e => {
-    if (!sw) return;
-    const dx = e.clientX - sw.x, dy = e.clientY - sw.y;
-    if (!sw.live){
-      if (Math.abs(dx) < 12 || Math.abs(dx) < Math.abs(dy)) return;   // let vertical gestures be
-      sw.live = true; pan.classList.add('dragging');
-      try { pan.setPointerCapture(e.pointerId); } catch (_) {}
-    }
-    /* resist the direction that has nowhere to go */
-    const room = dx > 0 ? (canStepBack() ? 1 : .25) : (canStepFwd() ? 1 : .25);
-    sw.dx = dx * room;
-    pan.style.setProperty('--swipe', sw.dx + 'px');
-    pan.classList.add('swiping');
-  });
-  const end = () => {
-    if (!sw){ return; }
-    const dx = sw.dx; sw = null;
-    pan.classList.remove('dragging','swiping');
-    pan.style.removeProperty('--swipe');
-    if (dx > 70 && canStepBack()) stepBack();
-    else if (dx < -70 && canStepFwd()) stepFwd();
-  };
-  ['pointerup','pointercancel'].forEach(k => pan.addEventListener(k, end));
-})();
-
 document.querySelectorAll('.bar [data-mode]').forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
 document.querySelector('[data-done]').onclick = done;
 $('#p-x').onclick = ()=> ['review','account','ident'].includes(S.mode) ? setMode(S.mode) : shut();
