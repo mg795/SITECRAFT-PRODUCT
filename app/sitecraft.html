@@ -97,13 +97,13 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .p-hd .ttl{font-size:.72rem;font-weight:600;color:var(--mut);line-height:1.3;min-width:0;display:flex;align-items:center;gap:.34rem;flex-wrap:wrap;letter-spacing:.005em}
 .p-hd .ttl i{font-style:normal;color:var(--faint);font-weight:500}
 .p-hd .dot{color:var(--rule);font-weight:400}
-.flagchip{display:inline-flex;align-items:center;font-size:.72rem;font-weight:700;padding:.05rem .45rem;border-radius:999px;white-space:nowrap}
-.flagchip.v3{color:var(--amber-ink);background:var(--amber-bg)}
-.flagchip.v2{color:var(--ink-2);background:var(--sunk)}
-.flagchip.v1{color:var(--faint);background:var(--sunk)}
+.flagchip{display:inline-flex;align-items:center;font-size:.72rem;font-weight:700;white-space:nowrap}
+.flagchip.v3{color:var(--red)}
+.flagchip.v2{color:var(--ink-2)}
+.flagchip.v1{color:var(--faint)}
 .p-x{margin-left:auto;border:0;background:transparent;color:var(--green);font-size:1.05rem;line-height:1;font-weight:800;padding:0 .1rem;flex:none}
 .p-bd{overflow-y:auto;padding:.9rem 1.05rem 1.05rem;display:flex;flex-direction:column;gap:.7rem}
-.p-ft{font-size:.68rem;color:var(--faint);text-align:center;padding-top:.2rem;border-top:1px solid var(--rule-2);margin-top:.15rem}
+.p-ft{font-size:.68rem;color:var(--faint);text-align:center;padding-top:.35rem}
 .p-ft u{cursor:pointer}
 
 /* buttons */
@@ -160,15 +160,15 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .note-amber b{font-weight:700}
 
 /* content analysis */
-.ca{border:1px solid var(--rule);border-radius:8px;overflow:hidden}
-.ca-hd{width:100%;border:0;background:var(--green-pale);display:flex;align-items:center;gap:.62rem;padding:.6rem .7rem;text-align:left}
+.ca{border:1px solid var(--rule);border-radius:10px}
+.ca-hd{width:100%;border:0;background:var(--green-pale);display:flex;align-items:center;gap:.62rem;padding:.62rem .7rem;text-align:left;border-radius:9px 9px 0 0}
 .ca-sc{width:2.05rem;height:2.05rem;border-radius:50%;background:var(--red);color:#fff;font-size:.78rem;font-weight:800;display:grid;place-items:center;flex:none;font-family:var(--m)}
 .ca-hd.up .ca-sc{background:var(--green-d)}
 .ca-nm{display:grid;gap:.05rem;min-width:0}
 .ca-nm b{font-size:.86rem;font-weight:700;color:var(--navy)}
 .ca-nm span{font-size:.73rem;color:var(--ink-2);line-height:1.35}
 .ca-hd .tw{margin-left:auto;color:var(--green);font-weight:800;font-size:1rem;flex:none}
-.ca-bd{padding:.75rem .7rem;display:grid;gap:.65rem;background:var(--card)}
+.ca-bd{padding:.75rem .7rem;display:grid;gap:.65rem;background:var(--card);border-radius:0 0 9px 9px}
 .ca-bd[hidden]{display:none}
 .ca-t{text-align:center;font-size:.84rem;font-weight:700;color:var(--navy)}
 
@@ -185,10 +185,11 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .tile .tw{display:block;font-size:.62rem;letter-spacing:.02em;font-weight:700;color:var(--green-x);margin-top:.18rem}
 .tile .tp{display:block;font-family:var(--m);font-size:.7rem;font-weight:500;color:var(--ink-2);margin-top:.1rem}
 .tile.up .tp{color:var(--green-ink)}
-/* the tooltip line — replaces a whole dropdown, and only speaks when asked */
-.tipline{min-height:2.4rem;font-size:.78rem;line-height:1.45;color:var(--ink-2);background:var(--sunk);border-radius:9px;padding:.45rem .6rem;transition:color .14s}
-.tipline b{color:var(--navy);font-weight:700}
-.tipline.idle{color:var(--faint)}
+/* the tooltip: an overlay, so showing it can never move the tile you are pointing at */
+.tilewrap{position:relative}
+.tipline{position:absolute;top:calc(100% + .3rem);left:0;right:0;z-index:6;font-size:.78rem;line-height:1.45;color:#fff;background:var(--bar);border-radius:9px;padding:.5rem .65rem;box-shadow:0 6px 20px rgba(10,14,20,.28);opacity:0;pointer-events:none;transition:opacity .12s}
+.tipline.on{opacity:1}
+.tipline b{color:#9BD35F;font-weight:700}
 .rec{font-size:.83rem;font-weight:700;color:var(--navy);text-align:center;line-height:1.45}
 .rec span{color:var(--red)}
 
@@ -208,6 +209,8 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .sec-bd[hidden]{display:none}
 .itm{display:grid;grid-template-columns:auto 1fr auto;gap:.5rem .55rem;padding:.6rem 0;border-bottom:1px solid var(--rule-2);align-items:start}
 .itm:last-child{border-bottom:0}
+.itm.stack{grid-template-columns:1fr auto}
+.itm.stack .who{display:block;margin-bottom:.1rem}
 .itm .who{font-size:.75rem;font-weight:700;color:var(--red)}
 .itm .who i{font-style:normal;color:var(--green-ink);font-weight:600}
 .itm .who em{font-style:normal;color:var(--amber-ink);font-weight:600}
@@ -219,6 +222,11 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .itm .amt{font-family:var(--m);font-size:.86rem;font-weight:700;color:var(--navy);text-align:right;white-space:nowrap}
 .itm.gone .new,.itm.gone .who{color:var(--faint);text-decoration:line-through}
 .itm input[type=checkbox]{margin:.25rem 0 0;accent-color:var(--green)}
+.upsell{font-size:.74rem;color:var(--green-ink);line-height:1.35;margin-top:.15rem}
+.mini-g{border:0;background:var(--green);color:#fff;padding:.28rem .7rem;border-radius:999px;font-size:.75rem;font-weight:700;white-space:nowrap}
+.mini-g:hover{background:var(--green-d)}
+.lastcall{display:grid;gap:.5rem;padding:.7rem;margin-top:.5rem;background:var(--green-pale);border-radius:12px;font-size:.79rem;color:var(--green-ink);line-height:1.4}
+.lastcall b{color:var(--green-x);font-weight:700}
 .spent{display:flex;align-items:baseline;gap:.6rem;padding-top:.6rem;font-size:.88rem;font-weight:700;color:var(--navy)}
 .spent .amt{margin-left:auto;font-family:var(--m);font-size:1.35rem;font-weight:800}
 .mini{font-size:.73rem;color:var(--faint);text-align:center}
@@ -281,49 +289,49 @@ const SITE = {
   home:{ name:'Home', value:3, comps:[
     {id:'h-k', lbl:'Eyebrow', t:'kick', hero:1, price:0.99, text:'Northgate · Seattle',
       up:'Family Dentistry · Northgate, Seattle', s:[2.0,1.5,2.5], u:[6.5,7.0,7.5],
-      rec:'Your label names the service as well as the place, so it reads as a subject and not a postcode.'},
+      rec:'A place name alone gives search nothing to match against.'},
     {id:'h-h1',lbl:'Heading', t:'h1', hero:1, price:5.99, text:'Gentle Family Dentistry in Northgate, Seattle',
       up:'Same-Day Crowns and Gentle Family Dentistry in Northgate, Seattle', s:[3.0,2.5,4.5], u:[8.5,9.0,8.5],
-      rec:'Your heading names the service people actually search for, and gets tagged so engines know it is the page subject.'},
+      rec:'Searches for same-day crowns find other practices, not yours.'},
     {id:'h-p1',lbl:'Body copy', t:'p', hero:1, price:3.99, text:'We have been caring for families across North Seattle since 2004. Same-day crowns, clear aligners, and emergency appointments — with a team that remembers your name.',
       up:'We have cared for families across North Seattle since 2004. You can get a same-day crown, clear aligners, or an emergency appointment from a team that remembers your name.', s:[4.0,3.5,5.0], u:[8.5,8.0,8.0],
-      rec:'Your paragraph gets rewritten so every sentence makes sense on its own.'},
-    {id:'h-img',lbl:'Feature photo', t:'img', price:1.99, text:'Waiting room · 1200 × 630', alt:'Waiting room',
+      rec:'Assistants skip paragraphs they cannot lift as one whole thought.'},
+    {id:'h-img',lbl:'Feature Photo', t:'img', price:1.99, text:'Waiting room · 1200 × 630', alt:'Waiting room',
       up:'The Northgate Family Dental waiting room in Seattle, where families wait for same-day crown appointments', s:[0.0,0.0,0.0], u:[3.5,3.5,3.5],
-      rec:'Your photo gets a proper description, tagged so search engines know what it shows.'},
+      rec:'Search engines cannot see photos, so yours is simply ignored.'},
     {id:'h-h2',lbl:'Heading', t:'h2', price:2.99, text:'Our Services',
       up:'Same-Day Crowns Mean You Leave With Your Tooth Restored', s:[1.0,1.0,3.0], u:[9.0,9.0,8.5],
-      rec:'Your heading makes a claim an assistant can quote, instead of a label it has to skip.'},
+      rec:'A plain label gives assistants nothing worth quoting to anyone.'},
     {id:'h-p2',lbl:'Body copy', t:'p', price:3.99, text:'Our practice offers a comprehensive range of general and cosmetic dental services designed to meet the needs of patients at every stage of life, and we pride ourselves on staying current with the latest techniques available in modern dentistry today.',
       up:'We offer general and cosmetic dental services for patients at every stage of life. We stay current with the latest techniques in modern dentistry. Whether you need a routine cleaning or a crown, you are cared for by a practice that keeps its skills sharp.', s:[3.5,3.0,5.0], u:[8.5,9.0,8.0],
-      rec:'Your paragraph gets rewritten so every sentence makes sense on its own.'},
+      rec:'Assistants skip paragraphs they cannot lift as one whole thought.'},
     {id:'h-band',lbl:'List item', t:'band', price:0, text:'Rated 5 stars by 200+ patients · 9 out of 10 patients say they felt no pain', s:[3.0,2.0,3.0],
       blocked:'To show star ratings in search results the reviews have to be visible on this page. Sitecraft will never invent a rating or a patient count, so this one needs you: publish the reviews and the next scan will pick them up.'},
   ]},
   services:{ name:'Services', value:2, comps:[
     {id:'s-h1',lbl:'Heading', t:'h1', hero:1, price:5.99, text:'Our Dental Services',
       up:'Dental Services in Northgate, From Cleanings to Same-Day Crowns', s:[2.0,2.0,4.0], u:[9.0,8.5,9.0],
-      rec:'Your heading names the services people search for, tagged as the page subject.'},
+      rec:'People searching your services are shown other practices instead.'},
     {id:'s-p1',lbl:'Body copy', t:'p', hero:1, price:2.99, text:'Everything we do is aimed at keeping your visit short and your results lasting. Below are the treatments patients ask for most.',
       up:'Every treatment is aimed at keeping your visit short and your results lasting. These are the treatments Northgate patients ask for most.', s:[5.0,4.5,6.0], u:[8.5,9.0,8.0],
-      rec:'Your paragraph names the place, so it stops reading like advice for anywhere.'},
+      rec:'Advice that fits anywhere rarely gets matched to your area.'},
     {id:'s-h2',lbl:'Heading', t:'h2', price:2.99, text:'Same-Day Crowns',
       up:'Same-Day Crowns Are Milled In Our Own Lab, So You Leave Restored', s:[4.0,3.0,6.0], u:[9.0,9.0,8.5],
-      rec:'Your heading makes a claim an assistant can quote, instead of a label it has to skip.'},
+      rec:'A plain label gives assistants nothing worth quoting to anyone.'},
     {id:'s-p2',lbl:'Body copy', t:'p', price:3.99, text:'We mill crowns in our own lab. Most patients arrive with a damaged tooth and leave the same afternoon with the permanent crown already fitted. No temporary, no second visit.',
       up:'We mill crowns in our own lab. Most patients arrive with a damaged tooth and leave the same afternoon with the permanent crown fitted. There is no temporary crown and no second visit.', s:[7.0,6.5,7.0], u:[9.5,9.0,9.0],
-      rec:'Already strong. The boost mainly adds the tagging that engines read.'},
+      rec:'Untagged, engines guess at what this says and often misread.'},
   ]},
   about:{ name:'About', value:1, comps:[
     {id:'a-h1',lbl:'Heading', t:'h1', hero:1, price:4.99, text:'About Our Practice',
       up:'A Northgate Dental Practice Caring For Seattle Families Since 2004', s:[2.0,2.0,4.0], u:[9.0,8.5,9.0],
-      rec:'Your heading names who you are and where, tagged as the page subject.'},
+      rec:'Searches for a local dentist land on another practice instead.'},
     {id:'a-p1',lbl:'Body copy', t:'p', hero:1, price:2.99, text:'Dr. Amara Okoye opened the practice in 2004 with one chair and a small waiting room above a bakery on Northgate Way.',
       up:'Dr. Amara Okoye opened this Northgate practice in 2004 with one chair and a small waiting room above a bakery on Northgate Way.', s:[6.0,5.0,5.5], u:[9.0,8.5,8.0],
-      rec:'Your paragraph names the place, so it stops reading like advice for anywhere.'},
+      rec:'Advice that fits anywhere rarely gets matched to your area.'},
     {id:'a-h2',lbl:'Heading', t:'h2', price:2.99, text:'Why Patients Stay',
       up:'Patients Stay Because The Same Team Sees Them Every Visit', s:[3.0,2.0,4.0], u:[9.0,9.0,8.5],
-      rec:'Your heading makes a claim an assistant can quote, instead of a label it has to skip.'},
+      rec:'A plain label gives assistants nothing worth quoting to anyone.'},
   ]},
 };
 const SCORE_NM = ['AI retrieval','AEO optimized','SEO optimized'];
@@ -335,9 +343,9 @@ const WHY = [
 ];
 const TAGGING = '<b>What does tagging mean?</b> Tagging means adding extra notes into your page\'s code. Visitors never see them. Google and AI search engines read them to work out what each part of your page actually is.<br><br>Writing it better lifts part of these scores on its own. The tagging only comes with a boost, which is why the numbers keep climbing after you have done your best with the words.';
 const TIP = [
-  'Whether an assistant can lift this out on its own. Short, self-contained lines score high; a sentence that only makes sense after the one above it scores low.',
-  'Whether ChatGPT, Perplexity or Google\'s AI answers name you. Claims beat labels, and naming your actual area beats advice that fits anywhere.',
-  'Whether Google can rank it. It wants the words people really search for, near the front, reading naturally.',
+  'Can an assistant lift this out on its own? Short, self-contained lines score high.',
+  'Will ChatGPT or Google\'s AI answers name you? Claims beat labels; your area beats anywhere.',
+  'Can Google rank it? It wants the words people search for, near the front.',
 ];
 const PEOPLE = ['Jo Castellane','Priya Raman'];
 
@@ -357,6 +365,7 @@ const paidTotal = () => S.receipts.reduce((t,r)=>t+r.amt,0);
 const pageSpend = p => S.boosts.filter(b=>b.page===p).reduce((t,b)=>t+b.price,0);
 const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const avg = a => a.reduce((x,y)=>x+y,0)/a.length;
+const uniq = a => [...new Set(a)];
 
 function dif(a,b){
   const A=a.split(/(\s+)/),B=b.split(/(\s+)/),n=A.length,m=B.length;
@@ -433,6 +442,8 @@ function toast(m, undo){
 const VALUE = {3:'Critical Page', 2:'Support Page', 1:'Minor Page'};
 const pageValue = pg => ({ label: VALUE[pg.value], cls: 'v' + pg.value });
 const tc = s => String(s).replace(/\b\w/g, m => m.toUpperCase());
+const SHORT = {'Feature Photo':'Photo','Body copy':'Text','List item':'Text','Eyebrow':'Label','Heading':'Heading'};
+const shortOf = c => SHORT[c.lbl] || tc(c.lbl);
 const hdr = c => `${esc(c.lbl)} <span class="dot">·</span> <i>On ${SITE[pgOf(c.id)].name}</i>`;
 const flagOf = c => pageValue(SITE[pgOf(c.id)]);
 
@@ -478,7 +489,7 @@ function flash(id){
 function showMe(id){ shut(); S.page = pgOf(id); draw(); setTimeout(()=>flash(id), 120); }
 
 /* ═══════════ scores block ═══════════ */
-function scores(c, proj){
+function scores(c, proj, openByDefault){
   const cur = c.s, up = c.u;
   const shown = proj && up ? up : cur;
   const badge = (proj ? avg(up) : avg(cur)).toFixed(1);
@@ -487,25 +498,24 @@ function scores(c, proj){
       <span class="tv">${v.toFixed(1)}</span><span class="tu">/10</span>${proj?`<span class="tp">was ${cur[i].toFixed(1)}</span><span class="tw">Projected</span>`:''}
     </div>`).join('');
   return `<div class="ca">
-    <button class="ca-hd ${proj?'up':''}" data-t="cab" aria-expanded="true">
+    <button class="ca-hd ${proj?'up':''}" data-t="cab" aria-expanded="${!!openByDefault}">
       <span class="ca-sc">${badge}</span>
-      <span class="ca-nm"><b>Content Analysis</b><span>See how AI reads this, and what it could be</span></span>
-      <span class="tw">✕</span></button>
-    <div class="ca-bd" id="cab">
-      <div class="ca-t">${esc(tc(c.lbl))} Content Analysis</div>
-      <div class="tiles">${tiles}</div>
-      <div class="tipline idle" id="tip">Hover any score to see what it means.</div>
-      ${c.rec?`<div class="rec"><span>Recommendation:</span> ${esc(c.rec)}</div>`:''}
+      <span class="ca-nm"><b>Content Analysis</b><span>How AI reads this, and what it could be</span></span>
+      <span class="tw">${openByDefault?'✕':'+'}</span></button>
+    <div class="ca-bd" id="cab" ${openByDefault?'':'hidden'}>
+      <div class="tilewrap"><div class="tiles">${tiles}</div>
+        <div class="tipline" id="tip"></div></div>
+      ${c.rec?`<div class="rec"><span>Right now:</span> ${esc(c.rec)}</div>`:''}
     </div></div>`;
 }
 
 /* the tooltip line: one place that speaks only when asked */
 function wireTips(){
   const tip = $('#tip'); if (!tip) return;
-  const idle = 'Hover any score to see what it means.';
   document.querySelectorAll('[data-tip]').forEach(t=>{
-    const show = () => { tip.classList.remove('idle'); tip.innerHTML = `<b>${SCORE_NM[+t.dataset.tip]}.</b> ${TIP[+t.dataset.tip]}`; };
-    const hide = () => { tip.classList.add('idle'); tip.textContent = idle; };
+    const i = +t.dataset.tip;
+    const show = () => { tip.innerHTML = `<b>${SCORE_NM[i]}.</b> ${TIP[i]}`; tip.classList.add('on'); };
+    const hide = () => tip.classList.remove('on');
     t.addEventListener('mouseenter', show); t.addEventListener('focus', show);
     t.addEventListener('mouseleave', hide); t.addEventListener('blur', hide);
     t.addEventListener('click', show);
@@ -576,7 +586,7 @@ function flow(){
   const secondary = canBack
     ? `<button class="ghost" id="bk">← Use my original photo instead</button>`
     : ((img && !F.photo && F.desc === null) || (!img && F.words === null)
-        ? '' : `<button class="ghost" id="sv">Save and close</button>`);
+        ? '' : `<button class="ghost" id="sv">Boost This ${esc(shortOf(c))} Later</button>`);
 
   open({ ttl: hdr(c), flag: flagOf(c), body: parts.join('') + cta + secondary
         + (hint?`<div class="sub" style="text-align:center">${hint}</div>`:'')
@@ -699,7 +709,7 @@ function boostP(id, proj = true){
     <div class="ask">${proj ? 'Where a boost would take you' : 'What you have right now'}</div>
     ${d ? `<div class="box">${rend(d, proj?'+':'-')}</div>`
         : `<div class="box">${esc(proj ? c.up : (c.alt || '(no description)'))}</div>`}
-    ${scores(c, proj)}
+    ${scores(c, proj, true)}
     <div class="sub" style="text-align:center">${proj?'<b>Nothing on your page has changed.</b>':'This is live on your page now.'}</div>
     <button class="g" id="go">Boost this ${esc(c.lbl.toLowerCase())}<span class="amt2">${M(c.price)}</span></button>
     <button class="ghost" id="flip">${proj?'Show my scores again':'Show me the boost again'}</button>
@@ -784,13 +794,21 @@ function seats(){
 
 /* ═══════════ review ═══════════ */
 function review(){
-  const chg = S.changes.length ? S.changes.map((c,i)=>`<div class="itm">
-      <span class="who">${esc(c.lbl)} <i>on ${SITE[c.page].name}</i></span>
-      <span class="bdy">${c.kind==='copy'?`<span class="old">${esc(c.old.slice(0,64))}${c.old.length>64?'…':''}</span>`:''}
+  const chg = S.changes.length ? S.changes.map((c,i)=>{
+    const k = comp(c.id), up = canBoost(k) && !isBoosted(c.id);
+    return `<div class="itm stack">
+      <span class="bdy"><span class="who">${esc(c.lbl)} <i>on ${SITE[c.page].name}</i></span>
+        ${c.kind==='copy'?`<span class="old">${esc(c.old.slice(0,64))}${c.old.length>64?'…':''}</span>`:''}
         <span class="new">${esc(c.now.slice(0,72))}${c.now.length>72?'…':''}</span>
-        <span class="stamp">Marshall · ${esc(c.when)}</span></span>
-      <span class="acts"><button class="pill" data-show="${c.id}">Show me</button><button class="pill" data-undo="${i}">Undo</button></span>
-    </div>`).join('') : '<div class="empty">Nothing changed yet.</div>';
+        <span class="stamp">Marshall · ${esc(c.when)}</span>
+        ${up?`<span class="upsell">You changed the words. A boost adds the tagging engines read.</span>`:''}</span>
+      <span class="acts">${up?`<button class="mini-g" data-boostnow="${c.id}">Boost ${M(k.price)}</button>`:''}
+        <button class="pill" data-show="${c.id}">Show me</button><button class="pill" data-undo="${i}">Undo</button></span>
+    </div>`;}).join('') : '<div class="empty">Nothing changed yet.</div>';
+
+  /* one last offer before they close the session */
+  const openBoosts = uniq(S.changes.map(c=>c.id)).map(comp).filter(k=>canBoost(k) && !isBoosted(k.id));
+  const openTotal = openBoosts.reduce((t,k)=>t+k.price,0);
 
   const openN = S.notes.filter(n=>!n.done).length;
   const nts = S.notes.length ? S.notes.map((n,i)=>`<div class="itm ${n.done?'gone':''}">
@@ -812,7 +830,12 @@ function review(){
 
   open({ ttl:'<b>Review the whole site</b>', body:`
     <div class="sec"><button class="sec-hd" data-t="r1" aria-expanded="true">What changed (${S.changes.length})<span class="tw">✕</span></button>
-      <div class="sec-bd" id="r1">${chg}</div></div>
+      <div class="sec-bd" id="r1">${chg}
+        ${openTotal?`<div class="lastcall">
+          <div><b>${openBoosts.length} of your edits ${openBoosts.length===1?'is':'are'} still untagged.</b>
+          Search engines read the tagging, not just the words.</div>
+          <button class="g" id="boostall">Boost ${openBoosts.length===1?'it':'them all'}<span class="amt2">${M(openTotal)}</span></button>
+        </div>`:''}</div></div>
     <div class="sec"><button class="sec-hd" data-t="r2" aria-expanded="${openN?'true':'false'}">Notes (${openN} open of ${S.notes.length})<span class="tw">${openN?'✕':'+'}</span></button>
       <div class="sec-bd" id="r2" ${openN?'':'hidden'}>${nts}
         ${S.notes.length?`<div class="help" style="padding-top:.5rem">Tick the notes you want to send</div>
@@ -824,6 +847,23 @@ function review(){
         <div class="mini">Across the whole site so far: ${M(S.boosts.reduce((t,b)=>t+b.price,0))} · settles when you press Done.</div></div></div>
     <div class="p-ft">Approved by <b>Marshall</b>, just now.</div>`});
 
+  document.querySelectorAll('[data-boostnow]').forEach(b=>b.onclick=()=>{
+    const id = b.dataset.boostnow; shut(); S.page = pgOf(id); draw();
+    setTimeout(()=>{ S.flow = {id, photo:null, desc:null, words:null, analysed:true}; boostP(id); }, 140);
+  });
+  const ba = $('#boostall');
+  if (ba) ba.onclick = () => {
+    const snap = openBoosts.map(k=>({k, was: k.t==='img'?k.alt:k.text}));
+    openBoosts.forEach(k=>{ if (k.t==='img') k.alt = k.up; else k.text = k.up;
+      S.boosts.push({id:k.id, page:pgOf(k.id), lbl:k.lbl, price:k.price, gain:k.u.map((v,i)=>+(v-k.s[i]).toFixed(1))}); });
+    S.session += openTotal; S.boostCount += openBoosts.length;
+    draw(); review(); bdg();
+    toast(`Boosted ${openBoosts.length}. <b>${M(openTotal)}</b> on this session.`, ()=>{
+      snap.forEach(({k,was})=>{ if (k.t==='img') k.alt = was; else k.text = was; });
+      S.boosts.splice(S.boosts.length-openBoosts.length, openBoosts.length);
+      S.session -= openTotal; S.boostCount -= openBoosts.length; draw(); review(); bdg();
+    });
+  };
   document.querySelectorAll('[data-show]').forEach(b=>b.onclick=()=>showMe(b.dataset.show));
   document.querySelectorAll('[data-undo]').forEach(b=>b.onclick=()=>{
     const c = S.changes[+b.dataset.undo], k = comp(c.id);
