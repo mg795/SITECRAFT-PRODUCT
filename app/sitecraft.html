@@ -140,7 +140,7 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .sdone .tick{width:1.15rem;height:1.15rem;border-radius:50%;background:var(--green-d);color:#fff;display:grid;place-items:center;font-size:.7rem;font-weight:800;flex:none}
 .sdone .lbl2{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sdone button{margin-left:auto;border:0;background:transparent;color:var(--green-ink);font-size:.78rem;font-weight:700;text-decoration:underline;padding:0;flex:none}
-.ask{font-size:1.02rem;font-weight:700;color:var(--navy);letter-spacing:-.015em;line-height:1.3}
+.ask{font-size:1.02rem;font-weight:700;color:var(--navy);letter-spacing:-.015em;line-height:1.3;display:flex;align-items:center;gap:.4rem}
 .sub{font-size:.82rem;color:var(--mut);line-height:1.45;margin-top:-.25rem}
 
 .drop{position:relative;border:0;border-radius:14px;background:var(--sunk);min-height:9rem;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:1.1rem 1rem;gap:.1rem;cursor:pointer;transition:border-color .14s,background .14s}
@@ -215,7 +215,14 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .tag0,.tag1,.tagadd{font-size:.7rem;font-weight:600;padding:.14rem .5rem;border-radius:999px;white-space:nowrap;flex:none}
 .tagadd{border:1.5px solid var(--green);background:var(--card);color:var(--green-d)}
 .tagadd:hover{background:var(--green);color:#fff}
-.tagmine{background:var(--sunk);color:var(--ink-2)}
+.tagmine{background:var(--sunk);color:var(--ink-2);display:inline-flex;align-items:center;gap:.24rem}
+.tagkept{background:var(--sunk);color:var(--green-ink)}
+.tagx{border:0;background:transparent;color:var(--faint);font-size:.82rem;line-height:1;padding:0;font-weight:700}
+.tagx:hover{color:var(--red)}
+.taginput{border:0;outline:2px solid var(--green);outline-offset:-2px;background:var(--card);color:var(--ink);
+  font-family:var(--f);font-size:.7rem;font-weight:600;padding:.14rem .5rem;border-radius:999px;width:7rem;flex:none}
+.tag1.more{background:var(--sunk);color:var(--mut)}
+.labnote{font-weight:600;letter-spacing:0;text-transform:none;color:var(--mut);font-size:.6rem}
 .tag0{background:var(--sunk);color:var(--faint)}
 .tag1{background:var(--green-pale);color:var(--green-ink)}
 .ba{display:grid;gap:.3rem}
@@ -387,17 +394,10 @@ const TAGS_AFTER = {
   kick: ['Place', 'Category', 'Region'],
   band: [],
 };
-/* a boost must always land at least two tags ahead of whatever is there,
-   so the gap stays visible however many the client adds themselves */
-const maxUserTags = c => Math.max(0, (TAGS_AFTER[c.t] || []).length - 2);
-const TAG_SUGGEST = {
-  img:  ['Interior', 'Team', 'Room'],
-  h1:   ['Service', 'Area', 'Practice'],
-  h2:   ['Service', 'Treatment'],
-  p:    ['Service', 'Practice'],
-  kick: ['Area', 'Category'],
-  band: [],
-};
+/* the boost recommends; the client's own tags are kept and carried through,
+   so what they get is always their tags plus at least two more */
+const MAX_OWN_TAGS = 3;
+const PIC_HELP = "Search can't see this picture yet. Boost it and we'll describe and tag it so it counts.";
 const SCORE_TL = ['AI RETRIEVAL','AEO OPTIMIZED','SEO OPTIMIZED'];
 const WHY = [
   '<b>Why this matters.</b> AI tools pull out one paragraph at a time, not whole pages. If a paragraph only makes sense after reading the one above it, it gets left behind when an assistant is putting an answer together.',
@@ -487,19 +487,39 @@ function open({ttl, flag, body, back}){
   if (!pan.classList.contains('moved')) pan.style.transform = '';
   pan.classList.add('open'); $('#scrim').classList.add('open');
   wireTips();
-  document.querySelectorAll('[data-addtag]').forEach(b=>b.onclick=()=>{
-    const c = comp(S.flow && S.flow.id); if (!c) return;
-    c.userTags = [...(c.userTags||[]), b.dataset.addtag];
+  const flowComp = () => comp(S.flow && S.flow.id);
+  const nb = document.querySelector('[data-newtag]');
+  if (nb) nb.onclick = () => { S.flow.addingTag = true; flow(); };
+  document.querySelectorAll('[data-deltag]').forEach(b=>b.onclick=()=>{
+    const c = flowComp(); if (!c) return;
+    c.userTags = (c.userTags||[]).filter(t => t !== b.dataset.deltag);
     flow();
   });
-  const ht = $('#headtip'), q = document.querySelector('.qmark');
-  if (q && ht){
+  const ti = $('#taginput');
+  if (ti){
+    ti.focus();
+    const commit = () => {
+      const c = flowComp(); if (!c) return;
+      const v = ti.value.trim().slice(0, 18);
+      if (v && !(c.userTags||[]).includes(v) && (c.userTags||[]).length < MAX_OWN_TAGS)
+        c.userTags = [...(c.userTags||[]), v];
+      S.flow.addingTag = false; flow();
+    };
+    ti.onkeydown = e => {
+      if (e.key === 'Enter'){ e.preventDefault(); commit(); }
+      if (e.key === 'Escape'){ e.preventDefault(); S.flow.addingTag = false; flow(); }
+    };
+    ti.onblur = commit;
+  }
+  document.querySelectorAll('.tagrow2').forEach(fitTags);
+  const ht = $('#headtip');
+  if (ht) document.querySelectorAll('[data-help]').forEach(q=>{
     const on = () => { ht.textContent = q.dataset.help; ht.classList.add('on'); };
     const off = () => ht.classList.remove('on');
     q.addEventListener('mouseenter', on); q.addEventListener('focus', on);
     q.addEventListener('mouseleave', off); q.addEventListener('blur', off);
-    q.addEventListener('click', e => { e.stopPropagation(); ht.classList.toggle('on'); });
-  }
+    q.addEventListener('click', e => { e.stopPropagation(); ht.textContent = q.dataset.help; ht.classList.toggle('on'); });
+  });
   document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{
     const t = document.getElementById(b.dataset.t), o = b.getAttribute('aria-expanded')==='true';
     b.setAttribute('aria-expanded', String(!o)); t.hidden = o;
@@ -594,12 +614,15 @@ function scores(c, proj){
   const isImg = c.t === 'img';
   const nowText = isImg ? (c.alt || 'No description yet') : c.text;
   const mine = c.userTags || (c.userTags = []);
-  const room = maxUserTags(c) - mine.length;
-  const left = room > 0 ? (TAG_SUGGEST[c.t] || []).filter(t => !mine.includes(t)).slice(0, room) : [];
-  const tagsNow = (mine.length ? mine.map(t=>`<span class="tag1 tagmine">${t}</span>`).join('')
-                               : '<span class="tag0">None yet</span>')
-    + left.map(t=>`<button class="tagadd" data-addtag="${t}">+ ${t}</button>`).join('');
-  const tagsUp  = (TAGS_AFTER[c.t] || []).map(t=>`<span class="tag1">${t}</span>`).join('');
+  const F = S.flow || {};
+  const chips = mine.map(t=>`<span class="tag1 tagmine">${esc(t)}<button class="tagx" data-deltag="${esc(t)}" aria-label="Remove ${esc(t)}">&times;</button></span>`).join('');
+  const slot = F.addingTag
+    ? `<input class="taginput" id="taginput" maxlength="18" placeholder="Type a tag" autocomplete="off">`
+    : (mine.length < MAX_OWN_TAGS ? `<button class="tagadd" data-newtag="1">+ Add tag</button>` : '');
+  const tagsNow = (mine.length ? '' : '<span class="tag0">None yet</span>') + chips + slot;
+  const recs = (TAGS_AFTER[c.t] || []).filter(t => !mine.includes(t));
+  const tagsUp = recs.map(t=>`<span class="tag1">${esc(t)}</span>`).join('')
+               + mine.map(t=>`<span class="tag1 tagkept">${esc(t)}</span>`).join('');
 
   return `<div class="ca">
     <div class="ca-hd ${proj?'up':''}">
@@ -625,10 +648,31 @@ function scores(c, proj){
       ${proj ? `<div class="ba up">
         <div class="lab up">After the Boost</div>
         <div class="box upbox">${esc(c.up)}</div>
-        <div class="lab up">Tags It Would Get</div>
+        <div class="lab up">Tags It Would Get${mine.length?` <span class="labnote">yours kept</span>`:''}</div>
         <div class="tagrow2">${tagsUp || '<span class="tag1">Structured markup</span>'}</div>
       </div>` : ''}
     </div></div>`;
+}
+
+/* one line, always: anything that will not fit is folded into a counter */
+function fitTags(row){
+  if (!row || !row.clientWidth) return;
+  row.querySelectorAll('.more').forEach(m => m.remove());
+  const chips = [...row.children];
+  chips.forEach(c => { c.hidden = false; });
+  const gap = parseFloat(getComputedStyle(row).gap) || 5;
+  const budget = row.clientWidth - 30;          /* room for the counter */
+  let used = 0, over = 0;
+  chips.forEach((c, i) => {
+    const w = c.getBoundingClientRect().width + (i ? gap : 0);
+    if (used + w > budget && i > 0){ c.hidden = true; over++; }
+    else used += w;
+  });
+  if (over){
+    const m = document.createElement('span');
+    m.className = 'tag1 more'; m.textContent = '+' + over;
+    row.appendChild(m);
+  }
 }
 
 /* the numbers roll up in place, the way a slot machine settles */
@@ -719,9 +763,8 @@ function flow(){
   /* ── stage 2 (photos only): what is in it ── */
   if (img && F.photo && F.desc === null){
     parts.push(`<div class="stage">
-      <div class="ask">What is in this picture?</div>
+      <div class="ask">What is in this picture?<button class="qmark" data-help="${esc(PIC_HELP)}" aria-label="Why this matters"></button></div>
       <textarea class="fld grow" id="dsc" rows="1" placeholder="A short, plain description">${esc(F.draftDesc ?? c.alt ?? '')}</textarea>
-      <div class="sub">Search can't see this picture yet. <b>Boost it</b> and we'll describe and tag it so it counts.</div>
     </div>`);
   }
 
