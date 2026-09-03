@@ -314,6 +314,47 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .mini-g:hover{background:var(--green-d)}
 .lastcall{display:grid;gap:.5rem;padding:.7rem;margin-top:.5rem;background:var(--green-pale);border-radius:12px;font-size:.79rem;color:var(--green-ink);line-height:1.4}
 .lastcall b{color:var(--green-x);font-weight:700}
+
+/* the sheet: a second surface over the panel, for the one irreversible step */
+.sheet{position:absolute;inset:0;z-index:30;display:flex;align-items:flex-end;justify-content:center;
+  background:rgba(10,14,20,.34);opacity:0;transition:opacity .16s}
+.sheet.on{opacity:1}
+.sheet[hidden]{display:none!important}
+.sheetcard{width:100%;max-height:100%;overflow-y:auto;scrollbar-width:none;background:var(--card);
+  border-radius:14px 14px 0 0;padding:1.05rem 1.05rem 1.1rem;display:grid;gap:.7rem;
+  transform:translateY(14px);transition:transform .18s}
+.sheetcard::-webkit-scrollbar{display:none}
+.sheet.on .sheetcard{transform:none}
+.sh-ttl{font-size:1.06rem;font-weight:800;color:var(--navy);letter-spacing:-.018em;line-height:1.25}
+.sh-sub{font-size:.83rem;line-height:1.5;color:var(--ink-2)}
+.sh-sub b{color:var(--navy);font-weight:700}
+.sh-lock{display:flex;gap:.5rem;align-items:flex-start;background:var(--sunk);border-radius:10px;
+  padding:.6rem .7rem;font-size:.78rem;line-height:1.45;color:var(--ink-2)}
+.sh-lock span{flex:none;font-size:.8rem;line-height:1.35}
+.sh-line{display:flex;align-items:center;gap:.5rem;font-size:.84rem;font-weight:600;color:var(--ink-2)}
+.sh-line .amt{margin-left:auto;font-family:var(--m);font-variant-numeric:tabular-nums;font-weight:700;color:var(--navy)}
+.sh-win{display:grid;gap:.35rem;justify-items:center;text-align:center;background:var(--green-pale);
+  border-radius:12px;padding:.85rem .8rem}
+.sh-win .tickbig{width:2rem;height:2rem;border-radius:50%;background:var(--green-d);color:#fff;
+  display:grid;place-items:center;font-size:1rem;font-weight:800}
+.sh-win .wt{font-size:1.02rem;font-weight:800;color:var(--green-x);letter-spacing:-.015em;line-height:1.25}
+.sh-win .ws{font-size:.8rem;line-height:1.45;color:var(--green-ink)}
+
+/* the measuring stick: ten cells, filled to where the page now stands */
+.gauges{display:grid;gap:.6rem}
+.gauge{display:grid;gap:.28rem}
+.ghd{display:flex;align-items:baseline;gap:.4rem}
+.glbl{font-size:.6rem;letter-spacing:.04em;text-transform:uppercase;font-weight:700;color:var(--ink-2)}
+.gnum{margin-left:auto;font-family:var(--m);font-variant-numeric:tabular-nums;font-size:.84rem;
+  font-weight:700;color:var(--navy);display:flex;align-items:baseline;gap:.3rem}
+.gnum em{font-style:normal;font-size:.66rem;font-weight:600;color:var(--mut)}
+.gnum b{font-size:.7rem;font-weight:800;color:var(--green-x)}
+.gbar{position:relative;height:.62rem;border-radius:999px;background:var(--sunk);overflow:hidden}
+.gbar i{position:absolute;top:0;bottom:0;display:block}
+.gfill{left:0;background:var(--green-ink);opacity:.42;width:0;transition:width .5s cubic-bezier(.2,.7,.3,1)}
+.ggain{background:var(--green);width:0;transition:width .7s cubic-bezier(.2,.7,.3,1) .12s}
+.gticks{left:0;right:0;pointer-events:none;
+  background:repeating-linear-gradient(90deg,transparent 0,transparent calc(10% - 2px),var(--card) calc(10% - 2px),var(--card) 10%)}
 /* the rows inside the offer belong to it, so they take its colours */
 .lastcall .itm{border-bottom-color:color-mix(in srgb,var(--green-x) 22%,transparent);padding:.5rem 0;align-items:center}
 .lastcall .itm:last-of-type{border-bottom:0}
@@ -372,6 +413,7 @@ body.editing </style>
 <div class="pan" id="pan" role="dialog" aria-modal="true">
   <div class="p-hd"><div class="ttl" id="p-ttl"></div><div class="headtip" id="headtip"></div><button class="p-back" id="p-back" aria-label="Back" hidden>&#8592;</button><button class="p-x" id="p-x" aria-label="Close">✕</button></div>
   <div class="p-bd" id="p-bd"></div>
+  <div class="sheet" id="sheet" hidden><div class="sheetcard" id="sheetcard"></div></div>
 </div>
 
 <div class="toast" id="toast" hidden><span id="t-msg"></span><button id="t-undo">Undo</button></div>
@@ -507,7 +549,7 @@ const PEOPLE = ['Jo Castellane','Priya Raman'];
 /* ═══════════ state ═══════════ */
 const S = { page:'home', mode:null, editing:false, sel:null, open:null,
   flows:{}, changes:[], notes:[], boosts:[], receipts:[{when:'2026-09-02 16:06', site:'Real Estate Excellence', n:1, amt:0.99}],
-  seats:1, session:0, boostCount:0, skipConfirm:false, offered:false, picked:new Set(), noteTo:PEOPLE[0], projecting:null,
+  seats:1, session:0, boostCount:0, picked:new Set(), noteTo:PEOPLE[0], projecting:null,
   later:new Set() };
 
 const $ = s => document.querySelector(s);
@@ -687,6 +729,7 @@ function shut(){
   pan.classList.remove('open','moved');
   pan.style.left = ''; pan.style.top = '';   /* always back to centre */
   open._key = null;
+  const sh = $('#sheet'); sh.hidden = true; sh.classList.remove('on'); $('#sheetcard').innerHTML = '';
   $('#scrim').classList.remove('open');
   S.sel = null; S.projecting = null;
   document.querySelectorAll('.c.sel').forEach(e=>e.classList.remove('sel'));
@@ -987,8 +1030,7 @@ function flow(){
   const started = F.analysed || (img ? (photoSet || descSet) : wordsSet);
   let cta = '';
   /* one press arms it, the next one buys it: nothing else on the panel moves */
-  if (F.confirming) cta = `<button class="g" id="go">Boost this ${esc(shortOf(c).toLowerCase())}!<span class="amt2">${M(c.price)}</span></button>`;
-  else if (!F.analysed) cta = `<button class="g" id="go">See How AI Reads This <span class="arw">→</span></button>`;
+  if (!F.analysed) cta = `<button class="g" id="go">See How AI Reads This <span class="arw">→</span></button>`;
   else if (canBoost(c) && !isBoosted(c.id) && !F.previewed)
     cta = `<button class="g" id="go">Preview Your Boost <span class="arw">→</span></button>`;
   else if (canBoost(c) && !isBoosted(c.id)) cta = `<button class="g" id="go">Boost this ${esc(c.lbl.toLowerCase())}<span class="amt2">${M(c.price)}</span></button>`;
@@ -1118,13 +1160,11 @@ function flow(){
   if (go) go.onclick = () => {
     if (dsc) commitDesc();
     if (ed && !commitWords()) return;
-    if (F.confirming) return apply(c.id);
     F.open = null;                                  /* the CTA settles any reopened step */
     F.scroll = true;
     if (!F.analysed){ F.analysed = true; return flow(); }
     if (!F.previewed && canBoost(c)){ F.previewed = true; return flow(); }
-    if (S.skipConfirm) return apply(c.id);
-    F.scroll = false; F.confirming = true; return flow();
+    return askBoost([c]);                           /* the last step gets its own surface */
   };
   const sv = $('#sv');
   if (sv) sv.onclick = () => {
@@ -1134,7 +1174,7 @@ function flow(){
        review panel asks for it again before the session settles */
     if (canBoost(c) && !isBoosted(c.id)){
       S.later.add(c.id);
-      F.analysed = true; F.previewed = true; F.rolled = true; F.confirming = false; F.open = null;
+      F.analysed = true; F.previewed = true; F.rolled = true; F.open = null;
     }
     draw();
     setMode('review');
@@ -1195,30 +1235,115 @@ function blockedP(id){
     ${scores(c, false)}`});
 }
 
-/* ═══════════ boost: apply ═══════════ */
-function apply(id){
-  const c = comp(id), was = c.t === 'img' ? c.alt : c.text;
-  if (c.t === 'img') c.alt = c.up; else c.text = c.up;
-  S.boosts.push({id, page:pgOf(id), lbl:c.lbl, price:c.price, gain:c.u.map((v,i)=>+(v-liveScores(c)[i]).toFixed(1))});
-  S.session += c.price; S.boostCount++;
-  S.later.delete(id);
-  shut(); draw(); flash(id); bdg();
-  toast(`Boosted. <b>${M(c.price)}</b> added to this session. Nothing's charged until Done.`, () => {
-    if (c.t === 'img') c.alt = was; else c.text = was;
-    S.boosts.pop(); S.session -= c.price; S.boostCount--; draw(); bdg();
-  });
-  if (S.boostCount === 3 && !S.skipConfirm && !S.offered){ S.offered = true; setTimeout(offer, 1400); }
+/* ═══════════ boost: ask, apply, celebrate ═══════════ */
+/* how the whole page reads, not just the part in front of them */
+function pageScore(page){
+  const cs = SITE[page].comps.filter(k => k.s && k.u);
+  if (!cs.length) return {ai:0, seo:0};
+  const now = k => isBoosted(k.id) ? k.u : liveScores(k);
+  return { ai:  +avg(cs.map(k => (now(k)[0] + now(k)[1]) / 2)).toFixed(1),
+           seo: +avg(cs.map(k => now(k)[2])).toFixed(1) };
 }
-function offer(){
-  open({ ttl:'Sitecraft noticed a habit', body:`
-    <div class="sdone" style="align-items:flex-start"><span class="tick">⚡</span>
-      <span style="font-weight:500;line-height:1.45">You have boosted three times and said yes every time. Sitecraft can skip the confirm from now on. You'll still see the comparison first, and Undo still works.</span></div>
-    <button class="g" id="yes">Skip it from now on</button>
-    <button class="ghost" id="no">Keep asking me</button>`});
-  $('#no').onclick = () => { shut(); toast('No problem. Sitecraft will keep asking.'); };
-  $('#yes').onclick = () => { S.skipConfirm = true; shut(); toast('Done. Boosts now take one step.'); };
+const nextUp = (page, not) =>
+  SITE[page].comps.find(k => k.id !== not && canBoost(k) && !isBoosted(k.id));
+
+function sheet(html){
+  const sh = $('#sheet');
+  $('#sheetcard').innerHTML = html;
+  sh.hidden = false;
+  requestAnimationFrame(() => sh.classList.add('on'));
+}
+function sheetShut(){
+  const sh = $('#sheet');
+  sh.classList.remove('on');
+  setTimeout(() => { sh.hidden = true; $('#sheetcard').innerHTML = ''; }, 170);
+}
+const sheetOpen = () => !$('#sheet').hidden;
+
+/* the one step that cannot be walked back gets its own surface and its own words */
+function askBoost(list){
+  const many = list.length > 1, tot = list.reduce((t,k)=>t+k.price, 0);
+  const one = list[0], pg = SITE[pgOf(one.id)].name;
+  sheet(`
+    <div class="sh-ttl">${many ? `Boost ${list.length} parts of ${esc(pg)}?` : `Boost this ${esc(one.lbl.toLowerCase())}?`}</div>
+    <div class="sh-sub">${many ? 'Each one is' : 'This is'} rewritten and tagged on your live page so answer engines can read ${many ? 'them' : 'it'}.</div>
+    <div class="sh-lock"><span>&#128274;</span><div>A boost holds for <b>90 days</b>. Once you say yes, it can't be cancelled before then.</div></div>
+    ${list.map(k=>`<div class="sh-line">${esc(k.lbl)} <span style="color:var(--faint);font-weight:500">on ${esc(SITE[pgOf(k.id)].name)}</span><span class="amt">${M(k.price)}</span></div>`).join('')}
+    <button class="g" id="sh-go">${many ? `Boost all ${list.length}` : `Boost this ${esc(shortOf(one).toLowerCase())}`}<span class="amt2">${M(tot)}</span></button>
+    <button class="ghost" id="sh-no">Not yet</button>`);
+  $('#sh-no').onclick = sheetShut;
+  $('#sh-go').onclick = () => applyAll(list);
 }
 
+function applyAll(list){
+  const page = pgOf(list[0].id), before = pageScore(page);
+  const tot = list.reduce((t,k)=>t+k.price, 0);
+  list.forEach(k => {
+    S.boosts.push({id:k.id, page:pgOf(k.id), lbl:k.lbl, price:k.price,
+                   gain:k.u.map((v,i)=>+(v - liveScores(k)[i]).toFixed(1))});
+    if (k.t === 'img') k.alt = k.up; else k.text = k.up;
+    S.later.delete(k.id);
+  });
+  S.session += tot; S.boostCount += list.length;
+  draw(); bdg();
+  celebrate(list, before, pageScore(page), tot);
+}
+
+/* a boost is a win, so it is told as one, with the page's own numbers behind it */
+function celebrate(list, before, after, tot){
+  const one = list[0], page = pgOf(one.id), pg = SITE[page];
+  const val = VALUE[pg.value];
+  const gauge = (label, from, to) => `<div class="gauge">
+      <div class="ghd"><span class="glbl">${label}</span>
+        <span class="gnum">${to.toFixed(1)}<em>/10</em>${to > from ? `<b>+${(to-from).toFixed(1)}</b>` : ''}</span></div>
+      <div class="gbar"><i class="gfill" data-w="${from*10}"></i><i class="ggain" data-l="${from*10}" data-w="${to > from ? Math.max(1.8, (to-from)*10) : 0}"></i><i class="gticks"></i></div>
+    </div>`;
+  const left = SITE[page].comps.filter(k => canBoost(k) && !isBoosted(k.id)).length;
+  const nxt = nextUp(page, null);
+  sheet(`
+    <div class="sh-win">
+      <span class="tickbig">&#10003;</span>
+      <div class="wt">${list.length > 1 ? `${list.length} parts of ${esc(pg.name)} are readable now` : `Your ${esc(one.lbl.toLowerCase())} is readable now`}</div>
+      <div class="ws">${list.length > 1 ? 'That is' : 'That is one more piece of'} a <b>${esc(val)}</b> ${list.length > 1 ? 'pulling further ahead' : 'working for you'} in AI answers and search results.</div>
+    </div>
+    <div class="gauges">
+      ${gauge(esc(pg.name) + ' &middot; AI visibility',  before.ai,  after.ai)}
+      ${gauge(esc(pg.name) + ' &middot; SEO visibility', before.seo, after.seo)}
+    </div>
+    <div class="sh-line">Added to this session<span class="amt">${M(tot)}</span></div>
+    <div class="sub">Nothing is charged until you press <b>Done</b>.</div>
+    ${nxt ? `<button class="g" id="sh-next">Boost the next one<span class="amt2">${M(nxt.price)}</span></button>
+      <div class="mini">${left} more ${left===1?'part':'parts'} of ${esc(pg.name)} ${left===1?'is':'are'} still untagged.</div>`
+          : `<button class="g" id="sh-rev">See the whole site<span class="arw">&rarr;</span></button>`}
+    <button class="ghost" id="sh-done">Back to my page</button>`);
+
+  /* the bars fill once the sheet is up, so the gain is something you watch happen */
+  requestAnimationFrame(() => {
+    document.querySelectorAll('#sheetcard .gfill').forEach(e => e.style.width = e.dataset.w + '%');
+    document.querySelectorAll('#sheetcard .ggain').forEach(e => {
+      e.style.left = e.dataset.l + '%'; e.style.width = e.dataset.w + '%';
+    });
+  });
+
+  $('#sh-done').onclick = () => {
+    sheetShut();
+    if (S.mode === 'review') return review();      /* they came from the review, they go back to it */
+    shut(); draw(); flash(one.id);
+  };
+  const nb = $('#sh-next');
+  if (nb) nb.onclick = () => {
+    sheetShut(); shut();
+    setTimeout(() => {
+      setFlow({id:nxt.id, photo:null, desc:null, words:null, analysed:true, previewed:true, rolled:true,
+               wasSrc:nxt.src||null, wasFit:nxt.fit?{...nxt.fit}:null, altWas:nxt.alt||'', textWas:nxt.text||''});
+      pick(nxt.id);                                 /* straight to its boost */
+    }, 180);
+  };
+  const rb = $('#sh-rev');
+  if (rb) rb.onclick = () => { sheetShut(); setMode('review'); };
+}
+
+function apply(id){ askBoost([comp(id)]); }
 /* ═══════════ comments ═══════════ */
 function noteP(id){
   const c = comp(id), mine = S.notes.filter(n=>n.id===id);
@@ -1335,32 +1460,9 @@ function review(){
     setTimeout(()=>{ setFlow({id, photo:null, desc:null, words:null, analysed:true, previewed:true}); editP(id); }, 140);
   });
   const bas = $('#boostaside');
-  if (bas) bas.onclick = () => {
-    const snap = aside.map(k=>({k, was: k.t==='img'?k.alt:k.text}));
-    aside.forEach(k=>{ if (k.t==='img') k.alt = k.up; else k.text = k.up;
-      S.boosts.push({id:k.id, page:pgOf(k.id), lbl:k.lbl, price:k.price, gain:k.u.map((v,i)=>+(v-liveScores(k)[i]).toFixed(1))});
-      S.later.delete(k.id); });
-    S.session += asideTotal; S.boostCount += aside.length;
-    draw(); review(); bdg();
-    toast(`Boosted ${aside.length}. <b>${M(asideTotal)}</b> on this session.`, ()=>{
-      snap.forEach(({k,was})=>{ if (k.t==='img') k.alt = was; else k.text = was; S.later.add(k.id); });
-      S.boosts.splice(S.boosts.length-aside.length, aside.length);
-      S.session -= asideTotal; S.boostCount -= aside.length; draw(); review(); bdg();
-    });
-  };
+  if (bas) bas.onclick = () => askBoost(aside);
   const ba = $('#boostall');
-  if (ba) ba.onclick = () => {
-    const snap = openBoosts.map(k=>({k, was: k.t==='img'?k.alt:k.text}));
-    openBoosts.forEach(k=>{ if (k.t==='img') k.alt = k.up; else k.text = k.up;
-      S.boosts.push({id:k.id, page:pgOf(k.id), lbl:k.lbl, price:k.price, gain:k.u.map((v,i)=>+(v-k.s[i]).toFixed(1))}); });
-    S.session += openTotal; S.boostCount += openBoosts.length;
-    draw(); review(); bdg();
-    toast(`Boosted ${openBoosts.length}. <b>${M(openTotal)}</b> on this session.`, ()=>{
-      snap.forEach(({k,was})=>{ if (k.t==='img') k.alt = was; else k.text = was; });
-      S.boosts.splice(S.boosts.length-openBoosts.length, openBoosts.length);
-      S.session -= openTotal; S.boostCount -= openBoosts.length; draw(); review(); bdg();
-    });
-  };
+  if (ba) ba.onclick = () => askBoost(openBoosts);
   document.querySelectorAll('[data-show]').forEach(b=>b.onclick=()=>showMe(b.dataset.show));
   document.querySelectorAll('[data-undo]').forEach(b=>b.onclick=()=>{
     const c = S.changes[+b.dataset.undo], k = comp(c.id);
@@ -1412,12 +1514,11 @@ function account(){
         ${S.seats<2?'<div class="itm"><span></span><span class="bdy"><span class="stamp">One seat is included. A second is $9/mo.</span></span><span class="acts"><button class="pill" id="as">Add</button></span></div>':''}</div></div>
     <div class="sec"><button class="sec-hd" data-t="a4" aria-expanded="false">How you like to work<span class="tw">+</span></button>
       <div class="sec-bd" id="a4" hidden><div class="itm">
-        <span></span><span class="bdy"><span class="new">Confirm before each boost</span><span class="stamp">${S.skipConfirm?'Off, boosts apply in one step':'On, Sitecraft asks first'}</span></span>
-        <span class="acts"><button class="pill" id="fc">${S.skipConfirm?'Turn on':'Turn off'}</button></span></div></div></div>
+        <span></span><span class="bdy"><span class="new">Confirm before each boost</span><span class="stamp">Always on. A boost holds for 90 days, so Sitecraft asks every time.</span></span>
+        <span></span></div></div></div>
     <div class="note-amber">Your plan is <b>$299/mo</b>. Boosts are agreed as you pick them and settle as one amount each time you press Done.</div>
     <div class="p-ft"><u>All my details</u> · © 2026 ReadTomato™</div>`});
   const a = $('#as'); if (a) a.onclick = seats;
-  $('#fc').onclick = ()=>{ S.skipConfirm = !S.skipConfirm; account(); };
 }
 
 /* ═══════════ the ? guide ═══════════ */
@@ -1481,14 +1582,13 @@ function guide(){
 function canStepBack(){
   const F = S.flow; if (!F) return false;
   const c = comp(F.id); if (!c) return false;
-  if (F.confirming || F.previewed || F.analysed) return true;
+  if (F.previewed || F.analysed) return true;
   return c.t === 'img' && (F.desc !== null || !!F.photo);
 }
 function stepBack(){
   const F = S.flow, c = comp(F.id);
   F.open = null;
-  if (F.confirming) F.confirming = false;
-  else if (F.previewed){ F.previewed = false; F.rolled = false; }
+  if (F.previewed){ F.previewed = false; F.rolled = false; }
   else if (F.analysed) F.analysed = false;
   else if (c.t === 'img' && F.desc !== null) F.desc = null;
   else if (c.t === 'img' && F.photo) { c.src = F.wasSrc || null; c.fit = F.wasFit || null; F.photo = null; draw(); }
@@ -1497,7 +1597,8 @@ function stepBack(){
 document.querySelectorAll('.bar [data-mode]').forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
 document.querySelector('[data-done]').onclick = done;
 $('#sc-done').onclick = done;
-$('#p-x').onclick = ()=> ['review','account','ident'].includes(S.mode) ? setMode(S.mode) : shut();
+$('#p-x').onclick = ()=> sheetOpen() ? sheetShut()
+  : (['review','account','ident'].includes(S.mode) ? setMode(S.mode) : shut());
 $('#scrim').onclick = ()=>$('#p-x').click();
 document.addEventListener('keydown', e=>{ if (e.key==='Escape') $('#p-x').click(); });
 document.querySelectorAll('nav.site a').forEach(a=>a.onclick=e=>{
