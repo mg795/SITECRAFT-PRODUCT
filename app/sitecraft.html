@@ -141,8 +141,10 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .g[disabled]{background:var(--sunk);color:var(--faint);cursor:not-allowed}
 .g .amt2{font-variant-numeric:tabular-nums;margin-left:auto;font-family:var(--m);font-weight:700;opacity:.95}
 .g .arw{font-weight:800;opacity:.8}
-.ghost{border:0;background:transparent;color:var(--mut);font-size:.83rem;font-weight:600;padding:.5rem;width:100%;text-align:center;border-radius:999px}
-.ghost:hover{background:var(--sunk);color:var(--ink-2)}
+/* the second action reads as a button at rest and turns green under the pointer */
+.ghost{border:0;background:var(--sunk);color:var(--ink-2);font-size:.83rem;font-weight:600;padding:.62rem .5rem;width:100%;text-align:center;border-radius:999px;transition:background .14s,color .14s}
+.ghost:hover,.ghost:focus-visible{background:var(--green);color:#fff}
+.ghost:active{background:var(--green-d);color:#fff}
 .pill{border:0;background:var(--sunk);color:var(--ink-2);padding:.34rem .8rem;border-radius:999px;font-size:.78rem;font-weight:600;white-space:nowrap;transition:border-color .14s,background .14s}
 .pill:hover{background:var(--rule)}
 .pair{display:grid;grid-template-columns:auto 1fr;gap:.55rem;align-items:center}
@@ -1207,8 +1209,11 @@ function flow(){
       S.later.add(c.id);
       F.analysed = true; F.previewed = true; F.rolled = true; F.open = null;
     }
-    draw();
-    setMode('review');
+    /* keep them moving down the page; the review panel asks about it later */
+    const nxt = nextUp(pgOf(c.id), c.id);
+    shut(); draw();
+    if (nxt) return setTimeout(() => pick(nxt.id), 160);
+    toast('Set aside. That is every part of this page looked at.');
   };
 }
 
@@ -1304,8 +1309,14 @@ function pageScore(page){
   return { ai:  +avg(cs.map(k => (now(k)[0] + now(k)[1]) / 2)).toFixed(1),
            seo: +avg(cs.map(k => now(k)[2])).toFixed(1) };
 }
-const nextUp = (page, not) =>
-  (SITE[page] || {comps:[]}).comps.find(k => k.id !== not && canBoost(k) && !isBoosted(k.id));
+/* the next one down the page: never backwards, never one already boosted or
+   already set aside, and no wrap, so pressing on always reaches the end */
+function nextUp(page, after){
+  const cs = (SITE[page] || {comps:[]}).comps;
+  const at = after ? cs.findIndex(k => k.id === after) : -1;
+  return cs.find((k, i) => i > at && k.id !== after
+                 && canBoost(k) && !isBoosted(k.id) && !S.later.has(k.id));
+}
 
 function sheet(html){
   const sh = $('#sheet');
