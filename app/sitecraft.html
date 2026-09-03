@@ -109,11 +109,11 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .flagchip.v3{color:var(--red)}
 .flagchip.v2{color:var(--ink-2)}
 .flagchip.v1{color:var(--faint)}
-.qmark{border:0;background:var(--green);color:#fff;width:1.05rem;height:1.05rem;border-radius:50%;font-size:.64rem;font-weight:800;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;line-height:1;flex:none;transition:background .12s,color .12s}
+.qmark{border:0;background:transparent;color:var(--green-d);font-size:.82rem;font-weight:800;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;flex:none;transition:color .12s}
 .qmark::before{content:'?';display:block;line-height:1;text-align:center}
-.qmark:hover,.qmark:focus-visible{background:var(--green-x)}
+.qmark:hover,.qmark:focus-visible{color:var(--green-x)}
 .flagchip .qmark{margin-left:.28rem}
-.tile.up .tl .qmark{background:var(--green-d)}
+.tile.up .tl .qmark{color:var(--green-x)}
 /* the header tooltip, capped at two lines so it can never wreck the panel */
 .headtip{position:absolute;top:2.3rem;left:1.1rem;right:1.1rem;z-index:9;background:var(--bar);color:#fff;font-size:.75rem;line-height:1.4;border-radius:8px;padding:.42rem .6rem;opacity:0;pointer-events:none;transition:opacity .12s;
   text-wrap:balance;max-height:calc(2 * 1.4em + 1rem);overflow:hidden}
@@ -177,7 +177,7 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .reset:hover{background:var(--green-d)}
 .fld{width:100%;font-family:var(--f);font-size:.9rem;line-height:1.45;padding:.7rem .8rem;border:0;border-radius:10px;background:var(--sunk);color:var(--ink);outline:none}
 .fld.grow{resize:none;overflow:hidden;display:block}
-.fld:focus{outline:2px solid var(--green);outline-offset:-2px}
+.fld:focus{background:var(--card)}
 
 /* copy boxes */
 .box{background:var(--sunk);border:0;border-radius:7px;padding:.65rem .75rem;font-size:.9rem;line-height:1.6;color:var(--ink-2)}
@@ -219,14 +219,14 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .tile .tp{font-variant-numeric:tabular-nums;display:block;font-family:var(--m);font-size:.7rem;font-weight:500;color:var(--ink-2);margin-top:.1rem}
 .tile.up .tp{color:var(--green-ink)}
 /* the tooltip: an overlay, so showing it can never move the tile you are pointing at */
-.tilewrap{position:relative}
+.tilewrap,.tipwrap{position:relative}
 .tipline{position:absolute;top:calc(100% + .3rem);left:0;right:0;z-index:6;font-size:.78rem;line-height:1.4;color:#fff;background:var(--bar);border-radius:9px;padding:.5rem .65rem;opacity:0;pointer-events:none;transition:opacity .12s;
   text-wrap:balance;max-height:calc(2 * 1.4em + 1rem);overflow:hidden}
 .tipline.on{opacity:1}
 .tipline b{color:#9BD35F;font-weight:700}
 .ca-hd .ca-q{flex:none}
 .ca-hd .ca-nm{flex:none}
-.tile .tl .qmark{width:.88rem;height:.88rem;font-size:.56rem;margin-left:.22rem}
+.tile .tl .qmark{margin-left:.2rem}
 .tagrow2{display:flex;gap:.3rem;flex-wrap:nowrap;overflow:hidden;align-items:center;min-height:1.35rem}
 .tag0,.tag1,.tagadd{font-size:.7rem;font-weight:600;padding:.14rem .5rem;border-radius:999px;white-space:nowrap;flex:none}
 .tagadd{border:1.5px solid var(--green);background:var(--card);color:var(--green-d)}
@@ -585,6 +585,15 @@ function open({ttl, flag, body, back}){
     ti.onblur = commit;
   }
   document.querySelectorAll('.tagrow2').forEach(fitTags);
+  document.querySelectorAll('[data-tiptext]').forEach(q=>{
+    const line = q.closest('.tipwrap') && q.closest('.tipwrap').querySelector('.tipline');
+    if (!line) return;
+    const on = () => { line.textContent = q.dataset.tiptext; line.classList.add('on'); };
+    const off = () => line.classList.remove('on');
+    q.addEventListener('mouseenter', on); q.addEventListener('focus', on);
+    q.addEventListener('mouseleave', off); q.addEventListener('blur', off);
+    q.addEventListener('click', e => { e.stopPropagation(); line.textContent = q.dataset.tiptext; line.classList.toggle('on'); });
+  });
   const ht = $('#headtip');
   if (ht) document.querySelectorAll('[data-help]').forEach(q=>{
     const on = () => { ht.textContent = q.dataset.help; ht.classList.add('on'); };
@@ -830,9 +839,11 @@ function flow(){
 
   /* ── stage 1: the change ── */
   if (editDone){
+    const onOriginal = img && F.wasSrc && c.src === F.wasSrc;
     parts.push(`<div class="sdone"><span class="tick">✓</span>
-      <span class="lbl2">${img ? (F.photo ? 'New photo added' : 'Description updated') : 'Your words saved'}</span>
+      <span class="lbl2">${img ? (onOriginal ? 'Original photo in place' : 'New photo added') : 'Your words saved'}</span>
       <button data-re="1">Change</button></div>`);
+    if (img) parts.push(`<input type="file" id="fi2" accept="image/*" hidden>`);
     if (img && F.photo && F.desc === null){
       const f = c.fit || (c.fit = {x:50, y:50, z:100});
       parts.push(`<div class="stage">
@@ -857,7 +868,10 @@ function flow(){
   /* ── stage 2 (photos only): what is in it ── */
   if (img && F.photo && F.desc === null){
     parts.push(`<div class="stage">
-      <div class="ask">What is in this picture?<button class="qmark" data-help="${esc(PIC_HELP)}" aria-label="Why this matters"></button></div>
+      <div class="tipwrap">
+        <div class="ask">What is in this picture?<button class="qmark" data-tiptext="${esc(PIC_HELP)}" aria-label="Why this matters"></button></div>
+        <div class="tipline"></div>
+      </div>
       <textarea class="fld grow" id="dsc" rows="1" placeholder="A short, plain description">${esc(F.draftDesc ?? c.alt ?? '')}</textarea>
     </div>`);
   }
@@ -873,7 +887,7 @@ function flow(){
   else if (canBoost(c) && !isBoosted(c.id)) cta = `<button class="g" id="go">Boost this ${esc(c.lbl.toLowerCase())}<span class="amt2">${M(c.price)}</span></button>`;
   else if (isBoosted(c.id)) cta = `<div class="sdone"><span class="tick">✓</span><span class="lbl2">Boosted, ${M(S.boosts.find(x=>x.id===c.id).price)} on this session</span></div>`;
 
-  const canBack = img && F.photo && F.desc === null;
+  const canBack = img && F.photo && F.desc === null && F.wasSrc && c.src !== F.wasSrc;
   const secondary = canBack
     ? `<button class="ghost" id="bk">← Use my original photo instead</button>`
     : ((img && !F.photo && F.desc === null) || (!img && F.words === null)
@@ -884,7 +898,25 @@ function flow(){
 
   /* ── wiring ── */
   const re = document.querySelector('[data-re]');
-  if (re) re.onclick = () => { setFlow({id:c.id, photo:null, desc:null, words:null, analysed:F.analysed, wasSrc:F.wasSrc, wasFit:F.wasFit}); flow(); };
+  const fi2 = $('#fi2');
+  if (re) re.onclick = () => {
+    if (img && fi2) return fi2.click();            /* pick a new one right here */
+    setFlow({id:c.id, photo:null, desc:null, words:null, analysed:F.analysed, wasSrc:F.wasSrc, wasFit:F.wasFit});
+    flow();
+  };
+  if (fi2) fi2.onchange = e => {
+    const file = e.target.files[0];
+    if (!file || !file.type.startsWith('image/')) return toast('That needs to be an image file.');
+    const r = new FileReader();
+    r.onload = ev => {
+      c.src = ev.target.result; c.fit = {x:50, y:50, z:100}; F.photo = c.src;
+      const probe = new Image();
+      probe.onload = () => { c.dim = {w:probe.naturalWidth, h:probe.naturalHeight}; };
+      probe.src = c.src;
+      flow(); draw(); toast('Photo swapped.');
+    };
+    r.readAsDataURL(file);
+  };
 
   const dz = $('#dz'), fi = $('#fi');
   if (dz){
@@ -892,7 +924,7 @@ function flow(){
       if (!file || !file.type.startsWith('image/')) return toast('That needs to be an image file.');
       const r = new FileReader();
       r.onload = e => {
-        F.photo = e.target.result; c.src = e.target.result; c.fit = {x:50, y:50, z:100};
+        c.src = e.target.result; F.photo = c.src; c.fit = {x:50, y:50, z:100};
         const probe = new Image();
         probe.onload = () => { c.dim = {w:probe.naturalWidth, h:probe.naturalHeight}; };
         probe.src = e.target.result;
@@ -936,9 +968,10 @@ function flow(){
 
   const bkBtn = $('#bk');
   if (bkBtn) bkBtn.onclick = () => {
-    c.src = F.wasSrc || null; c.fit = F.wasFit || null;
-    setFlow({id:c.id, photo:null, desc:null, words:null, analysed:F.analysed, wasSrc:F.wasSrc, wasFit:F.wasFit});
-    flow(); draw(); toast('Back to your original photo.');
+    c.src = F.wasSrc || null;
+    c.fit = F.wasFit ? {...F.wasFit} : {x:50, y:50, z:100};
+    F.photo = c.src;                                /* stay on this screen */
+    flow(); draw(); toast('Your original photo is back.');
   };
 
   const dsc = $('#dsc');
