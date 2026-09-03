@@ -1,5 +1,5 @@
 <title>Sitecraft Editor</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
 <style>
 /* ═══════ V1 design system ═══════ */
 :root{
@@ -12,7 +12,7 @@
   --ink:#16243C; --ink-2:#495A72; --mut:#77869B; --faint:#9AA7B8;
   --sh:0 14px 44px rgba(16,24,40,.18);
   --f:"Inter",ui-sans-serif,system-ui,sans-serif;
-  --m:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --m:"Inter",ui-sans-serif,system-ui,sans-serif;  /* numbers: Inter with tabular figures */
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --navy:#E7ECF3; --navy-2:#B7C3D4; --bar:#0A0E16; --bar-2:#1E2739;
@@ -36,6 +36,7 @@
 [hidden]{display:none!important}
 body{margin:0;background:var(--card);color:var(--ink);font-family:var(--f);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;padding-bottom:7rem}
 button{font:inherit;color:inherit;cursor:pointer}
+input,textarea,select{font-family:inherit}
 :focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
@@ -83,7 +84,7 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .bar button.on{background:#fff;color:var(--bar)}
 .bar button.done.armed{background:var(--green);color:#fff}
 .bar .bdg{background:var(--amber);color:#fff;font-size:.66rem;font-weight:800;padding:.05rem .32rem;border-radius:999px;min-width:1.1rem;text-align:center}
-.bar .ses{color:var(--green);font-family:var(--m);font-size:.76rem;font-weight:600;padding:.5rem .7rem;border-left:1px solid var(--bar-2);margin-left:.15rem;display:flex;align-items:center}
+.bar .ses{font-variant-numeric:tabular-nums;color:var(--green);font-family:var(--m);font-size:.76rem;font-weight:600;padding:.5rem .7rem;border-left:1px solid var(--bar-2);margin-left:.15rem;display:flex;align-items:center}
 
 /* ═══════ panel ═══════ */
 .scrim{position:fixed;inset:0;background:rgba(12,18,28,.4);z-index:70;display:none}
@@ -92,7 +93,7 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .pan.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
 .pan.moved{transition:opacity .16s}
 .pan.dragging{transition:none}
-.p-hd{padding:.85rem 1.1rem .3rem;display:flex;align-items:center;gap:.5rem;cursor:grab;user-select:none}
+.p-hd{position:relative;padding:.85rem 1.1rem .3rem;display:flex;align-items:center;gap:.5rem;cursor:grab;user-select:none}
 .p-hd:active{cursor:grabbing}
 .p-hd .ttl{font-size:.72rem;font-weight:600;color:var(--mut);line-height:1.3;min-width:0;display:flex;align-items:center;gap:.34rem;flex-wrap:wrap;letter-spacing:.005em}
 .p-hd .ttl i{font-style:normal;color:var(--faint);font-weight:500}
@@ -101,6 +102,12 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .flagchip.v3{color:var(--red)}
 .flagchip.v2{color:var(--ink-2)}
 .flagchip.v1{color:var(--faint)}
+.flagchip .qmark{border:0;background:var(--sunk);color:var(--mut);width:.95rem;height:.95rem;border-radius:50%;font-size:.6rem;font-weight:800;line-height:1;margin-left:.28rem;padding:0;display:inline-grid;place-items:center;vertical-align:middle}
+.flagchip .qmark:hover{background:var(--navy);color:var(--card)}
+/* the header tooltip, capped at two lines so it can never wreck the panel */
+.headtip{position:absolute;top:2.3rem;left:1.1rem;right:1.1rem;z-index:9;background:var(--bar);color:#fff;font-size:.75rem;line-height:1.4;border-radius:8px;padding:.42rem .6rem;opacity:0;pointer-events:none;transition:opacity .12s;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.headtip.on{opacity:1}
 .p-x{margin-left:auto;border:0;background:transparent;color:var(--green);font-size:1.05rem;line-height:1;font-weight:800;padding:0 .1rem;flex:none}
 .p-bd{overflow-y:auto;padding:.9rem 1.05rem 1.05rem;display:flex;flex-direction:column;gap:.7rem}
 .p-ft{font-size:.68rem;color:var(--faint);text-align:center;padding-top:.35rem}
@@ -112,12 +119,12 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .g:hover{background:var(--green-d)}
 .g:active{background:var(--green-x)}
 .g[disabled]{background:var(--sunk);color:var(--faint);cursor:not-allowed}
-.g .amt2{margin-left:auto;font-family:var(--m);font-weight:700;opacity:.95}
+.g .amt2{font-variant-numeric:tabular-nums;margin-left:auto;font-family:var(--m);font-weight:700;opacity:.95}
 .g .arw{font-weight:800;opacity:.8}
 .ghost{border:0;background:transparent;color:var(--mut);font-size:.83rem;font-weight:600;padding:.5rem;width:100%;text-align:center;border-radius:999px}
 .ghost:hover{background:var(--sunk);color:var(--ink-2)}
-.pill{border:1px solid var(--rule);background:var(--card);color:var(--ink-2);padding:.34rem .8rem;border-radius:999px;font-size:.78rem;font-weight:600;white-space:nowrap;transition:border-color .14s,background .14s}
-.pill:hover{border-color:var(--mut);background:var(--sunk)}
+.pill{border:0;background:var(--sunk);color:var(--ink-2);padding:.34rem .8rem;border-radius:999px;font-size:.78rem;font-weight:600;white-space:nowrap;transition:border-color .14s,background .14s}
+.pill:hover{background:var(--rule)}
 .pair{display:grid;grid-template-columns:auto 1fr;gap:.55rem;align-items:center}
 
 /* ── staged flow ── */
@@ -129,40 +136,42 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .ask{font-size:1.02rem;font-weight:700;color:var(--navy);letter-spacing:-.015em;line-height:1.3}
 .sub{font-size:.82rem;color:var(--mut);line-height:1.45;margin-top:-.25rem}
 
-.drop{position:relative;border:1px solid var(--rule);border-radius:14px;background:var(--sunk);min-height:9rem;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:1.1rem 1rem;gap:.1rem;cursor:pointer;transition:border-color .14s,background .14s}
-.drop:hover{border-color:var(--green);background:var(--green-pale)}
-.drop.over{border-color:var(--green);background:var(--green-pale)}
+.drop{position:relative;border:0;border-radius:14px;background:var(--sunk);min-height:9rem;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:1.1rem 1rem;gap:.1rem;cursor:pointer;transition:border-color .14s,background .14s}
+.drop:hover{background:var(--green-pale)}
+.drop.over{background:var(--green-pale)}
 .drop b{font-size:.88rem;color:var(--navy);font-weight:600;line-height:1.3}
 .drop span{font-size:.76rem;color:var(--mut);line-height:1.35}
 .drop em{position:absolute;left:0;right:0;bottom:.7rem;font-style:normal;font-size:.71rem;color:var(--faint);text-align:center}
-.drop.has{padding:0;border-color:var(--green);overflow:hidden;min-height:0;background:var(--card)}
+.drop.has{padding:0;overflow:hidden;min-height:0;background:var(--card)}
 .drop.has img{width:100%;display:block;aspect-ratio:1200/630;object-fit:cover}
-.crop{width:100%;aspect-ratio:1200/630;border-radius:12px;background-repeat:no-repeat;background-color:var(--sunk);cursor:grab;position:relative;overflow:hidden;border:1px solid var(--rule)}
+.crop{width:100%;aspect-ratio:1200/630;border-radius:12px;background-repeat:no-repeat;background-color:var(--sunk);cursor:grab;position:relative;overflow:hidden}
 .crop:active{cursor:grabbing}
 .crop .hint{position:absolute;left:50%;bottom:.5rem;transform:translateX(-50%);background:rgba(10,14,20,.62);color:#fff;font-size:.68rem;font-weight:600;padding:.16rem .55rem;border-radius:999px;pointer-events:none;transition:opacity .2s}
 .crop.moved .hint{opacity:0}
 .zoomrow{display:flex;align-items:center;gap:.6rem;font-size:.72rem;color:var(--mut);font-weight:600}
-.zoomrow input[type=range]{flex:1;accent-color:var(--green);height:1.1rem}
-.fld{width:100%;font-family:var(--f);font-size:.9rem;padding:.7rem .8rem;border:1px solid var(--rule);border-radius:10px;background:var(--card);color:var(--ink);outline:none}
-.fld:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--green-pale)}
+.zoomrow input[type=range]{flex:1;min-width:0;accent-color:var(--green);height:1.1rem}
+.reset{border:0;background:var(--green);color:#fff;font-size:.72rem;font-weight:700;padding:.26rem .7rem;border-radius:999px;flex:none}
+.reset:hover{background:var(--green-d)}
+.fld{width:100%;font-family:var(--f);font-size:.9rem;padding:.7rem .8rem;border:0;border-radius:10px;background:var(--sunk);color:var(--ink);outline:none}
+.fld:focus{outline:2px solid var(--green);outline-offset:-2px}
 
 /* copy boxes */
-.box{background:var(--sunk);border:1px solid var(--rule-2);border-radius:7px;padding:.65rem .75rem;font-size:.9rem;line-height:1.6;color:var(--ink-2)}
-.box.ed{background:var(--card);border-color:var(--blue);box-shadow:0 0 0 3px color-mix(in srgb,var(--blue) 14%,transparent);color:var(--ink);outline:none}
+.box{background:var(--sunk);border:0;border-radius:7px;padding:.65rem .75rem;font-size:.9rem;line-height:1.6;color:var(--ink-2)}
+.box.ed{background:var(--card);color:var(--ink);outline:2px solid var(--blue);outline-offset:-2px}
 .box ins{background:var(--green-pale);color:var(--green-ink);text-decoration:none;border-radius:2px;padding:0 .08rem}
 .box del{background:color-mix(in srgb,var(--red) 13%,transparent);color:var(--red);border-radius:2px;padding:0 .08rem}
 .lab{font-size:.64rem;letter-spacing:.09em;text-transform:uppercase;color:var(--mut);font-weight:700;display:flex;align-items:center;gap:.4rem}
 .lab .n{margin-left:auto;font-family:var(--m);letter-spacing:0;text-transform:none;font-weight:500}
-.wc{font-family:var(--m);font-size:.72rem;font-weight:500;color:var(--mut)}
+.wc{font-variant-numeric:tabular-nums;font-family:var(--m);font-size:.72rem;font-weight:500;color:var(--mut)}
 .wc.bad{color:var(--red)}.wc.ok{color:var(--green-ink)}
 .help{font-size:.76rem;color:var(--mut);text-align:center;line-height:1.45}
 .note-amber{background:var(--amber-bg);color:var(--amber-ink);border-radius:6px;padding:.55rem .7rem;font-size:.78rem;line-height:1.45}
 .note-amber b{font-weight:700}
 
 /* content analysis */
-.ca{border:1px solid var(--rule);border-radius:10px}
+.ca{border-radius:10px;background:var(--sunk)}
 .ca-hd{width:100%;border:0;background:var(--green-pale);display:flex;align-items:center;gap:.62rem;padding:.62rem .7rem;text-align:left;border-radius:9px 9px 0 0}
-.ca-sc{width:2.05rem;height:2.05rem;border-radius:50%;background:var(--red);color:#fff;font-size:.78rem;font-weight:800;display:grid;place-items:center;flex:none;font-family:var(--m)}
+.ca-sc{font-variant-numeric:tabular-nums;width:2.05rem;height:2.05rem;border-radius:50%;background:var(--red);color:#fff;font-size:.78rem;font-weight:800;display:grid;place-items:center;flex:none;font-family:var(--m)}
 .ca-hd.up .ca-sc{background:var(--green-d)}
 .ca-nm{display:grid;gap:.05rem;min-width:0}
 .ca-nm b{font-size:.86rem;font-weight:700;color:var(--navy)}
@@ -173,21 +182,22 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .ca-t{text-align:center;font-size:.84rem;font-weight:700;color:var(--navy)}
 
 .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem}
-.tile{background:var(--sunk);border-radius:10px;padding:.55rem .35rem .5rem;text-align:center;cursor:help;transition:background .14s;border:1px solid transparent}
-.tile:hover,.tile:focus-visible{border-color:var(--green)}
+.tile{background:var(--card);border-radius:10px;padding:.55rem .35rem .5rem;text-align:center;cursor:help;transition:background .14s}
+.tile:hover,.tile:focus-visible{background:var(--green-pale)}
 .tile.up{background:var(--green-pale)}
 .tile .tl{font-size:.6rem;letter-spacing:.04em;text-transform:uppercase;font-weight:700;color:var(--ink-2);display:block;margin-bottom:.1rem;line-height:1.25}
 .tile.up .tl{color:var(--green-ink)}
-.tile .tv{font-family:var(--m);font-size:1.2rem;font-weight:700;color:var(--red);letter-spacing:-.02em}
+.tile .tv{font-variant-numeric:tabular-nums;font-family:var(--m);font-size:1.2rem;font-weight:700;color:var(--red);letter-spacing:-.02em}
 .tile.up .tv{color:var(--green-x)}
 .tile .tu{font-size:.7rem;font-weight:600;color:var(--mut)}
 .tile.up .tu{color:var(--green-ink)}
 .tile .tw{display:block;font-size:.62rem;letter-spacing:.02em;font-weight:700;color:var(--green-x);margin-top:.18rem}
-.tile .tp{display:block;font-family:var(--m);font-size:.7rem;font-weight:500;color:var(--ink-2);margin-top:.1rem}
+.tile .tp{font-variant-numeric:tabular-nums;display:block;font-family:var(--m);font-size:.7rem;font-weight:500;color:var(--ink-2);margin-top:.1rem}
 .tile.up .tp{color:var(--green-ink)}
 /* the tooltip: an overlay, so showing it can never move the tile you are pointing at */
 .tilewrap{position:relative}
-.tipline{position:absolute;top:calc(100% + .3rem);left:0;right:0;z-index:6;font-size:.78rem;line-height:1.45;color:#fff;background:var(--bar);border-radius:9px;padding:.5rem .65rem;box-shadow:0 6px 20px rgba(10,14,20,.28);opacity:0;pointer-events:none;transition:opacity .12s}
+.tipline{position:absolute;top:calc(100% + .3rem);left:0;right:0;z-index:6;font-size:.78rem;line-height:1.4;color:#fff;background:var(--bar);border-radius:9px;padding:.5rem .65rem;opacity:0;pointer-events:none;transition:opacity .12s;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .tipline.on{opacity:1}
 .tipline b{color:#9BD35F;font-weight:700}
 .rec{font-size:.83rem;font-weight:700;color:var(--navy);text-align:center;line-height:1.45}
@@ -219,7 +229,7 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .itm .new{font-size:.85rem;color:var(--ink)}
 .itm .stamp{font-size:.7rem;color:var(--faint)}
 .itm .acts{display:grid;gap:.28rem;justify-items:stretch}
-.itm .amt{font-family:var(--m);font-size:.86rem;font-weight:700;color:var(--navy);text-align:right;white-space:nowrap}
+.itm .amt{font-variant-numeric:tabular-nums;font-family:var(--m);font-size:.86rem;font-weight:700;color:var(--navy);text-align:right;white-space:nowrap}
 .itm.gone .new,.itm.gone .who{color:var(--faint);text-decoration:line-through}
 .itm input[type=checkbox]{margin:.25rem 0 0;accent-color:var(--green)}
 .upsell{font-size:.74rem;color:var(--green-ink);line-height:1.35;margin-top:.15rem}
@@ -228,7 +238,7 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .lastcall{display:grid;gap:.5rem;padding:.7rem;margin-top:.5rem;background:var(--green-pale);border-radius:12px;font-size:.79rem;color:var(--green-ink);line-height:1.4}
 .lastcall b{color:var(--green-x);font-weight:700}
 .spent{display:flex;align-items:baseline;gap:.6rem;padding-top:.6rem;font-size:.88rem;font-weight:700;color:var(--navy)}
-.spent .amt{margin-left:auto;font-family:var(--m);font-size:1.35rem;font-weight:800}
+.spent .amt{font-variant-numeric:tabular-nums;margin-left:auto;font-family:var(--m);font-size:1.35rem;font-weight:800}
 .mini{font-size:.73rem;color:var(--faint);text-align:center}
 .empty{padding:1.1rem .5rem;text-align:center;color:var(--faint);font-size:.8rem}
 
@@ -237,9 +247,9 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .chip.gr{background:var(--green-pale);color:var(--green-ink)}
 .chip.am{background:var(--amber-bg);color:var(--amber-ink)}
 .who-pick{display:flex;gap:.35rem;flex-wrap:wrap}
-.who-pick button{border:1px solid var(--rule);background:var(--card);padding:.3rem .7rem;border-radius:999px;font-size:.78rem;font-weight:600;color:var(--mut)}
-.who-pick button.on{border-color:var(--green);background:var(--green-pale);color:var(--green-ink)}
-textarea.ta{width:100%;font-family:var(--f);font-size:.87rem;padding:.6rem .7rem;border:1px solid var(--blue);border-radius:7px;background:var(--card);color:var(--ink);resize:vertical;min-height:4.4rem;box-shadow:0 0 0 3px color-mix(in srgb,var(--blue) 14%,transparent)}
+.who-pick button{border:0;background:var(--sunk);padding:.3rem .7rem;border-radius:999px;font-size:.78rem;font-weight:600;color:var(--mut)}
+.who-pick button.on{background:var(--green-pale);color:var(--green-ink)}
+textarea.ta{width:100%;font-family:var(--f);font-size:.87rem;padding:.6rem .7rem;border:0;outline:2px solid var(--blue);outline-offset:-2px;border-radius:7px;background:var(--sunk);color:var(--ink);resize:vertical;min-height:4.4rem}
 .msg{font-size:.81rem;line-height:1.45;padding:.45rem .6rem;border-radius:6px;background:var(--sunk)}
 .msg b{display:block;font-size:.68rem;color:var(--faint);font-weight:600;margin-bottom:.1rem}
 .msg.them{background:var(--green-pale);color:var(--green-ink)}
@@ -252,14 +262,14 @@ body.editing .banner{display:block}
 body.editing nav.site{margin-top:1.6rem}
 </style>
 
-<div class="banner">You are editing — press <b>Done</b> to settle up and unlock the other pages</div>
+<div class="banner">You're editing. Press <b>Done</b> to settle up and unlock the other pages</div>
 
 <nav class="site">
   <span class="lg">Northgate Family Dental</span>
   <a href="#" data-go="home" class="on">Home</a>
   <a href="#" data-go="services">Services</a>
   <a href="#" data-go="about">About</a>
-  <div class="navlock">🔒 Locked while you are editing — press Done</div>
+  <div class="navlock">🔒 Locked while you're editing. Press Done</div>
 </nav>
 
 <div class="hero" id="hero"></div>
@@ -277,7 +287,7 @@ body.editing nav.site{margin-top:1.6rem}
 
 <div class="scrim" id="scrim"></div>
 <div class="pan" id="pan" role="dialog" aria-modal="true">
-  <div class="p-hd"><div class="ttl" id="p-ttl"></div><button class="p-x" id="p-x" aria-label="Close">✕</button></div>
+  <div class="p-hd"><div class="ttl" id="p-ttl"></div><div class="headtip" id="headtip"></div><button class="p-x" id="p-x" aria-label="Close">✕</button></div>
   <div class="p-bd" id="p-bd"></div>
 </div>
 
@@ -293,20 +303,20 @@ const SITE = {
     {id:'h-h1',lbl:'Heading', t:'h1', hero:1, price:5.99, text:'Gentle Family Dentistry in Northgate, Seattle',
       up:'Same-Day Crowns and Gentle Family Dentistry in Northgate, Seattle', s:[3.0,2.5,4.5], u:[8.5,9.0,8.5],
       rec:'Searches for same-day crowns find other practices, not yours.'},
-    {id:'h-p1',lbl:'Body copy', t:'p', hero:1, price:3.99, text:'We have been caring for families across North Seattle since 2004. Same-day crowns, clear aligners, and emergency appointments — with a team that remembers your name.',
+    {id:'h-p1',lbl:'Body copy', t:'p', hero:1, price:3.99, text:'We have been caring for families across North Seattle since 2004. Same-day crowns, clear aligners, and emergency appointments, from a team that remembers your name.',
       up:'We have cared for families across North Seattle since 2004. You can get a same-day crown, clear aligners, or an emergency appointment from a team that remembers your name.', s:[4.0,3.5,5.0], u:[8.5,8.0,8.0],
-      rec:'Assistants skip paragraphs they cannot lift as one whole thought.'},
+      rec:"Assistants skip paragraphs they can't lift as one whole thought."},
     {id:'h-img',lbl:'Feature Photo', t:'img', price:1.99, text:'Waiting room · 1200 × 630', alt:'Waiting room', dim:{w:1200,h:630},
       up:'The Northgate Family Dental waiting room in Seattle, where families wait for same-day crown appointments', s:[0.0,0.0,0.0], u:[3.5,3.5,3.5],
-      rec:'Search engines cannot see photos, so yours is simply ignored.'},
+      rec:"Search engines can't see photos, so yours is simply ignored."},
     {id:'h-h2',lbl:'Heading', t:'h2', price:2.99, text:'Our Services',
       up:'Same-Day Crowns Mean You Leave With Your Tooth Restored', s:[1.0,1.0,3.0], u:[9.0,9.0,8.5],
       rec:'A plain label gives assistants nothing worth quoting to anyone.'},
     {id:'h-p2',lbl:'Body copy', t:'p', price:3.99, text:'Our practice offers a comprehensive range of general and cosmetic dental services designed to meet the needs of patients at every stage of life, and we pride ourselves on staying current with the latest techniques available in modern dentistry today.',
       up:'We offer general and cosmetic dental services for patients at every stage of life. We stay current with the latest techniques in modern dentistry. Whether you need a routine cleaning or a crown, you are cared for by a practice that keeps its skills sharp.', s:[3.5,3.0,5.0], u:[8.5,9.0,8.0],
-      rec:'Assistants skip paragraphs they cannot lift as one whole thought.'},
+      rec:"Assistants skip paragraphs they can't lift as one whole thought."},
     {id:'h-band',lbl:'List item', t:'band', price:0, text:'Rated 5 stars by 200+ patients · 9 out of 10 patients say they felt no pain', s:[3.0,2.0,3.0],
-      blocked:'To show star ratings in search results the reviews have to be visible on this page. Sitecraft will never invent a rating or a patient count, so this one needs you: publish the reviews and the next scan will pick them up.'},
+      blocked:'To show star ratings in search results the reviews have to be visible on this page. Sitecraft never invents a rating or a patient count, so this one needs you: publish the reviews and the next scan will pick them up.'},
   ]},
   services:{ name:'Services', value:2, comps:[
     {id:'s-h1',lbl:'Heading', t:'h1', hero:1, price:5.99, text:'Our Dental Services',
@@ -339,13 +349,13 @@ const SCORE_TL = ['AI RETRIEVAL','AEO OPTIMIZED','SEO OPTIMIZED'];
 const WHY = [
   '<b>Why this matters.</b> AI tools pull out one paragraph at a time, not whole pages. If a paragraph only makes sense after reading the one above it, it gets left behind when an assistant is putting an answer together.',
   '<b>Why this matters.</b> This is whether ChatGPT, Perplexity or Google\'s AI answers name <em>you</em>. A heading that makes a claim beats a heading that is just a label, and naming your actual neighbourhood beats advice that could apply anywhere.',
-  '<b>Why this matters.</b> The traditional side — whether Google can rank this. It rewards the words people really search for appearing early, sensible lengths, and text that reads naturally rather than stuffed with keywords.',
+  '<b>Why this matters.</b> Whether Google can rank this. It rewards the words people really search for appearing early, sensible lengths, and text that reads naturally rather than stuffed with keywords.',
 ];
 const TAGGING = '<b>What does tagging mean?</b> Tagging means adding extra notes into your page\'s code. Visitors never see them. Google and AI search engines read them to work out what each part of your page actually is.<br><br>Writing it better lifts part of these scores on its own. The tagging only comes with a boost, which is why the numbers keep climbing after you have done your best with the words.';
 const TIP = [
-  'Can an assistant lift this out on its own? Short, self-contained lines score high.',
-  'Will ChatGPT or Google\'s AI answers name you? Claims beat labels; your area beats anywhere.',
-  'Can Google rank it? It wants the words people search for, near the front.',
+  "Can an assistant quote this on its own? Short, self-contained lines win.",
+  "Will AI answers name you? Claims beat labels, and your area beats anywhere.",
+  "Can Google rank it? It wants the words people search, near the front.",
 ];
 const PEOPLE = ['Jo Castellane','Priya Raman'];
 
@@ -413,13 +423,21 @@ function bdg(){
 
 /* ═══════════ panel ═══════════ */
 function open({ttl, flag, body}){
-  $('#p-ttl').innerHTML = (ttl||'') + (flag?` <span class="dot">·</span> <span class="flagchip ${flag.cls}">${flag.label}</span>`:'');
+  $('#p-ttl').innerHTML = (ttl||'') + (flag?` <span class="dot">·</span> <span class="flagchip ${flag.cls}">${flag.label}<button class="qmark" data-help="${esc(flag.help)}" aria-label="What is a ${flag.label}?">?</button></span>`:'');
   $('#p-bd').innerHTML = body || '';
   $('#toast').hidden = true; clearTimeout(toast._t);
   const pan = $('#pan');
   if (!pan.classList.contains('moved')) pan.style.transform = '';
   pan.classList.add('open'); $('#scrim').classList.add('open');
   wireTips();
+  const ht = $('#headtip'), q = document.querySelector('.qmark');
+  if (q && ht){
+    const on = () => { ht.textContent = q.dataset.help; ht.classList.add('on'); };
+    const off = () => ht.classList.remove('on');
+    q.addEventListener('mouseenter', on); q.addEventListener('focus', on);
+    q.addEventListener('mouseleave', off); q.addEventListener('blur', off);
+    q.addEventListener('click', e => { e.stopPropagation(); ht.classList.toggle('on'); });
+  }
   document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{
     const t = document.getElementById(b.dataset.t), o = b.getAttribute('aria-expanded')==='true';
     b.setAttribute('aria-expanded', String(!o)); t.hidden = o;
@@ -447,7 +465,12 @@ function toast(m, undo){
   $('#toast').hidden = false; clearTimeout(toast._t); toast._t = setTimeout(()=>$('#toast').hidden=true, 5000);
 }
 const VALUE = {3:'Critical Page', 2:'Support Page', 1:'Minor Page'};
-const pageValue = pg => ({ label: VALUE[pg.value], cls: 'v' + pg.value });
+const pageValue = pg => ({ label: VALUE[pg.value], cls: 'v' + pg.value, help: VALUE_HELP[pg.value] });
+const VALUE_HELP = {
+  3: "A page people land on from search. Work here moves the needle most.",
+  2: "A page that backs up the critical ones. Worth doing after those.",
+  1: "Rarely found through search. Fix it if you like, but it can wait.",
+};
 const tc = s => String(s).replace(/\b\w/g, m => m.toUpperCase());
 const SHORT = {'Feature Photo':'Photo','Body copy':'Text','List item':'Text','Eyebrow':'Label','Heading':'Heading'};
 const shortOf = c => SHORT[c.lbl] || tc(c.lbl);
@@ -471,7 +494,7 @@ function setMode(m){
 }
 function arm(){ if (S.editing) return; S.editing = true; document.body.classList.add('editing'); document.querySelector('.done').classList.add('armed'); }
 function done(){
-  if (!S.editing){ toast('You are already unlocked — pick a page.'); return; }
+  if (!S.editing){ toast("You're already unlocked. Pick a page."); return; }
   const amt = S.session;
   if (amt){ S.receipts.push({when:'now', site:'Northgate', n:S.boosts.length, amt}); S.session = 0; }
   S.editing = false; S.mode = null; S.flows = {};
@@ -536,7 +559,7 @@ function wireTips(){
 const setFlow = f => { S.flow = f; S.flows[f.id] = f; return f; };
 function editP(id){
   const c = comp(id);
-  /* resume where they left off — clicking away is a dismissal, not a discard */
+  /* resume where they left off: clicking away is a dismissal, not a discard */
   S.flow = S.flows[id] || setFlow({id, photo:null, desc:null, words:null, analysed:false,
                                    wasSrc:c.src||null, wasFit:c.fit?{...c.fit}:null});
   flow();
@@ -559,12 +582,12 @@ function flow(){
       parts.push(`<div class="stage">
         <div class="crop" id="crop" style="background-image:url(${c.src});background-size:${f.z}%;background-position:${f.x}% ${f.y}%">
           <span class="hint">Drag to reposition</span></div>
-        <div class="zoomrow"><span>Zoom</span><input type="range" id="zoom" min="100" max="260" value="${f.z}"></div>
+        <div class="zoomrow"><span>Zoom</span><input type="range" id="zoom" min="100" max="260" value="${f.z}"><button class="reset" id="rs">Reset</button></div>
       </div>`);
     }
   } else if (img){
     parts.push(`<div class="stage">
-      <div class="drop" id="dz"><b>Drag a photo here</b><span>or click to choose one</span><em>Any size — you position it next (now ${c.dim ? c.dim.w + ' × ' + c.dim.h : '1200 × 630'})</em></div>
+      <div class="drop" id="dz"><b>Drag a New Photo Here</b><span>or Click to Choose One</span><em>Any size, you position it next (now ${c.dim ? c.dim.w + ' × ' + c.dim.h : '1200 × 630'})</em></div>
       <input type="file" id="fi" accept="image/*" hidden>
     </div>`);
   } else {
@@ -580,7 +603,7 @@ function flow(){
     parts.push(`<div class="stage">
       <div class="ask">What is in this picture?</div>
       <input class="fld" id="dsc" value="${esc(F.draftDesc ?? c.alt ?? '')}" placeholder="A short, plain description">
-      <div class="sub">A picture is invisible to search without this. Plain words help — a <b>boost</b> writes and tags it properly.</div>
+      <div class="sub">Search can't see this picture yet. <b>Boost it</b> and we'll describe and tag it so it counts.</div>
     </div>`);
   }
 
@@ -591,7 +614,7 @@ function flow(){
   let cta = '';
   if (!F.analysed) cta = `<button class="g" id="go">See How AI Reads This <span class="arw">→</span></button>`;
   else if (canBoost(c) && !isBoosted(c.id)) cta = `<button class="g" id="go">Boost this ${esc(c.lbl.toLowerCase())}<span class="amt2">${M(c.price)}</span></button>`;
-  else if (isBoosted(c.id)) cta = `<div class="sdone"><span class="tick">✓</span><span class="lbl2">Boosted — ${M(S.boosts.find(x=>x.id===c.id).price)} on this session</span></div>`;
+  else if (isBoosted(c.id)) cta = `<div class="sdone"><span class="tick">✓</span><span class="lbl2">Boosted, ${M(S.boosts.find(x=>x.id===c.id).price)} on this session</span></div>`;
 
   const canBack = img && F.photo && F.desc === null;
   const secondary = canBack
@@ -599,8 +622,7 @@ function flow(){
     : ((img && !F.photo && F.desc === null) || (!img && F.words === null)
         ? '' : `<button class="ghost" id="sv">Boost This ${esc(shortOf(c))} Later</button>`);
 
-  open({ ttl: hdr(c), flag: flagOf(c), body: parts.join('') + cta + secondary
-        + `<div class="p-ft"><u>Disclaimer</u> · © 2026 ReadTomato™</div>` });
+  open({ ttl: hdr(c), flag: flagOf(c), body: parts.join('') + cta + secondary });
 
   /* ── wiring ── */
   const re = document.querySelector('[data-re]');
@@ -651,6 +673,7 @@ function flow(){
     });
     ['pointerup','pointercancel'].forEach(k => crop.addEventListener(k, () => { drag = null; }));
     $('#zoom').oninput = e => { f.z = +e.target.value; paint(); };
+    $('#rs').onclick = () => { f.x = 50; f.y = 50; f.z = 100; $('#zoom').value = 100; crop.classList.remove('moved'); paint(); };
   }
 
   const bkBtn = $('#bk');
@@ -672,7 +695,7 @@ function flow(){
     const tick = () => {
       const n = W(ed.innerText), ok = n === target;
       wc.className = 'wc ' + (ok ? 'ok' : 'bad');
-      wc.textContent = ok ? `${n} of ${target} words` : `${n} of ${target} words — ${n>target?(n-target)+' too many':(target-n)+' to go'}`;
+      wc.textContent = ok ? `${n} of ${target} words` : `${n} of ${target} words, ${n>target?(n-target)+' too many':(target-n)+' to go'}`;
       return ok;
     };
     ed.addEventListener('input', tick); tick();
@@ -714,8 +737,7 @@ function blockedP(id){
   open({ ttl: hdr(c), flag: flagOf(c), body:`
     <div class="box">${esc(c.text)}</div>
     <div class="note-amber"><b>This one needs you, not a boost.</b><br>${esc(c.blocked)}</div>
-    ${scores(c, false)}
-    <div class="p-ft"><u>Disclaimer</u> · © 2026 ReadTomato™</div>`});
+    ${scores(c, false)}`});
 }
 
 /* ═══════════ boost: projection, then one confirm ═══════════ */
@@ -728,8 +750,7 @@ function boostP(id, proj = true){
     ${scores(c, proj, true)}
     <div class="sub" style="text-align:center">${proj?'<b>Nothing on your page has changed.</b>':'This is live on your page now.'}</div>
     <button class="g" id="go">Boost this ${esc(c.lbl.toLowerCase())}<span class="amt2">${M(c.price)}</span></button>
-    <button class="ghost" id="flip">${proj?'Show my scores again':'Show me the boost again'}</button>
-    <div class="p-ft"><u>Disclaimer</u> · © 2026 ReadTomato™</div>`});
+    <button class="ghost" id="flip">${proj?'Show my scores again':'Show me the boost again'}</button>`});
   $('#flip').onclick = () => boostP(id, !proj);
   $('#go').onclick = () => S.skipConfirm ? apply(id) : confirmP(id);
 }
@@ -742,8 +763,7 @@ function confirmP(id){
       <span class="amt" style="margin-left:auto">${M(S.session)}</span></div>
     <div class="sub">Boosts are agreed as you pick them and settle as <b>one amount</b> when you press Done.</div>
     <button class="g" id="go">Yes, boost it<span class="amt2">${M(c.price)}</span></button>
-    <button class="ghost" id="bk">Back</button>
-    <div class="p-ft"><u>Disclaimer</u> · © 2026 ReadTomato™</div>`});
+    <button class="ghost" id="bk">Back</button>`});
   $('#bk').onclick = () => boostP(id);
   $('#go').onclick = () => apply(id);
 }
@@ -753,7 +773,7 @@ function apply(id){
   S.boosts.push({id, page:pgOf(id), lbl:c.lbl, price:c.price, gain:c.u.map((v,i)=>+(v-c.s[i]).toFixed(1))});
   S.session += c.price; S.boostCount++;
   shut(); draw(); flash(id); bdg();
-  toast(`Boosted. <b>${M(c.price)}</b> added to this session — nothing charged until Done.`, () => {
+  toast(`Boosted. <b>${M(c.price)}</b> added to this session. Nothing's charged until Done.`, () => {
     if (c.t === 'img') c.alt = was; else c.text = was;
     S.boosts.pop(); S.session -= c.price; S.boostCount--; draw(); bdg();
   });
@@ -762,10 +782,10 @@ function apply(id){
 function offer(){
   open({ ttl:'Sitecraft noticed a habit', body:`
     <div class="sdone" style="align-items:flex-start"><span class="tick">⚡</span>
-      <span style="font-weight:500;line-height:1.45">You have boosted three times and said yes every time. Sitecraft can skip the confirm from now on — you will still see the comparison first, and Undo still works.</span></div>
+      <span style="font-weight:500;line-height:1.45">You have boosted three times and said yes every time. Sitecraft can skip the confirm from now on. You'll still see the comparison first, and Undo still works.</span></div>
     <button class="g" id="yes">Skip it from now on</button>
     <button class="ghost" id="no">Keep asking me</button>`});
-  $('#no').onclick = () => { shut(); toast('No problem — Sitecraft will keep asking.'); };
+  $('#no').onclick = () => { shut(); toast('No problem. Sitecraft will keep asking.'); };
   $('#yes').onclick = () => { S.skipConfirm = true; shut(); toast('Done. Boosts now take one step.'); };
 }
 
@@ -784,8 +804,7 @@ function noteP(id){
     <div class="who-pick" id="wp">${PEOPLE.slice(0,S.seats).map((p,i)=>`<button data-w="${esc(p)}" class="${i?'':'on'}">${esc(p)}</button>`).join('')}
       ${S.seats<2?'<button data-add="1" style="border-style:solid">+ Add someone · $9/mo</button>':''}</div>
     <button class="g" id="ad">Save this note</button>
-    <div class="help">Notes gather in Review, so you can send them in one go.</div>
-    <div class="p-ft"><u>Disclaimer</u> · © 2026 ReadTomato™</div>`});
+    <div class="help">Notes gather in Review, so you can send them in one go.</div>`});
   S.noteTo = PEOPLE[0];
   document.querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>{
     document.querySelectorAll('[data-w]').forEach(x=>x.classList.remove('on')); b.classList.add('on'); S.noteTo = b.dataset.w;
@@ -802,7 +821,7 @@ function seats(){
   open({ ttl:'<b>Add someone to your account</b>', body:`
     <div class="chips"><span class="chip gr">1 seat included</span><span class="chip">${S.seats} of ${S.seats} used</span></div>
     <div class="itm" style="border:0"><span></span><span class="bdy"><span class="new">One more reviewer</span><span class="stamp">Cancel any time</span></span><span class="amt">$9.00/mo</span></div>
-    <div class="help">Reviewers see the live site and every note, and can reply in the thread. They cannot make edits.</div>
+    <div class="help">Reviewers see the live site and every note, and can reply in the thread. They can't make edits.</div>
     <div class="pair"><button class="pill" id="no">Not now</button><button class="g" id="yes">Add for $9/mo</button></div>`});
   $('#no').onclick = shut;
   $('#yes').onclick = ()=>{ S.seats = 2; shut(); toast(`${PEOPLE[1]} added as a reviewer.`); };
@@ -856,7 +875,7 @@ function review(){
       <div class="sec-bd" id="r2" ${openN?'':'hidden'}>${nts}
         ${S.notes.length?`<div class="help" style="padding-top:.5rem">Tick the notes you want to send</div>
         <button class="g" id="send" ${S.picked.size?'':'disabled'}>Send the ticked notes</button>
-        <div class="mini" style="padding-top:.3rem">Each note goes to the person it was already meant for — one message each, holding only their notes.</div>`:''}</div></div>
+        <div class="mini" style="padding-top:.3rem">Each note goes to the person it was already meant for. One message each, holding only their notes.</div>`:''}</div></div>
     <div class="sec"><button class="sec-hd" data-t="r3" aria-expanded="true">Boosts on this page (${S.boosts.filter(b=>b.page===S.page).length})<span class="tw">✕</span></button>
       <div class="sec-bd" id="r3">${bst}
         <div class="spent"><span>Spent on this page</span><span class="amt">${M(pageSpend(S.page))}</span></div>
@@ -899,10 +918,10 @@ function review(){
     if (!S.picked.size) return;
     const by = {};
     [...S.picked].forEach(i=>{ const n = S.notes[i]; (by[n.to] = by[n.to]||[]).push(n);
-      n.sent = true; n.reply = 'Looks good — happy for you to publish this.'; });
+      n.sent = true; n.reply = 'Looks good, happy for you to publish this.'; });
     const names = Object.keys(by), n = S.picked.size; S.picked.clear();
     review(); bdg();
-    toast(`${n} note${n>1?'s':''} sent on — ${names.map(k=>`<b>${k}</b> got ${by[k].length}`).join(', ')}, one message each. Carry on looking around whenever you like.`);
+    toast(`${n} note${n>1?'s':''} sent on. ${names.map(k=>`<b>${k}</b> got ${by[k].length}`).join(', ')}, one message each. Carry on looking around whenever you like.`);
   };
 }
 
@@ -926,12 +945,12 @@ function account(){
         <div class="mini">Each line is one settled session, not one boost.</div></div></div>
     <div class="sec"><button class="sec-hd" data-t="a3" aria-expanded="false">People on your account<span class="tw">+</span></button>
       <div class="sec-bd" id="a3" hidden>
-        <div class="itm"><span class="who">Owner</span><span class="bdy"><span class="new">You — edit and boost</span></span><span></span></div>
-        ${PEOPLE.slice(0,S.seats).map(p=>`<div class="itm"><span class="who"><i>Reviewer</i></span><span class="bdy"><span class="new">${esc(p)} — notes only</span></span><span></span></div>`).join('')}
+        <div class="itm"><span class="who">Owner</span><span class="bdy"><span class="new">You, edit and boost</span></span><span></span></div>
+        ${PEOPLE.slice(0,S.seats).map(p=>`<div class="itm"><span class="who"><i>Reviewer</i></span><span class="bdy"><span class="new">${esc(p)}, notes only</span></span><span></span></div>`).join('')}
         ${S.seats<2?'<div class="itm"><span></span><span class="bdy"><span class="stamp">One seat is included. A second is $9/mo.</span></span><span class="acts"><button class="pill" id="as">Add</button></span></div>':''}</div></div>
     <div class="sec"><button class="sec-hd" data-t="a4" aria-expanded="false">How you like to work<span class="tw">+</span></button>
       <div class="sec-bd" id="a4" hidden><div class="itm">
-        <span></span><span class="bdy"><span class="new">Confirm before each boost</span><span class="stamp">${S.skipConfirm?'Off — boosts apply in one step':'On — Sitecraft asks first'}</span></span>
+        <span></span><span class="bdy"><span class="new">Confirm before each boost</span><span class="stamp">${S.skipConfirm?'Off, boosts apply in one step':'On, Sitecraft asks first'}</span></span>
         <span class="acts"><button class="pill" id="fc">${S.skipConfirm?'Turn on':'Turn off'}</button></span></div></div></div>
     <div class="note-amber">Your plan is <b>$299/mo</b>. Boosts are agreed as you pick them and settle as one amount each time you press Done.</div>
     <div class="p-ft"><u>All my details</u> · © 2026 ReadTomato™</div>`});
@@ -956,8 +975,7 @@ function guide(){
     }).join('')}</div>
     ${tot?`<div class="spent"><span>Boost all ${left.length} left on this page</span><span class="amt">${M(tot)}</span></div>
       <button class="g" id="all">Boost the whole page · ${M(tot)}</button>
-      <div class="mini">Adds to this session. Nothing charged until you press Done.</div>`:'<div class="help">Everything boostable on this page is done.</div>'}
-    <div class="p-ft"><u>Disclaimer</u> · © 2026 ReadTomato™</div>`});
+      <div class="mini">Adds to this session. Nothing charged until you press Done.</div>`:'<div class="help">Everything boostable on this page is done.</div>'}`});
   document.querySelectorAll('[data-show]').forEach(b=>b.onclick=()=>showMe(b.dataset.show));
   const a = $('#all');
   if (a) a.onclick = ()=>{
