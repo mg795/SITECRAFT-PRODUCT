@@ -110,7 +110,7 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .tile.up .tl .qmark{background:var(--green-d)}
 /* the header tooltip, capped at two lines so it can never wreck the panel */
 .headtip{position:absolute;top:2.3rem;left:1.1rem;right:1.1rem;z-index:9;background:var(--bar);color:#fff;font-size:.75rem;line-height:1.4;border-radius:8px;padding:.42rem .6rem;opacity:0;pointer-events:none;transition:opacity .12s;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  text-wrap:balance;max-height:calc(2 * 1.4em + 1rem);overflow:hidden}
 .headtip.on{opacity:1}
 .p-back{margin-left:auto;border:0;background:transparent;color:var(--green);font-size:1.05rem;line-height:1;font-weight:800;padding:0 .1rem;flex:none}
 .p-back[hidden]+.p-x{margin-left:auto}
@@ -152,6 +152,15 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .drop em{position:absolute;left:0;right:0;bottom:.7rem;font-style:normal;font-size:.71rem;color:var(--faint);text-align:center}
 .drop.has{padding:0;overflow:hidden;min-height:0;background:var(--card)}
 .drop.has img{width:100%;display:block;aspect-ratio:1200/630;object-fit:cover}
+/* the photo currently on the page, dimmed so the prompt reads over it */
+.drop.onphoto{background-size:cover;background-position:center;min-height:11rem;overflow:hidden}
+.drop.onphoto::before{content:'';position:absolute;inset:0;background:rgba(10,14,20,.58);transition:background .14s}
+.drop.onphoto:hover::before,.drop.onphoto.over::before{background:rgba(10,14,20,.42)}
+.drop.onphoto > b,.drop.onphoto > span{position:relative;z-index:1}
+.drop.onphoto em{z-index:1}
+.drop.onphoto b{color:#fff}
+.drop.onphoto span{color:rgba(255,255,255,.88)}
+.drop.onphoto em{color:rgba(255,255,255,.72)}
 .crop{width:100%;aspect-ratio:1200/630;border-radius:12px;background-repeat:no-repeat;background-color:var(--sunk);cursor:grab;position:relative;overflow:hidden}
 .crop:active{cursor:grabbing}
 .crop .hint{position:absolute;left:50%;bottom:.5rem;transform:translateX(-50%);background:rgba(10,14,20,.62);color:#fff;font-size:.68rem;font-weight:600;padding:.16rem .55rem;border-radius:999px;pointer-events:none;transition:opacity .2s}
@@ -206,7 +215,7 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 /* the tooltip: an overlay, so showing it can never move the tile you are pointing at */
 .tilewrap{position:relative}
 .tipline{position:absolute;top:calc(100% + .3rem);left:0;right:0;z-index:6;font-size:.78rem;line-height:1.4;color:#fff;background:var(--bar);border-radius:9px;padding:.5rem .65rem;opacity:0;pointer-events:none;transition:opacity .12s;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  text-wrap:balance;max-height:calc(2 * 1.4em + 1rem);overflow:hidden}
 .tipline.on{opacity:1}
 .tipline b{color:#9BD35F;font-weight:700}
 .ca-hd .ca-q{flex:none}
@@ -607,9 +616,9 @@ function toast(m, undo){
 const VALUE = {3:'Critical Page', 2:'Support Page', 1:'Minor Page'};
 const pageValue = pg => ({ label: VALUE[pg.value], cls: 'v' + pg.value, help: VALUE_HELP[pg.value] });
 const VALUE_HELP = {
-  3: "A page people land on from search. Work here moves the needle most.",
-  2: "A page that backs up the critical ones. Worth doing after those.",
-  1: "Rarely found through search. Fix it if you like, but it can wait.",
+  3: "People arrive on this page straight from search, so anything you improve here moves the needle furthest.",
+  2: "This page supports the critical ones. It is worth your attention once those are in good shape.",
+  1: "People rarely reach this page through search, so you can fix it whenever it suits you.",
 };
 const tc = s => String(s).replace(/\b\w/g, m => m.toUpperCase());
 const SHORT = {'Feature Photo':'Photo','Body copy':'Text','List item':'Text','Eyebrow':'Label','Heading':'Heading'};
@@ -821,7 +830,7 @@ function flow(){
     }
   } else if (img){
     parts.push(`<div class="stage">
-      <div class="drop" id="dz"><b>Drag a New Photo Here</b><span>or Click to Choose One</span><em>Any size, you position it next (now ${c.dim ? c.dim.w + ' × ' + c.dim.h : '1200 × 630'})</em></div>
+      <div class="drop${c.src ? ' onphoto' : ''}" id="dz"${c.src ? ` style="background-image:url(${c.src})"` : ''}><b>Drag a New Photo Here</b><span>or Click to Choose One</span><em>Any size, you position it next (now ${c.dim ? c.dim.w + ' × ' + c.dim.h : '1200 × 630'})</em></div>
       <input type="file" id="fi" accept="image/*" hidden>
     </div>`);
   } else {
