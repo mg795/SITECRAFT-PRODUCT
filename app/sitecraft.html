@@ -1,766 +1,767 @@
 <title>Sitecraft Editor</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
-/* ═══════════════ tokens ═══════════════ */
+/* ═══════ V1 design system ═══════ */
 :root{
-  --site-bg:#FFFFFF; --site-ink:#1A1D21; --site-ink2:#4A5359; --site-soft:#F2F0EC; --site-accent:#1F6F5C;
-  --ui:#FFFFFF; --ui-sunk:#F4F6F7; --ui-ink:#14181C; --ui-ink2:#414B53; --ui-mut:#6B7680; --ui-faint:#98A3AB;
-  --rule:#E1E5E8; --rule-soft:#EDF0F2;
-  --bar:#15181C; --bar-ink:#F2F4F5; --bar-mut:#8C959D; --bar-hi:#2A3037;
-  --accent:#C4392C; --accent-bg:#FBEAE7; --accent-ink:#C4392C;
-  --lo:#B4443A; --mid:#B07D2E; --hi:#2F7D52;
-  --ins:#DCEEE3; --ins-ink:#1D5638; --del:#F9E0DD; --del-ink:#8E2C23;
-  --ok:#2F7D52; --warn:#B07D2E;
-  --f-ui:"Plus Jakarta Sans",ui-sans-serif,system-ui,sans-serif;
-  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
-  --f-site:"Source Serif 4",Georgia,serif;
-  --sh:0 8px 34px rgba(12,16,20,.20);
+  --navy:#16243C; --navy-2:#2C3E5C; --bar:#131A28; --bar-2:#26314A;
+  --red:#C41E3A; --red-2:#E8455E;
+  --green:#7EB93F; --green-d:#6BA032; --green-pale:#EAF4DC; --green-ink:#4C7A1F;
+  --amber:#E2932B; --amber-bg:#FDF4E3; --amber-ink:#8A6416;
+  --blue:#2563EB;
+  --page:#F4F5F7; --card:#FFFFFF; --sunk:#EFF1F4; --rule:#E4E7EC; --rule-2:#EEF0F3;
+  --ink:#16243C; --ink-2:#495A72; --mut:#77869B; --faint:#9AA7B8;
+  --sh:0 14px 44px rgba(16,24,40,.18);
+  --f:"Inter",ui-sans-serif,system-ui,sans-serif;
+  --m:"IBM Plex Mono",ui-monospace,Menlo,monospace;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --site-bg:#14181B; --site-ink:#E9EDEF; --site-ink2:#AFB9C0; --site-soft:#1D2226; --site-accent:#6FB9A4;
-  --ui:#1A1F23; --ui-sunk:#232A2F; --ui-ink:#E9EDEF; --ui-ink2:#BDC7CE; --ui-mut:#8B959D; --ui-faint:#6A757D;
-  --rule:#2D343A; --rule-soft:#252C31;
-  --bar:#0B0E11; --bar-ink:#F2F4F5; --bar-mut:#7E888F; --bar-hi:#242B31;
-  --accent:#E8796A; --accent-bg:#38211E; --accent-ink:#E8796A;
-  --lo:#DE7C72; --mid:#D2A15E; --hi:#6FB98C;
-  --ins:#1C3527; --ins-ink:#8FD3AC; --del:#38211E; --del-ink:#E89A92;
-  --ok:#6FB98C; --warn:#D2A15E;
-  --sh:0 8px 34px rgba(0,0,0,.55);
+  --navy:#E7ECF3; --navy-2:#B7C3D4; --bar:#0A0E16; --bar-2:#1E2739;
+  --red:#F2647C; --red-2:#F2647C;
+  --green:#8CC64C; --green-d:#7EB93F; --green-pale:#1E2A16; --green-ink:#A8D472;
+  --amber:#E2932B; --amber-bg:#2A2113; --amber-ink:#E0B476;
+  --page:#0E1319; --card:#161C25; --sunk:#1E252F; --rule:#2A3240; --rule-2:#222932;
+  --ink:#E7ECF3; --ink-2:#B2BECD; --mut:#8494A6; --faint:#66748A;
+  --sh:0 14px 44px rgba(0,0,0,.6);
 }}
 :root[data-theme="dark"]{
-  --site-bg:#14181B; --site-ink:#E9EDEF; --site-ink2:#AFB9C0; --site-soft:#1D2226; --site-accent:#6FB9A4;
-  --ui:#1A1F23; --ui-sunk:#232A2F; --ui-ink:#E9EDEF; --ui-ink2:#BDC7CE; --ui-mut:#8B959D; --ui-faint:#6A757D;
-  --rule:#2D343A; --rule-soft:#252C31;
-  --bar:#0B0E11; --bar-ink:#F2F4F5; --bar-mut:#7E888F; --bar-hi:#242B31;
-  --accent:#E8796A; --accent-bg:#38211E; --accent-ink:#E8796A;
-  --lo:#DE7C72; --mid:#D2A15E; --hi:#6FB98C;
-  --ins:#1C3527; --ins-ink:#8FD3AC; --del:#38211E; --del-ink:#E89A92;
-  --ok:#6FB98C; --warn:#D2A15E;
-  --sh:0 8px 34px rgba(0,0,0,.55);
+  --navy:#E7ECF3; --navy-2:#B7C3D4; --bar:#0A0E16; --bar-2:#1E2739;
+  --red:#F2647C; --red-2:#F2647C;
+  --green:#8CC64C; --green-d:#7EB93F; --green-pale:#1E2A16; --green-ink:#A8D472;
+  --amber:#E2932B; --amber-bg:#2A2113; --amber-ink:#E0B476;
+  --page:#0E1319; --card:#161C25; --sunk:#1E252F; --rule:#2A3240; --rule-2:#222932;
+  --ink:#E7ECF3; --ink-2:#B2BECD; --mut:#8494A6; --faint:#66748A;
+  --sh:0 14px 44px rgba(0,0,0,.6);
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-body{margin:0;background:var(--site-bg);color:var(--site-ink);font-family:var(--f-site);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;padding-bottom:7rem}
+body{margin:0;background:var(--card);color:var(--ink);font-family:var(--f);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;padding-bottom:7rem}
 button{font:inherit;color:inherit;cursor:pointer}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
-/* ═══════════════ the client's own website ═══════════════ */
-nav.site{display:flex;align-items:center;gap:1.4rem;padding:1rem 2rem;border-bottom:1px solid var(--rule);position:relative;flex-wrap:wrap}
-nav.site .logo{font-family:var(--f-ui);font-weight:800;letter-spacing:-.02em;font-size:1.05rem;margin-right:auto}
-nav.site a{font-family:var(--f-ui);font-size:.86rem;font-weight:500;color:var(--site-ink2);text-decoration:none;padding:.2rem 0;border-bottom:2px solid transparent}
-nav.site a.on{color:var(--site-ink);border-bottom-color:var(--site-accent)}
-nav.site .nav-lock{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:color-mix(in srgb,var(--site-bg) 84%,transparent);font-family:var(--f-ui);font-size:.78rem;color:var(--ui-mut);gap:.4rem}
-body.editing nav.site .nav-lock{display:flex}
+/* ═══════ the client's site ═══════ */
+nav.site{display:flex;align-items:center;gap:1.5rem;padding:.9rem 2.2rem;border-bottom:1px solid var(--rule);position:relative;flex-wrap:wrap;background:var(--card)}
+nav.site .lg{font-weight:800;letter-spacing:-.02em;font-size:1rem;margin-right:auto;color:var(--navy)}
+nav.site a{font-size:.85rem;font-weight:500;color:var(--ink-2);text-decoration:none}
+nav.site a.on{color:var(--blue);font-weight:600}
+nav.site .navlock{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:color-mix(in srgb,var(--card) 88%,transparent);font-size:.78rem;font-weight:600;color:var(--amber-ink);gap:.4rem}
+body.editing nav.site .navlock{display:flex}
 
-main{max-width:52rem;margin:0 auto;padding:2.4rem 2rem 3rem}
-h1.c{font-family:var(--f-site);font-size:2.15rem;line-height:1.14;letter-spacing:-.02em;font-weight:700;margin:0 0 .7rem;text-wrap:balance}
-h2.c{font-family:var(--f-site);font-size:1.35rem;line-height:1.25;font-weight:600;margin:2rem 0 .6rem;text-wrap:balance}
-p.c{margin:0 0 1rem;color:var(--site-ink2);font-size:1rem;line-height:1.68}
-.img.c{background:var(--site-soft);border-radius:3px;display:grid;place-items:center;font-family:var(--f-mono);font-size:.7rem;color:var(--ui-faint);aspect-ratio:1200/630;margin:0 0 1.2rem;text-align:center;padding:1rem}
-.kick{font-family:var(--f-ui);font-size:.72rem;letter-spacing:.11em;text-transform:uppercase;color:var(--site-accent);font-weight:700;margin-bottom:.5rem}
+.hero{background:var(--bar);padding:3.2rem 2.2rem;color:#fff}
+.hero .in{max-width:52rem;margin:0 auto}
+main{max-width:52rem;margin:0 auto;padding:2.2rem 2.2rem 3rem}
+.kick{font-size:.72rem;letter-spacing:.11em;text-transform:uppercase;color:var(--blue);font-weight:700;margin:0 0 .6rem}
+.hero .kick{color:#7FA6F5}
+h1.c{font-size:2.3rem;line-height:1.1;letter-spacing:-.028em;font-weight:800;margin:0 0 .8rem;text-wrap:balance}
+.hero h1.c{color:#fff}
+h2.c{font-size:1.4rem;line-height:1.24;font-weight:700;letter-spacing:-.018em;margin:2rem 0 .6rem;color:var(--navy);text-wrap:balance}
+p.c{margin:0 0 1rem;color:var(--ink-2);font-size:.98rem;line-height:1.7}
+.hero p.c{color:#C3CEE2;max-width:44rem}
+.img.c{background:var(--sunk);border-radius:4px;display:grid;place-items:center;font-family:var(--m);font-size:.7rem;color:var(--faint);aspect-ratio:1200/630;margin:0 0 1.2rem;padding:1rem;text-align:center}
+.band.c{background:var(--sunk);padding:.8rem 1rem;border-radius:4px;font-size:.88rem;color:var(--mut);margin:1rem 0}
 
-/* component affordances */
-.c{position:relative;border-radius:3px;transition:box-shadow .16s,background .16s;scroll-margin:6rem}
-body.pickable .c{cursor:pointer}
-body.pickable .c:hover{background:var(--accent-bg);box-shadow:0 0 0 3px var(--accent-bg)}
-.c.sel{background:var(--accent-bg);box-shadow:0 0 0 3px var(--accent)}
-body.identify .c{outline:1px dashed color-mix(in srgb,var(--accent) 55%,transparent);outline-offset:5px}
-@keyframes flash{0%{background:var(--ins)}100%{background:transparent}}
-.c.flash{animation:flash 1.5s ease-out}
+.c{position:relative;border-radius:3px;transition:box-shadow .15s;scroll-margin:7rem}
+body.pick .c{cursor:pointer}
+body.pick .c:hover{box-shadow:0 0 0 2px var(--blue)}
+.c.sel{box-shadow:0 0 0 2px var(--blue)}
+body.ident .c[data-boost]{box-shadow:0 0 0 1px color-mix(in srgb,var(--red) 45%,transparent)}
+@keyframes fl{0%{box-shadow:0 0 0 3px var(--green)}100%{box-shadow:0 0 0 3px transparent}}
+.c.fl{animation:fl 1.6s ease-out}
 
-.tagrow{position:absolute;top:-.62rem;right:0;display:none;gap:.3rem;z-index:6}
-body.identify .tagrow,body.editing.pickable .c:hover .tagrow,.c.sel .tagrow{display:flex}
-.tag{font-family:var(--f-mono);font-size:.63rem;font-weight:600;padding:.1rem .38rem;border-radius:2px;background:var(--bar);color:var(--bar-ink);white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.2)}
-.tag.paid{background:var(--ok)}
-.pin{position:absolute;top:-.5rem;left:-.5rem;width:1.25rem;height:1.25rem;border-radius:50%;background:var(--warn);color:#fff;font-family:var(--f-mono);font-size:.66rem;font-weight:700;display:grid;place-items:center;z-index:7;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.etag{position:absolute;top:-.72rem;right:.2rem;display:none;gap:.25rem;z-index:6;align-items:center}
+body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
+.etag span{font-size:.62rem;font-weight:700;padding:.14rem .4rem;border-radius:3px;background:var(--bar);color:#fff;white-space:nowrap;letter-spacing:.02em}
+.etag .pr{background:var(--red)}
+.etag .dn{background:var(--green-d)}
+.npin{position:absolute;top:-.5rem;left:-.55rem;width:1.2rem;height:1.2rem;border-radius:50%;background:var(--amber);color:#fff;font-size:.64rem;font-weight:800;display:grid;place-items:center;z-index:7}
 
-/* ═══════════════ floating bar ═══════════════ */
-.bar{position:fixed;left:50%;bottom:1.1rem;transform:translateX(-50%);background:var(--bar);border-radius:999px;display:flex;gap:.15rem;padding:.4rem;box-shadow:var(--sh);z-index:100;font-family:var(--f-ui);max-width:calc(100vw - 1.5rem)}
-.bar button{border:0;background:transparent;color:var(--bar-mut);border-radius:999px;padding:.5rem .78rem;display:flex;flex-direction:column;align-items:center;gap:.15rem;font-size:.62rem;font-weight:600;letter-spacing:.02em;min-width:3.6rem;position:relative}
-.bar button svg{width:1.12rem;height:1.12rem;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
-.bar button:hover{color:var(--bar-ink);background:var(--bar-hi)}
-.bar button.on{background:var(--accent);color:#fff}
-.bar button.lock.armed{background:var(--ok);color:#fff}
-.bar .dot{position:absolute;top:.3rem;right:.55rem;min-width:.95rem;height:.95rem;border-radius:999px;background:var(--accent);color:#fff;font-family:var(--f-mono);font-size:.56rem;font-weight:700;display:grid;place-items:center;padding:0 .17rem}
-.bar .sep{width:1px;background:var(--bar-hi);margin:.35rem .25rem}
+/* ═══════ floating bar ═══════ */
+.bar{position:fixed;left:50%;bottom:1.1rem;transform:translateX(-50%);background:var(--bar);border:1px solid rgba(255,255,255,.09);border-radius:999px;display:flex;gap:.2rem;padding:.4rem;box-shadow:var(--sh);z-index:100;max-width:calc(100vw - 1rem);overflow-x:auto}
+.bar button{border:0;background:transparent;color:#C7D0DE;border-radius:999px;padding:.5rem .85rem;display:flex;align-items:center;gap:.42rem;font-size:.82rem;font-weight:600;white-space:nowrap;position:relative}
+.bar button svg{width:1rem;height:1rem;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.bar button:hover{background:var(--bar-2);color:#fff}
+.bar button.on{background:#fff;color:var(--bar)}
+.bar button.done.armed{background:var(--green);color:#fff}
+.bar .bdg{background:var(--amber);color:#fff;font-size:.66rem;font-weight:800;padding:.05rem .32rem;border-radius:999px;min-width:1.1rem;text-align:center}
+.bar .ses{color:var(--green);font-family:var(--m);font-size:.76rem;font-weight:600;padding:.5rem .7rem;border-left:1px solid var(--bar-2);margin-left:.15rem;display:flex;align-items:center}
 
-/* ═══════════════ sheet ═══════════════ */
-.scrim{position:fixed;inset:0;background:rgba(10,13,16,.42);z-index:70;display:none}
+/* ═══════ panel ═══════ */
+.scrim{position:fixed;inset:0;background:rgba(12,18,28,.4);z-index:70;display:none}
 .scrim.open{display:block}
-.scrim.open{display:block}
-.sheet{position:fixed;left:50%;bottom:5.3rem;transform:translateX(-50%) translateY(calc(100% + 5.3rem));width:min(41rem,calc(100vw - 1.5rem));max-height:min(72vh,40rem);background:var(--ui);color:var(--ui-ink);border-radius:12px;box-shadow:var(--sh);z-index:80;display:grid;grid-template-rows:auto 1fr auto;font-family:var(--f-ui);transition:transform .26s cubic-bezier(.3,.8,.3,1);overflow:hidden}
-.sheet.open{transform:translateX(-50%) translateY(0)}
-.sh-top{padding:.85rem 1.1rem .7rem;border-bottom:1px solid var(--rule);display:grid;gap:.3rem}
-.sh-eyebrow{display:flex;align-items:center;gap:.5rem;font-family:var(--f-mono);font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ui-faint)}
-.sh-eyebrow .step{background:var(--ui-sunk);padding:.1rem .38rem;border-radius:2px;color:var(--ui-mut);font-weight:600}
-.sh-eyebrow .x{margin-left:auto;border:0;background:transparent;color:var(--ui-mut);font-size:1.15rem;line-height:1;padding:0 .2rem}
-.sh-top h2{margin:0;font-size:1.06rem;font-weight:700;letter-spacing:-.015em}
-.sh-top p{margin:0;font-size:.84rem;color:var(--ui-mut);line-height:1.45}
-.sh-body{overflow-y:auto;padding:.95rem 1.1rem;display:flex;flex-direction:column;gap:.8rem}
-.sh-foot{padding:.75rem 1.1rem;border-top:1px solid var(--rule);display:flex;align-items:center;gap:.6rem;background:var(--ui)}
-.sh-foot .hint{font-size:.75rem;color:var(--ui-faint);line-height:1.35}
+.pan{position:fixed;left:50%;top:50%;transform:translate(-50%,-48%) scale(.98);width:min(27rem,calc(100vw - 1.5rem));max-height:min(82vh,46rem);background:var(--card);border-radius:14px;box-shadow:var(--sh);z-index:80;display:grid;grid-template-rows:auto 1fr;opacity:0;pointer-events:none;transition:opacity .16s,transform .16s;overflow:hidden}
+.pan.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+.p-hd{padding:.85rem 1.05rem .7rem;display:grid;grid-template-columns:1fr auto;gap:.25rem .6rem;border-bottom:1px solid var(--rule-2)}
+.p-hd .ttl{font-size:.84rem;font-weight:700;color:var(--red);line-height:1.35;min-width:0}
+.p-hd .meta{grid-column:1/-1;display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+.p-hd .ttl b{color:var(--navy)}
+.p-hd .ttl i{font-style:normal;color:var(--mut);font-weight:500}
+.p-hd .step,.p-hd .flag{font-family:var(--m);font-size:.62rem;font-weight:600;color:var(--mut);background:var(--sunk);padding:.1rem .34rem;border-radius:3px;white-space:nowrap}
+.p-hd .flag{color:var(--amber-ink);background:var(--amber-bg)}
+.p-x{margin-left:auto;border:0;background:transparent;color:var(--green);font-size:1.05rem;line-height:1;font-weight:800;padding:0 .1rem;flex:none}
+.p-bd{overflow-y:auto;padding:.9rem 1.05rem 1.05rem;display:flex;flex-direction:column;gap:.7rem}
+.p-ft{font-size:.68rem;color:var(--faint);text-align:center;padding-top:.2rem;border-top:1px solid var(--rule-2);margin-top:.15rem}
+.p-ft u{cursor:pointer}
 
-.btn{border:1px solid var(--rule);background:var(--ui);color:var(--ui-ink2);padding:.55rem .9rem;border-radius:5px;font-size:.85rem;font-weight:600}
-.btn:hover{border-color:var(--ui-mut)}
-.btn-go{background:var(--accent);border-color:var(--accent);color:#fff;margin-left:auto}
-.btn-go:hover{filter:brightness(1.07)}
-.btn-go[disabled]{opacity:.45;cursor:not-allowed;filter:none}
-.btn-dark{background:var(--bar);border-color:var(--bar);color:var(--bar-ink);margin-left:auto}
-.btn-sm{padding:.34rem .6rem;font-size:.78rem}
+/* buttons */
+.g{border:0;background:var(--green);color:#fff;padding:.6rem 1rem;border-radius:7px;font-size:.88rem;font-weight:700;text-align:center}
+.g:hover{background:var(--green-d)}
+.g[disabled]{background:color-mix(in srgb,var(--green) 42%,var(--card));cursor:not-allowed}
+.g.wide{width:100%;padding:.72rem 1rem;font-size:.92rem}
+.pill{border:1px solid var(--rule);background:var(--sunk);color:var(--ink-2);padding:.32rem .68rem;border-radius:6px;font-size:.78rem;font-weight:600;white-space:nowrap}
+.pill:hover{border-color:var(--mut)}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:.55rem}
 
-/* ═══════════════ before / after ═══════════════ */
-.ba{display:grid;gap:.32rem}
-.ba-lab{display:flex;align-items:center;gap:.45rem;font-family:var(--f-mono);font-size:.63rem;letter-spacing:.09em;text-transform:uppercase;color:var(--ui-faint)}
-.ba-lab .n{margin-left:auto;letter-spacing:0}
-.copy{font-family:var(--f-site);font-size:.93rem;line-height:1.6;padding:.62rem .75rem;border-radius:4px;border:1px solid var(--rule-soft);background:var(--ui-sunk);color:var(--ui-mut)}
-.copy.now{border-style:dashed}
-.copy.up{background:var(--ui);border-color:var(--accent);color:var(--ui-ink);box-shadow:0 0 0 3px var(--accent-bg)}
-.copy ins{background:var(--ins);color:var(--ins-ink);text-decoration:none;border-radius:2px;padding:0 .1rem}
-.copy del{background:var(--del);color:var(--del-ink);border-radius:2px;padding:0 .1rem}
+/* copy boxes */
+.box{background:var(--sunk);border:1px solid var(--rule-2);border-radius:7px;padding:.65rem .75rem;font-size:.9rem;line-height:1.6;color:var(--ink-2)}
+.box.ed{background:var(--card);border-color:var(--blue);box-shadow:0 0 0 3px color-mix(in srgb,var(--blue) 14%,transparent);color:var(--ink);outline:none}
+.box ins{background:var(--green-pale);color:var(--green-ink);text-decoration:none;border-radius:2px;padding:0 .08rem}
+.box del{background:color-mix(in srgb,var(--red) 13%,transparent);color:var(--red);border-radius:2px;padding:0 .08rem}
+.lab{font-size:.64rem;letter-spacing:.09em;text-transform:uppercase;color:var(--mut);font-weight:700;display:flex;align-items:center;gap:.4rem}
+.lab .n{margin-left:auto;font-family:var(--m);letter-spacing:0;text-transform:none;font-weight:500}
+.wc{font-family:var(--m);font-size:.72rem;font-weight:500;color:var(--mut)}
+.wc.bad{color:var(--red)}.wc.ok{color:var(--green-ink)}
+.help{font-size:.76rem;color:var(--mut);text-align:center;line-height:1.45}
+.note-amber{background:var(--amber-bg);color:var(--amber-ink);border-radius:6px;padding:.55rem .7rem;font-size:.78rem;line-height:1.45}
+.note-amber b{font-weight:700}
 
-/* score meters */
-.scores{display:grid;gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:5px;overflow:hidden}
-.score{background:var(--ui)}
-.score-hd{width:100%;border:0;background:transparent;display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:.6rem;padding:.58rem .7rem;text-align:left}
-.score-nm{font-size:.85rem;font-weight:600;display:flex;align-items:center;gap:.4rem}
-.score-nm .chev{color:var(--ui-faint);font-size:.62rem;transition:transform .18s}
-.score-hd[aria-expanded="true"] .chev{transform:rotate(90deg)}
-.meter{display:flex;gap:2px;width:6.5rem}
-.meter i{flex:1;height:.42rem;border-radius:1px;background:var(--rule);display:block}
-.meter i.f{background:var(--g)}
-.meter i.gain{background:var(--g);opacity:.42}
-.score-num{font-family:var(--f-mono);font-size:.78rem;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;min-width:4.6rem;text-align:right}
-.score-num b{color:var(--g)}
-.score-num s{color:var(--ui-faint);text-decoration:none}
-.score-why{padding:0 .7rem .65rem;font-size:.81rem;color:var(--ui-mut);line-height:1.5;max-width:60ch}
-.score-why[hidden]{display:none}
-.score-why strong{color:var(--ui-ink2);font-weight:600}
+/* content analysis */
+.ca{border:1px solid var(--rule);border-radius:8px;overflow:hidden}
+.ca-hd{width:100%;border:0;background:var(--green-pale);display:flex;align-items:center;gap:.62rem;padding:.6rem .7rem;text-align:left}
+.ca-sc{width:2.05rem;height:2.05rem;border-radius:50%;background:var(--red);color:#fff;font-size:.78rem;font-weight:800;display:grid;place-items:center;flex:none;font-family:var(--m)}
+.ca-hd.up .ca-sc{background:var(--green-d)}
+.ca-nm{display:grid;gap:.05rem;min-width:0}
+.ca-nm b{font-size:.86rem;font-weight:700;color:var(--navy)}
+.ca-nm span{font-size:.73rem;color:var(--ink-2);line-height:1.35}
+.ca-hd .tw{margin-left:auto;color:var(--green);font-weight:800;font-size:1rem;flex:none}
+.ca-bd{padding:.75rem .7rem;display:grid;gap:.65rem;background:var(--card)}
+.ca-bd[hidden]{display:none}
+.ca-t{text-align:center;font-size:.84rem;font-weight:700;color:var(--navy)}
 
-.price{display:flex;align-items:center;gap:.55rem;padding:.6rem .75rem;background:var(--ui-sunk);border-radius:5px;font-size:.85rem}
-.price .amt{font-family:var(--f-mono);font-weight:700;font-size:1.02rem;margin-left:auto}
-.price .sub{font-size:.75rem;color:var(--ui-faint)}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem}
+.tile{background:var(--sunk);border-radius:6px;padding:.5rem .3rem;text-align:center}
+.tile.up{background:var(--green-pale)}
+.tile .tl{font-size:.57rem;letter-spacing:.05em;text-transform:uppercase;font-weight:700;color:var(--mut);display:block;margin-bottom:.15rem;line-height:1.25}
+.tile .tv{font-family:var(--m);font-size:1.15rem;font-weight:700;color:var(--red);letter-spacing:-.02em}
+.tile.up .tv{color:var(--green-d)}
+.tile .tu{font-size:.66rem;font-weight:600;color:var(--faint)}
+.tile .tw{display:block;font-size:.53rem;letter-spacing:.07em;text-transform:uppercase;font-weight:700;color:var(--green-ink);margin-top:.1rem}
+.tile .tp{display:block;font-family:var(--m);font-size:.62rem;color:var(--faint);margin-top:.05rem}
+.rec{font-size:.83rem;font-weight:700;color:var(--navy);text-align:center;line-height:1.45}
+.rec span{color:var(--red)}
 
-/* editor */
-.ed{font-family:var(--f-site);font-size:.95rem;line-height:1.6;padding:.65rem .78rem;border:1px solid var(--accent);border-radius:4px;background:var(--ui);color:var(--ui-ink);min-height:4rem;outline:none;box-shadow:0 0 0 3px var(--accent-bg)}
-.wc{display:flex;align-items:center;gap:.4rem;font-family:var(--f-mono);font-size:.72rem;color:var(--ui-mut)}
-.wc b{font-weight:600}
-.wc.bad{color:var(--accent-ink)}
-.wc.good{color:var(--ok)}
-.locknote{font-size:.78rem;color:var(--ui-faint);display:flex;gap:.4rem;align-items:flex-start;line-height:1.4}
+/* collapsibles */
+.coll{border-top:1px solid var(--rule-2)}
+.coll-hd{width:100%;border:0;background:transparent;display:flex;align-items:center;gap:.5rem;padding:.5rem 0;text-align:left;font-size:.82rem;font-weight:700;color:var(--navy)}
+.coll-hd .tw{margin-left:auto;color:var(--green);font-weight:800;font-size:.95rem}
+.coll-bd{padding:0 0 .6rem;font-size:.81rem;color:var(--ink-2);line-height:1.55;display:grid;gap:.45rem}
+.coll-bd[hidden]{display:none}
+.coll-bd b{color:var(--navy);font-weight:700}
 
-/* lists */
-.grp{border:1px solid var(--rule);border-radius:5px;overflow:hidden}
-.grp-hd{width:100%;border:0;background:var(--ui-sunk);display:flex;align-items:center;gap:.55rem;padding:.6rem .75rem;text-align:left;font-size:.87rem;font-weight:600}
-.grp-hd .cnt{margin-left:auto;font-family:var(--f-mono);font-size:.72rem;color:var(--ui-mut);font-weight:500}
-.grp-hd .chev{color:var(--ui-faint);font-size:.62rem;transition:transform .18s}
-.grp-hd[aria-expanded="true"] .chev{transform:rotate(90deg)}
-.grp-bd{display:grid;gap:1px;background:var(--rule-soft)}
-.grp-bd[hidden]{display:none}
-.row{background:var(--ui);padding:.55rem .75rem;display:grid;grid-template-columns:auto 1fr auto;gap:.55rem;align-items:baseline;font-size:.83rem}
-.row .where{font-family:var(--f-mono);font-size:.65rem;color:var(--ui-faint);white-space:nowrap}
-.row .what{color:var(--ui-ink2);min-width:0}
-.row .what em{font-style:normal;color:var(--ui-faint)}
-.row .amt{font-family:var(--f-mono);font-size:.76rem;font-weight:600;color:var(--ok);white-space:nowrap}
-.row input[type=checkbox]{margin:0;align-self:center}
-.empty{padding:1.5rem 1rem;text-align:center;color:var(--ui-faint);font-size:.83rem;background:var(--ui)}
+/* rows / lists */
+.sec{display:grid;gap:.3rem}
+.sec-hd{width:100%;border:0;background:transparent;display:flex;align-items:center;gap:.5rem;padding:.45rem 0;font-size:.86rem;font-weight:700;color:var(--navy);text-align:left;border-bottom:1px solid var(--rule-2)}
+.sec-hd .tw{margin-left:auto;color:var(--green);font-weight:800;font-size:.95rem}
+.sec-bd{display:grid}
+.sec-bd[hidden]{display:none}
+.itm{display:grid;grid-template-columns:auto 1fr auto;gap:.5rem .55rem;padding:.6rem 0;border-bottom:1px solid var(--rule-2);align-items:start}
+.itm:last-child{border-bottom:0}
+.itm .who{font-size:.75rem;font-weight:700;color:var(--red)}
+.itm .who i{font-style:normal;color:var(--green-ink);font-weight:600}
+.itm .who em{font-style:normal;color:var(--amber-ink);font-weight:600}
+.itm .bdy{min-width:0;display:grid;gap:.12rem}
+.itm .old{font-size:.82rem;color:var(--faint);text-decoration:line-through}
+.itm .new{font-size:.85rem;color:var(--ink)}
+.itm .stamp{font-size:.7rem;color:var(--faint)}
+.itm .acts{display:grid;gap:.28rem;justify-items:stretch}
+.itm .amt{font-family:var(--m);font-size:.86rem;font-weight:700;color:var(--navy);text-align:right;white-space:nowrap}
+.itm.gone .new,.itm.gone .who{color:var(--faint);text-decoration:line-through}
+.itm input[type=checkbox]{margin:.25rem 0 0;accent-color:var(--green)}
+.spent{display:flex;align-items:baseline;gap:.6rem;padding-top:.6rem;font-size:.88rem;font-weight:700;color:var(--navy)}
+.spent .amt{margin-left:auto;font-family:var(--m);font-size:1.35rem;font-weight:800}
+.mini{font-size:.73rem;color:var(--faint);text-align:center}
+.empty{padding:1.1rem .5rem;text-align:center;color:var(--faint);font-size:.8rem}
 
-.tot{display:flex;align-items:center;gap:.6rem;padding:.7rem .8rem;border:1px solid var(--rule);border-radius:5px;background:var(--ui-sunk);font-size:.86rem;font-weight:600}
-.tot .amt{margin-left:auto;font-family:var(--f-mono);font-size:1.1rem;font-weight:700}
-.tot.plan{background:var(--ui);font-weight:500;color:var(--ui-mut)}
-.tot.plan .amt{color:var(--ui-ink);font-size:.95rem}
+.chips{display:flex;gap:.3rem;flex-wrap:wrap}
+.chip{font-size:.68rem;font-weight:600;padding:.14rem .45rem;border-radius:4px;background:var(--sunk);color:var(--ink-2)}
+.chip.gr{background:var(--green-pale);color:var(--green-ink)}
+.chip.am{background:var(--amber-bg);color:var(--amber-ink)}
+.who-pick{display:flex;gap:.35rem;flex-wrap:wrap}
+.who-pick button{border:1px solid var(--rule);background:var(--card);padding:.3rem .6rem;border-radius:999px;font-size:.78rem;font-weight:600;color:var(--mut)}
+.who-pick button.on{border-color:var(--green);background:var(--green-pale);color:var(--green-ink)}
+textarea.ta{width:100%;font-family:var(--f);font-size:.87rem;padding:.6rem .7rem;border:1px solid var(--blue);border-radius:7px;background:var(--card);color:var(--ink);resize:vertical;min-height:4.4rem;box-shadow:0 0 0 3px color-mix(in srgb,var(--blue) 14%,transparent)}
+.msg{font-size:.81rem;line-height:1.45;padding:.45rem .6rem;border-radius:6px;background:var(--sunk)}
+.msg b{display:block;font-size:.68rem;color:var(--faint);font-weight:600;margin-bottom:.1rem}
+.msg.them{background:var(--green-pale);color:var(--green-ink)}
 
-.note-in{width:100%;font-family:var(--f-ui);font-size:.87rem;padding:.6rem .7rem;border:1px solid var(--accent);border-radius:4px;background:var(--ui);color:var(--ui-ink);resize:vertical;min-height:4.5rem;box-shadow:0 0 0 3px var(--accent-bg)}
-.who{display:flex;gap:.4rem;flex-wrap:wrap}
-.who button{border:1px solid var(--rule);background:var(--ui);padding:.32rem .62rem;border-radius:999px;font-size:.78rem;font-weight:500;color:var(--ui-mut)}
-.who button.on{border-color:var(--accent);background:var(--accent-bg);color:var(--accent-ink);font-weight:600}
-.thread{display:grid;gap:.4rem;padding:.55rem .75rem;background:var(--ui)}
-.msg{font-size:.82rem;line-height:1.45;padding:.45rem .6rem;border-radius:4px;background:var(--ui-sunk)}
-.msg .m-who{font-family:var(--f-mono);font-size:.64rem;color:var(--ui-faint);display:block;margin-bottom:.15rem}
-.msg.them{background:var(--accent-bg)}
-
-.learn{display:flex;gap:.55rem;align-items:flex-start;padding:.6rem .72rem;background:var(--ins);border-radius:5px;font-size:.81rem;color:var(--ins-ink);line-height:1.45}
-.learn b{display:block;font-weight:700;margin-bottom:.1rem}
-.learn button{margin-left:auto;border:1px solid currentColor;background:transparent;color:inherit;padding:.25rem .55rem;border-radius:4px;font-size:.75rem;font-weight:600;white-space:nowrap}
-
-.toast{position:fixed;left:50%;bottom:5.3rem;transform:translateX(-50%);background:var(--bar);color:var(--bar-ink);padding:.55rem .9rem;border-radius:6px;font-family:var(--f-ui);font-size:.82rem;box-shadow:var(--sh);z-index:105;display:flex;gap:.75rem;align-items:center;max-width:calc(100vw - 2rem)}
+.toast{position:fixed;left:50%;bottom:5rem;transform:translateX(-50%);background:var(--bar);color:#fff;padding:.6rem 1rem;border-radius:9px;font-size:.83rem;box-shadow:var(--sh);z-index:110;text-align:center;max-width:calc(100vw - 2rem);line-height:1.4}
 .toast[hidden]{display:none}
-.toast button{border:0;background:transparent;color:var(--bar-ink);text-decoration:underline;font-size:.78rem;font-weight:700;opacity:.9}
-
-.banner{position:fixed;top:0;left:0;right:0;background:var(--warn);color:#1a1206;font-family:var(--f-ui);font-size:.78rem;font-weight:600;padding:.4rem 1rem;text-align:center;z-index:55;display:none}
+.toast button{border:0;background:transparent;color:#9BD35F;text-decoration:underline;font-size:.8rem;font-weight:700;margin-left:.6rem}
+.banner{position:fixed;top:0;left:0;right:0;background:var(--amber);color:#2A1F06;font-size:.76rem;font-weight:700;padding:.35rem 1rem;text-align:center;z-index:65;display:none}
 body.editing .banner{display:block}
-body.editing nav.site{margin-top:1.7rem}
+body.editing nav.site{margin-top:1.6rem}
 </style>
 
-<div class="banner" id="banner">Editing — press <b>Done</b> to save and unlock page navigation</div>
+<div class="banner">You are editing — press <b>Done</b> to settle up and unlock the other pages</div>
 
-<!-- ══════════ the client's website ══════════ -->
 <nav class="site">
-  <span class="logo">Northgate Family Dental</span>
+  <span class="lg">Northgate Family Dental</span>
   <a href="#" data-go="home" class="on">Home</a>
   <a href="#" data-go="services">Services</a>
   <a href="#" data-go="about">About</a>
-  <div class="nav-lock">🔒 Navigation locked while editing — press Done</div>
+  <div class="navlock">🔒 Locked while you are editing — press Done</div>
 </nav>
 
+<div class="hero" id="hero"></div>
 <main id="page"></main>
 
-<!-- ══════════ floating bar ══════════ -->
 <div class="bar" role="toolbar" aria-label="Sitecraft">
-  <button id="b-acct" data-mode="account"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c1.4-3.6 4.2-5.2 7.5-5.2S18.1 16.4 19.5 20"/></svg>Account</button>
-  <button id="b-edit" data-mode="edit"><svg viewBox="0 0 24 24"><path d="M4 20h4L20 8l-4-4L4 16z"/><path d="M14.5 5.5 18.5 9.5"/></svg>Edit</button>
-  <button id="b-notes" data-mode="notes"><svg viewBox="0 0 24 24"><path d="M20 14.5a2.5 2.5 0 0 1-2.5 2.5H9l-4 3.5v-15A2.5 2.5 0 0 1 7.5 3h10A2.5 2.5 0 0 1 20 5.5z"/></svg>Notes<span class="dot" id="d-notes" hidden></span></button>
-  <button id="b-review" data-mode="review"><svg viewBox="0 0 24 24"><path d="M9 4h9.5A1.5 1.5 0 0 1 20 5.5V20H9z"/><path d="M4 7.5h5V20H5.5A1.5 1.5 0 0 1 4 18.5z"/><path d="M12 9h5M12 12.5h5"/></svg>Review<span class="dot" id="d-review" hidden></span></button>
-  <button id="b-ident" data-mode="identify"><svg viewBox="0 0 24 24"><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.6"/></svg>Identify</button>
-  <span class="sep"></span>
-  <button id="b-done" class="lock"><svg viewBox="0 0 24 24" id="lock-icon"><rect x="5" y="10.5" width="14" height="9.5" rx="1.8"/><path d="M8.4 10.5V7.6a3.6 3.6 0 0 1 7.2 0v2.9"/></svg>Done</button>
+  <button data-mode="account"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-2.87 1.2V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 7 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 3 15H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 7a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 2.6h.1a2 2 0 1 1 4 0V3a1.7 1.7 0 0 0 2.87 1.2l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 21 9v.1a2 2 0 1 1 0 4H21a1.7 1.7 0 0 0-1.6 1.9z"/></svg>My Account</button>
+  <button data-mode="edit"><svg viewBox="0 0 24 24"><path d="M4 20h4L20 8l-4-4L4 16z"/><path d="M14.5 5.5 18.5 9.5"/></svg>Edit</button>
+  <button data-mode="comment"><svg viewBox="0 0 24 24"><path d="M20 14.5a2.5 2.5 0 0 1-2.5 2.5H9l-4 3.5v-15A2.5 2.5 0 0 1 7.5 3h10A2.5 2.5 0 0 1 20 5.5z"/></svg>Comment<span class="bdg" data-bdg="notes" hidden></span></button>
+  <button data-mode="review"><svg viewBox="0 0 24 24"><rect x="5" y="3.5" width="14" height="17" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>Review<span class="bdg" data-bdg="review" hidden></span></button>
+  <button data-mode="ident"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.2a2.5 2.5 0 1 1 3.4 2.3c-.6.25-1 .8-1 1.5v.4"/><path d="M12 16.8h.01"/></svg>?</button>
+  <span class="ses" id="ses" hidden></span>
+  <button class="done" data-done><svg viewBox="0 0 24 24"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg>Done</button>
 </div>
 
 <div class="scrim" id="scrim"></div>
-<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-title">
-  <div class="sh-top">
-    <div class="sh-eyebrow"><span id="sh-kick">Sitecraft</span><span class="step" id="sh-step" hidden></span><button class="x" id="sh-x" aria-label="Close">&times;</button></div>
-    <h2 id="sh-title">—</h2>
-    <p id="sh-sub"></p>
-  </div>
-  <div class="sh-body" id="sh-body"></div>
-  <div class="sh-foot" id="sh-foot"></div>
+<div class="pan" id="pan" role="dialog" aria-modal="true">
+  <div class="p-hd"><div class="ttl" id="p-ttl"></div><button class="p-x" id="p-x" aria-label="Close">✕</button><div class="meta" id="p-meta"></div></div>
+  <div class="p-bd" id="p-bd"></div>
 </div>
 
-<div class="toast" id="toast" hidden><span id="toast-msg"></span><button id="toast-undo">Undo</button></div>
+<div class="toast" id="toast" hidden><span id="t-msg"></span><button id="t-undo">Undo</button></div>
 
 <script>
-/* ══════════════════ site content ══════════════════ */
+/* ═══════════ content ═══════════ */
 const SITE = {
-  home: { name:'Home', comps:[
-    { id:'h-k',  t:'kick',  price:1, text:'Northgate · Seattle' },
-    { id:'h-h1', t:'h1',    price:3, text:'Gentle Family Dentistry in Northgate, Seattle',
-      up:'Same-Day Crowns and Gentle Family Dentistry in Northgate, Seattle',
-      s:[3,2,5],u:[8,8,9] },
-    { id:'h-p1', t:'p',     price:3, text:'We have been caring for families across North Seattle since 2004. Same-day crowns, clear aligners, and emergency appointments — with a team that remembers your name.',
-      up:'We have cared for families across North Seattle since 2004. You can get a same-day crown, clear aligners, or an emergency appointment — from a team that remembers your name.',
-      s:[5,4,6],u:[9,8,8] },
-    { id:'h-img',t:'img',   price:2, text:'Waiting room, 1200 × 630', alt:'Northgate Family Dental waiting room',
-      up:'Gentle family dentistry in Northgate Seattle — the Northgate Family Dental waiting room', s:[2,2,3],u:[8,9,8] },
-    { id:'h-h2', t:'h2',    price:2, text:'Our Services',
-      up:'Same-Day Crowns Mean You Leave With Your Tooth Restored', s:[1,1,3],u:[9,9,8] },
-    { id:'h-p2', t:'p',     price:4, text:'Our practice offers a comprehensive range of general and cosmetic dental services designed to meet the needs of patients at every stage of life, and we pride ourselves on staying current with the latest techniques available in modern dentistry today.',
-      up:'We offer general and cosmetic dental services for patients at every stage of life. We stay current with the latest techniques in modern dentistry. Whether you need a routine cleaning or a crown, you are cared for by a practice that keeps its skills sharp.',
-      s:[4,3,5],u:[8,9,8] },
+  home:{ name:'Home', critical:true, comps:[
+    {id:'h-k', lbl:'Eyebrow', t:'kick', hero:1, price:0.99, text:'Northgate · Seattle', s:[2.0,1.5,2.5]},
+    {id:'h-h1',lbl:'Heading', t:'h1', hero:1, price:5.99, text:'Gentle Family Dentistry in Northgate, Seattle',
+      up:'Same-Day Crowns and Gentle Family Dentistry in Northgate, Seattle', s:[3.0,2.5,4.5], u:[8.5,9.0,8.5],
+      rec:'Your heading names the service people actually search for, and gets tagged so engines know it is the page subject.'},
+    {id:'h-p1',lbl:'Body copy', t:'p', hero:1, price:3.99, text:'We have been caring for families across North Seattle since 2004. Same-day crowns, clear aligners, and emergency appointments — with a team that remembers your name.',
+      up:'We have cared for families across North Seattle since 2004. You can get a same-day crown, clear aligners, or an emergency appointment from a team that remembers your name.', s:[4.0,3.5,5.0], u:[8.5,8.0,8.0],
+      rec:'Your paragraph gets rewritten so every sentence makes sense on its own.'},
+    {id:'h-img',lbl:'Feature photo', t:'img', price:1.99, text:'Waiting room · 1200 × 630', alt:'Waiting room',
+      up:'The Northgate Family Dental waiting room in Seattle, where families wait for same-day crown appointments', s:[0.0,0.0,0.0], u:[3.5,3.5,3.5],
+      rec:'Your photo gets a proper description, tagged so search engines know what it shows.'},
+    {id:'h-h2',lbl:'Heading', t:'h2', price:2.99, text:'Our Services',
+      up:'Same-Day Crowns Mean You Leave With Your Tooth Restored', s:[1.0,1.0,3.0], u:[9.0,9.0,8.5],
+      rec:'Your heading makes a claim an assistant can quote, instead of a label it has to skip.'},
+    {id:'h-p2',lbl:'Body copy', t:'p', price:3.99, text:'Our practice offers a comprehensive range of general and cosmetic dental services designed to meet the needs of patients at every stage of life, and we pride ourselves on staying current with the latest techniques available in modern dentistry today.',
+      up:'We offer general and cosmetic dental services for patients at every stage of life. We stay current with the latest techniques in modern dentistry. Whether you need a routine cleaning or a crown, you are cared for by a practice that keeps its skills sharp.', s:[3.5,3.0,5.0], u:[8.5,9.0,8.0],
+      rec:'Your paragraph gets rewritten so every sentence makes sense on its own.'},
+    {id:'h-band',lbl:'List item', t:'band', price:0, text:'Rated 5 stars by 200+ patients · 9 out of 10 patients say they felt no pain', s:[3.0,2.0,3.0],
+      blocked:'To show star ratings in search results the reviews have to be visible on this page. Sitecraft will never invent a rating or a patient count, so this one needs you: publish the reviews and the next scan will pick them up.'},
   ]},
-  services: { name:'Services', comps:[
-    { id:'s-h1', t:'h1',    price:3, text:'Our Dental Services',
-      up:'Dental Services in Northgate, From Cleanings to Same-Day Crowns', s:[2,2,4],u:[9,8,9] },
-    { id:'s-p1', t:'p',     price:3, text:'Everything we do is aimed at keeping your visit short and your results lasting. Below are the treatments patients ask for most.',
-      up:'Every treatment is aimed at keeping your visit short and your results lasting. These are the treatments Northgate patients ask for most.', s:[5,5,6],u:[8,9,8] },
-    { id:'s-h2', t:'h2',    price:2, text:'Same-Day Crowns',
-      up:'Same-Day Crowns Are Milled In Our Own Lab, So You Leave Restored', s:[4,3,6],u:[9,9,8] },
-    { id:'s-p2', t:'p',     price:3, text:'We mill crowns in our own lab. Most patients arrive with a damaged tooth and leave the same afternoon with the permanent crown already fitted. No temporary, no second visit.',
-      up:'We mill crowns in our own lab. Most patients arrive with a damaged tooth and leave the same afternoon with the permanent crown fitted. There is no temporary crown and no second visit.',
-      s:[7,6,7],u:[9,9,9] },
-    { id:'s-p3', t:'p',     price:2, text:'Clear aligners are fitted in-house and reviewed every six weeks.',
-      up:'Clear aligners are fitted in-house and reviewed every six weeks, so treatment stays on track without extra trips.', s:[5,4,5],u:[8,8,8] },
+  services:{ name:'Services', critical:true, comps:[
+    {id:'s-h1',lbl:'Heading', t:'h1', hero:1, price:5.99, text:'Our Dental Services',
+      up:'Dental Services in Northgate, From Cleanings to Same-Day Crowns', s:[2.0,2.0,4.0], u:[9.0,8.5,9.0],
+      rec:'Your heading names the services people search for, tagged as the page subject.'},
+    {id:'s-p1',lbl:'Body copy', t:'p', hero:1, price:2.99, text:'Everything we do is aimed at keeping your visit short and your results lasting. Below are the treatments patients ask for most.',
+      up:'Every treatment is aimed at keeping your visit short and your results lasting. These are the treatments Northgate patients ask for most.', s:[5.0,4.5,6.0], u:[8.5,9.0,8.0],
+      rec:'Your paragraph names the place, so it stops reading like advice for anywhere.'},
+    {id:'s-h2',lbl:'Heading', t:'h2', price:2.99, text:'Same-Day Crowns',
+      up:'Same-Day Crowns Are Milled In Our Own Lab, So You Leave Restored', s:[4.0,3.0,6.0], u:[9.0,9.0,8.5],
+      rec:'Your heading makes a claim an assistant can quote, instead of a label it has to skip.'},
+    {id:'s-p2',lbl:'Body copy', t:'p', price:3.99, text:'We mill crowns in our own lab. Most patients arrive with a damaged tooth and leave the same afternoon with the permanent crown already fitted. No temporary, no second visit.',
+      up:'We mill crowns in our own lab. Most patients arrive with a damaged tooth and leave the same afternoon with the permanent crown fitted. There is no temporary crown and no second visit.', s:[7.0,6.5,7.0], u:[9.5,9.0,9.0],
+      rec:'Already strong. The boost mainly adds the tagging that engines read.'},
   ]},
-  about: { name:'About', comps:[
-    { id:'a-h1', t:'h1',    price:3, text:'About Our Practice',
-      up:'A Northgate Family Dental Practice Caring For Seattle Families Since 2004', s:[2,2,4],u:[9,8,9] },
-    { id:'a-p1', t:'p',     price:3, text:'Dr. Amara Okoye opened the practice in 2004 with one chair and a small waiting room above a bakery on Northgate Way.',
-      up:'Dr. Amara Okoye opened this Northgate practice in 2004 with one chair and a small waiting room above a bakery on Northgate Way.', s:[6,5,5],u:[9,8,8] },
-    { id:'a-h2', t:'h2',    price:2, text:'Why Patients Stay',
-      up:'Patients Stay Because The Same Team Sees Them Every Visit', s:[3,2,4],u:[9,9,8] },
-    { id:'a-p2', t:'p',     price:2, text:'The same hygienist will usually see you year after year. We think that continuity is why families refer us to their neighbours.',
-      up:'The same hygienist usually sees you year after year. That continuity is why Northgate families refer us to their neighbours.', s:[5,5,6],u:[8,9,8] },
+  about:{ name:'About', critical:false, comps:[
+    {id:'a-h1',lbl:'Heading', t:'h1', hero:1, price:4.99, text:'About Our Practice',
+      up:'A Northgate Dental Practice Caring For Seattle Families Since 2004', s:[2.0,2.0,4.0], u:[9.0,8.5,9.0],
+      rec:'Your heading names who you are and where, tagged as the page subject.'},
+    {id:'a-p1',lbl:'Body copy', t:'p', hero:1, price:2.99, text:'Dr. Amara Okoye opened the practice in 2004 with one chair and a small waiting room above a bakery on Northgate Way.',
+      up:'Dr. Amara Okoye opened this Northgate practice in 2004 with one chair and a small waiting room above a bakery on Northgate Way.', s:[6.0,5.0,5.5], u:[9.0,8.5,8.0],
+      rec:'Your paragraph names the place, so it stops reading like advice for anywhere.'},
+    {id:'a-h2',lbl:'Heading', t:'h2', price:2.99, text:'Why Patients Stay',
+      up:'Patients Stay Because The Same Team Sees Them Every Visit', s:[3.0,2.0,4.0], u:[9.0,9.0,8.5],
+      rec:'Your heading makes a claim an assistant can quote, instead of a label it has to skip.'},
   ]},
 };
+const SCORE_NM = ['AI retrieval','AEO optimized','SEO optimized'];
+const SCORE_TL = ['AI RETRIEVAL','AEO OPTIMIZED','SEO OPTIMIZED'];
+const WHY = [
+  '<b>Why this matters.</b> AI tools pull out one paragraph at a time, not whole pages. If a paragraph only makes sense after reading the one above it, it gets left behind when an assistant is putting an answer together.',
+  '<b>Why this matters.</b> This is whether ChatGPT, Perplexity or Google\'s AI answers name <em>you</em>. A heading that makes a claim beats a heading that is just a label, and naming your actual neighbourhood beats advice that could apply anywhere.',
+  '<b>Why this matters.</b> The traditional side — whether Google can rank this. It rewards the words people really search for appearing early, sensible lengths, and text that reads naturally rather than stuffed with keywords.',
+];
+const TAGGING = '<b>What does tagging mean?</b> Tagging means adding extra notes into your page\'s code. Visitors never see them. Google and AI search engines read them to work out what each part of your page actually is.<br><br>Writing it better lifts part of these scores on its own. The tagging only comes with a boost, which is why the numbers keep climbing after you have done your best with the words.';
+const PEOPLE = ['Jo Castellane','Priya Raman'];
 
-const WHY = {
-  0:{ n:'AI retrieval', d:'Whether an AI assistant can <strong>find and lift this piece of text</strong> when someone asks a question. Assistants pull short, self-contained chunks — a clear sentence that stands on its own scores high, a long run-on sentence scores low because there is nothing clean to quote.' },
-  1:{ n:'AEO optimisation', d:'Answer Engine Optimisation — how likely <strong>ChatGPT, Perplexity or Google AI Overviews are to name you</strong> in their answer. Headings that make a claim beat headings that are just labels. Naming your actual neighbourhood beats generic advice that could apply anywhere.' },
-  2:{ n:'SEO optimisation', d:'The traditional side: whether <strong>Google can rank this</strong>. It rewards the words people really search for appearing early, sensible lengths, and text that reads naturally rather than stuffed with keywords.' },
-};
-const COLL = ['Dana Whitlock', 'Priya Raman'];
+/* ═══════════ state ═══════════ */
+const S = { page:'home', mode:null, editing:false, sel:null, open:null,
+  changes:[], notes:[], boosts:[], receipts:[{when:'2026-09-02 16:06', site:'Northgate', n:1, amt:0.99}],
+  seats:1, session:0, boostCount:0, skipConfirm:false, offered:false, picked:new Set(), noteTo:PEOPLE[0], projecting:null };
 
-/* ══════════════════ state ══════════════════ */
-const S = {
-  page:'home', mode:null, editing:false,
-  changes:[], notes:[], boosts:[],
-  boostCount:0, skipConfirm:false, offered:false,
-  seats:1, sel:null, draft:null, step:1, noteTo:COLL[0], picked:new Set(),
-};
-const money = n => '$' + n.toFixed(2);
-const words = s => s.trim() ? s.trim().split(/\s+/).length : 0;
-const comp = id => { for (const k in SITE) { const c = SITE[k].comps.find(c=>c.id===id); if (c) return c; } };
-const pageOf = id => Object.keys(SITE).find(k => SITE[k].comps.some(c=>c.id===id));
-const spend = () => S.boosts.reduce((t,b)=>t+b.price,0);
-const meterColor = v => v>=8 ? 'var(--hi)' : v>=5 ? 'var(--mid)' : 'var(--lo)';
+const $ = s => document.querySelector(s);
+const M = n => '$' + n.toFixed(2);
+const W = s => s.trim() ? s.trim().split(/\s+/).length : 0;
+const comp = id => { for (const k in SITE){ const c = SITE[k].comps.find(x=>x.id===id); if (c) return c; } };
+const pgOf = id => Object.keys(SITE).find(k => SITE[k].comps.some(c=>c.id===id));
+const isBoosted = id => S.boosts.some(b=>b.id===id);
+const paidTotal = () => S.receipts.reduce((t,r)=>t+r.amt,0);
+const pageSpend = p => S.boosts.filter(b=>b.page===p).reduce((t,b)=>t+b.price,0);
 const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const avg = a => a.reduce((x,y)=>x+y,0)/a.length;
 
-/* word-level diff */
-function diff(a,b){
-  const A=a.split(/(\s+)/), B=b.split(/(\s+)/), n=A.length, m=B.length;
+function dif(a,b){
+  const A=a.split(/(\s+)/),B=b.split(/(\s+)/),n=A.length,m=B.length;
   const L=Array.from({length:n+1},()=>new Uint16Array(m+1));
   for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--)L[i][j]=A[i]===B[j]?L[i+1][j+1]+1:Math.max(L[i+1][j],L[i][j+1]);
-  const out=[];const push=(t,x)=>{const p=out[out.length-1];if(p&&p.t===t)p.x+=x;else out.push({t,x});};
+  const o=[];const p=(t,x)=>{const l=o[o.length-1];if(l&&l.t===t)l.x+=x;else o.push({t,x});};
   let i=0,j=0;
-  while(i<n&&j<m){ if(A[i]===B[j]){push('=',A[i]);i++;j++;} else if(L[i+1][j]>=L[i][j+1]){push('-',A[i]);i++;} else {push('+',B[j]);j++;} }
-  while(i<n)push('-',A[i++]); while(j<m)push('+',B[j++]);
-  return out;
+  while(i<n&&j<m){if(A[i]===B[j]){p('=',A[i]);i++;j++;}else if(L[i+1][j]>=L[i][j+1]){p('-',A[i]);i++;}else{p('+',B[j]);j++;}}
+  while(i<n)p('-',A[i++]);while(j<m)p('+',B[j++]);return o;
 }
-const render = (d,keep) => d.filter(p=>p.t==='='||p.t===keep)
-  .map(p=>p.t==='='?esc(p.x):`<${keep==='+'?'ins':'del'}>${esc(p.x)}</${keep==='+'?'ins':'del'}>`).join('');
+const rend = (d,k) => d.filter(x=>x.t==='='||x.t===k).map(x=>x.t==='='?esc(x.x):`<${k==='+'?'ins':'del'}>${esc(x.x)}</${k==='+'?'ins':'del'}>`).join('');
 
-/* ══════════════════ render the site ══════════════════ */
-function drawPage(){
+/* ═══════════ draw site ═══════════ */
+function draw(){
   const pg = SITE[S.page];
-  document.getElementById('page').innerHTML = pg.comps.map(c=>{
-    const boosted = S.boosts.some(b=>b.id===c.id);
-    const txt = boosted ? (c.text) : c.text;
-    const noteN = S.notes.filter(n=>n.id===c.id).length;
-    const tag = c.t==='kick' ? '' : `<span class="tagrow">
-        ${noteN?'':''}
-        <span class="tag ${boosted?'paid':''}">${boosted?'✓ Boosted':'Boost '+money(c.price)}</span>
-      </span>`;
-    const pin = noteN ? `<span class="pin" title="${noteN} note(s)">${noteN}</span>` : '';
-    if (c.t==='img') return `<div class="img c" data-id="${c.id}">${pin}${tag}${esc(txt)}</div>`;
-    if (c.t==='kick') return `<p class="kick c" data-id="${c.id}">${pin}${esc(txt)}</p>`;
-    return `<${c.t} class="c" data-id="${c.id}">${pin}${tag}${esc(txt)}</${c.t}>`;
-  }).join('');
+  const one = c => {
+    const b = isBoosted(c.id), nn = S.notes.filter(n=>n.id===c.id && !n.done).length;
+    const tag = `<span class="etag">${b?'<span class="dn">✓ Boosted</span>'
+      :(c.price?`<span class="pr">Boost ${M(c.price)}</span>`:'<span>Needs you</span>')}<span>${esc(c.lbl)}</span></span>`;
+    const pin = nn?`<span class="npin">${nn}</span>`:'';
+    const at = c.price?' data-boost="1"':'';
+    if (c.t==='img') return `<div class="img c" data-id="${c.id}"${at}>${pin}${tag}${esc(c.text)}</div>`;
+    if (c.t==='kick') return `<p class="kick c" data-id="${c.id}"${at}>${pin}${tag}${esc(c.text)}</p>`;
+    if (c.t==='band') return `<div class="band c" data-id="${c.id}"${at}>${pin}${tag}${esc(c.text)}</div>`;
+    return `<${c.t} class="c" data-id="${c.id}"${at}>${pin}${tag}${esc(c.text)}</${c.t}>`;
+  };
+  $('#hero').innerHTML = `<div class="in">${pg.comps.filter(c=>c.hero).map(one).join('')}</div>`;
+  $('#page').innerHTML = pg.comps.filter(c=>!c.hero).map(one).join('');
   document.querySelectorAll('nav.site a').forEach(a=>a.classList.toggle('on', a.dataset.go===S.page));
-  document.querySelectorAll('.c').forEach(el=>{
-    el.addEventListener('click', e=>{
-      if (!document.body.classList.contains('pickable')) return;
-      e.preventDefault(); e.stopPropagation();
-      pick(el.dataset.id);
-    });
+  document.querySelectorAll('.c').forEach(el=>el.onclick = e => {
+    if (!document.body.classList.contains('pick')) return;
+    e.preventDefault(); e.stopPropagation(); pick(el.dataset.id);
   });
-  badges();
+  bdg();
 }
-function badges(){
-  const n = S.notes.length, r = S.changes.length + S.boosts.length;
-  const dn = document.getElementById('d-notes'), dr = document.getElementById('d-review');
-  dn.hidden = !n; dn.textContent = n;
-  dr.hidden = !r; dr.textContent = r;
+function bdg(){
+  const n = S.notes.filter(x=>!x.done).length, r = S.changes.length + S.boosts.length;
+  for (const [k,v] of [['notes',n],['review',r]]){
+    const e = document.querySelector(`[data-bdg="${k}"]`); e.hidden = !v; e.textContent = v;
+  }
+  const s = $('#ses'); s.hidden = !S.session; s.textContent = M(S.session);
 }
 
-/* ══════════════════ sheet plumbing ══════════════════ */
-const sheet = document.getElementById('sheet'), scrim = document.getElementById('scrim');
-function openSheet({kick,title,sub,step,body,foot}){
-  document.getElementById('sh-kick').textContent = kick || 'Sitecraft';
-  document.getElementById('sh-title').textContent = title || '';
-  document.getElementById('sh-sub').textContent = sub || '';
-  const st = document.getElementById('sh-step');
-  st.hidden = !step; if (step) st.textContent = step;
-  document.getElementById('sh-body').innerHTML = body || '';
-  document.getElementById('sh-foot').innerHTML = foot || '';
-  document.getElementById('toast').hidden = true;
-  clearTimeout(toast._t);
-  sheet.classList.add('open'); scrim.classList.add('open');
-  wireCollapse();
+/* ═══════════ panel ═══════════ */
+function open({ttl, step, flag, body}){
+  $('#p-ttl').innerHTML = ttl || '';
+  $('#p-meta').innerHTML = (flag?`<span class="flag">${flag}</span>`:'') + (step?`<span class="step">${step}</span>`:'');
+  $('#p-meta').hidden = !flag && !step;
+  $('#p-bd').innerHTML = body || '';
+  $('#toast').hidden = true; clearTimeout(toast._t);
+  $('#pan').classList.add('open'); $('#scrim').classList.add('open');
+  document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{
+    const t = document.getElementById(b.dataset.t), o = b.getAttribute('aria-expanded')==='true';
+    b.setAttribute('aria-expanded', String(!o)); t.hidden = o;
+    const w = b.querySelector('.tw'); if (w) w.textContent = o?'+':'✕';
+  });
 }
-function closeSheet(){
-  sheet.classList.remove('open'); scrim.classList.remove('open');
-  S.sel = null; S.draft = null; S.step = 1;
+function shut(){
+  $('#pan').classList.remove('open'); $('#scrim').classList.remove('open');
+  S.sel = null; S.projecting = null;
   document.querySelectorAll('.c.sel').forEach(e=>e.classList.remove('sel'));
 }
-function wireCollapse(){
-  document.querySelectorAll('[data-toggle]').forEach(b=>{
-    b.onclick = () => {
-      const t = document.getElementById(b.dataset.toggle);
-      const open = b.getAttribute('aria-expanded')==='true';
-      b.setAttribute('aria-expanded', String(!open));
-      t.hidden = open;
-    };
-  });
+function toast(m, undo){
+  $('#t-msg').innerHTML = m;
+  const u = $('#t-undo'); u.style.display = undo?'':'none'; u.onclick = () => { undo&&undo(); $('#toast').hidden = true; };
+  $('#toast').hidden = false; clearTimeout(toast._t); toast._t = setTimeout(()=>$('#toast').hidden=true, 5000);
 }
-function toast(msg, undo){
-  const t = document.getElementById('toast');
-  document.getElementById('toast-msg').textContent = msg;
-  const u = document.getElementById('toast-undo');
-  u.style.display = undo ? '' : 'none'; u.onclick = () => { undo && undo(); t.hidden = true; };
-  t.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(()=>t.hidden=true, 4500);
-}
+const hdr = c => `<b>${esc(c.lbl)}</b> / On <b>${SITE[pgOf(c.id)].name}</b>`;
+const flagOf = c => SITE[pgOf(c.id)].critical ? 'SEO/AEO Critical Page' : '';
 
-/* ══════════════════ mode switching ══════════════════ */
+/* ═══════════ modes ═══════════ */
 function setMode(m){
   S.mode = S.mode===m ? null : m;
-  document.querySelectorAll('.bar button[data-mode]').forEach(b=>b.classList.toggle('on', b.dataset.mode===S.mode));
-  const picking = S.mode==='edit' || S.mode==='notes' || S.mode==='identify';
-  document.body.classList.toggle('pickable', picking);
-  document.body.classList.toggle('identify', S.mode==='identify');
-  if (picking) enterEditing();
-  closeSheet();
-  if (S.mode==='review') showReview();
-  if (S.mode==='account') showAccount();
-  if (S.mode==='identify') showIdentify();
-  if (S.mode==='edit') toast('Edit mode — click any part of your page to change it');
-  if (S.mode==='notes') toast('Notes mode — click any part of your page to leave a note');
+  document.querySelectorAll('.bar [data-mode]').forEach(b=>b.classList.toggle('on', b.dataset.mode===S.mode));
+  const p = ['edit','comment','ident'].includes(S.mode);
+  document.body.classList.toggle('pick', p);
+  document.body.classList.toggle('ident', S.mode==='ident');
+  if (p) arm();
+  shut();
+  if (S.mode==='review') review();
+  if (S.mode==='account') account();
+  if (S.mode==='ident') guide();
+  if (S.mode==='edit') toast('Click any part of your page to change it or boost it.');
+  if (S.mode==='comment') toast('Click any part of your page to leave a note on it.');
 }
-function enterEditing(){
-  if (S.editing) return;
-  S.editing = true;
-  document.body.classList.add('editing');
-  document.getElementById('b-done').classList.add('armed');
-}
+function arm(){ if (S.editing) return; S.editing = true; document.body.classList.add('editing'); document.querySelector('.done').classList.add('armed'); }
 function done(){
-  if (!S.editing){ toast('Nothing to save — you are already unlocked'); return; }
+  if (!S.editing){ toast('You are already unlocked — pick a page.'); return; }
+  const amt = S.session;
+  if (amt){ S.receipts.push({when:'now', site:'Northgate', n:S.boosts.length, amt}); S.session = 0; }
   S.editing = false; S.mode = null;
-  document.body.classList.remove('editing','pickable','identify');
-  document.querySelectorAll('.bar button[data-mode]').forEach(b=>b.classList.remove('on'));
-  document.getElementById('b-done').classList.remove('armed');
-  closeSheet();
-  toast('Saved and locked. You can move between pages again.');
+  document.body.classList.remove('editing','pick','ident');
+  document.querySelectorAll('.bar [data-mode]').forEach(b=>b.classList.remove('on'));
+  document.querySelector('.done').classList.remove('armed');
+  shut(); bdg();
+  toast(amt ? `Session closed. <b>${M(amt)}</b> settled as one amount. The other pages are unlocked.`
+            : 'Saved and locked. The other pages are unlocked.');
 }
-
-/* ══════════════════ pick a component ══════════════════ */
 function pick(id){
   S.sel = id;
   document.querySelectorAll('.c.sel').forEach(e=>e.classList.remove('sel'));
-  const el = document.querySelector(`[data-id="${id}"]`);
-  el && el.classList.add('sel');
-  if (S.mode==='notes') return noteSheet(id);
-  return editSheet(id);
+  const el = document.querySelector(`[data-id="${id}"]`); el&&el.classList.add('sel');
+  S.mode==='comment' ? noteP(id) : editP(id);
+}
+function flash(id){
+  const el = document.querySelector(`[data-id="${id}"]`); if(!el) return;
+  el.classList.remove('fl'); void el.offsetWidth; el.classList.add('fl');
+  el.scrollIntoView({behavior:'smooth', block:'center'});
+}
+function showMe(id){ shut(); S.page = pgOf(id); draw(); setTimeout(()=>flash(id), 120); }
+
+/* ═══════════ scores block ═══════════ */
+function scores(c, proj){
+  const cur = c.s, up = c.u;
+  const shown = proj && up ? up : cur;
+  const badge = (proj?avg(up):avg(cur)).toFixed(1);
+  const tiles = shown.map((v,i)=>`<div class="tile ${proj?'up':''}">
+      <span class="tl">${SCORE_TL[i]}</span>
+      <span class="tv">${v.toFixed(1)}</span><span class="tu">/10</span>${proj?`<span class="tp">was ${cur[i].toFixed(1)}</span><span class="tw">projected</span>`:''}
+    </div>`).join('');
+  const colls = SCORE_NM.map((n,i)=>`<div class="coll">
+      <button class="coll-hd" data-t="w${i}" aria-expanded="false">${n} — what it means<span class="tw">+</span></button>
+      <div class="coll-bd" id="w${i}" hidden>${WHY[i]}</div></div>`).join('')
+    + `<div class="coll"><button class="coll-hd" data-t="wt" aria-expanded="false">What does tagging mean?<span class="tw">+</span></button>
+       <div class="coll-bd" id="wt" hidden>${TAGGING}</div></div>`;
+  return `<div class="ca">
+    <button class="ca-hd ${proj?'up':''}" data-t="cab" aria-expanded="true">
+      <span class="ca-sc">${badge}</span>
+      <span class="ca-nm"><b>Content Analysis</b><span>See how AI reads this, and what it could be</span></span>
+      <span class="tw">✕</span></button>
+    <div class="ca-bd" id="cab">
+      <div class="ca-t">${esc(c.lbl)} Content Analysis</div>
+      <div class="tiles">${tiles}</div>
+      ${c.rec?`<div class="rec"><span>Recommendation:</span> ${esc(c.rec)}</div>`:''}
+      ${colls}
+    </div></div>`;
 }
 
-/* ── step 1 of edit: what do you want to do ── */
-function editSheet(id){
-  const c = comp(id);
-  const boosted = S.boosts.some(b=>b.id===id);
-  const canBoost = !!c.up && !boosted;
-  openSheet({
-    kick:'Edit', step:'Step 1 of 2', title:'What would you like to do?',
-    sub:`You picked the ${label(c)} on your ${SITE[S.page].name} page.`,
-    body:`
-      <div class="ba"><div class="ba-lab">Current<span class="n">${c.t==='img'?'image':words(c.text)+' words'}</span></div>
-        <div class="copy now">${esc(c.text)}</div></div>
-      <div class="scores" style="border:0;background:transparent;gap:.5rem">
-        <button class="btn" style="text-align:left;display:grid;gap:.15rem" data-act="rewrite">
-          <b style="font-size:.88rem">Change the wording myself</b>
-          <span style="font-weight:400;font-size:.79rem;color:var(--ui-mut)">Free. Must stay ${c.t==='img'?'the same image size':'at '+words(c.text)+' words'} so your layout does not break.</span>
-        </button>
-        ${canBoost ? `<button class="btn" style="text-align:left;display:grid;gap:.15rem;border-color:var(--accent)" data-act="boost">
-          <b style="font-size:.88rem;color:var(--accent-ink)">Boost it for AI search — ${money(c.price)}</b>
-          <span style="font-weight:400;font-size:.79rem;color:var(--ui-mut)">See a stronger version side by side before you pay anything.</span>
-        </button>` : boosted ? `<div class="learn"><span>✓</span><span><b>Already boosted</b>You paid ${money(S.boosts.find(b=>b.id===id).price)} for this one.</span></div>` : ''}
-      </div>`,
-    foot:`<span class="hint">Nothing is charged until you confirm.</span><button class="btn" id="cx">Cancel</button>`
-  });
-  document.getElementById('cx').onclick = closeSheet;
-  document.querySelectorAll('[data-act]').forEach(b=>b.onclick = () =>
-    b.dataset.act==='boost' ? boostSheet(id) : rewriteSheet(id));
+/* ═══════════ edit panel — step 1 ═══════════ */
+function editP(id){
+  const c = comp(id), b = isBoosted(id);
+  if (c.blocked) return blockedP(id);
+  open({ ttl: hdr(c), flag: flagOf(c), step:'Step 1 of 2', body:`
+    <div class="lab">What it says now<span class="n">${c.t==='img'?'photo':W(c.text)+' words'}</span></div>
+    <div class="box">${esc(c.text)}</div>
+    <button class="pill" style="text-align:left;padding:.6rem .75rem" data-a="rw">
+      <b style="color:var(--navy);font-size:.86rem">${c.t==='img'?'Swap the picture':'Change the wording'}</b><br>
+      <span style="font-weight:400;color:var(--mut);font-size:.78rem">Free. Stays ${c.t==='img'?'the same size':'at '+W(c.text)+' words'} so nothing shifts.</span>
+    </button>
+    ${c.up && !b ? `<button class="pill" style="text-align:left;padding:.6rem .75rem;border-color:var(--green)" data-a="bo">
+      <b style="color:var(--green-ink);font-size:.86rem">Visibility Boost ${M(c.price)}</b><br>
+      <span style="font-weight:400;color:var(--mut);font-size:.78rem">See where it would take your scores. Nothing is charged yet.</span>
+    </button>` : b ? `<div class="note-amber"><b>Already boosted.</b> ${M(S.boosts.find(x=>x.id===id).price)} is on this session.</div>`:''}
+    ${scores(c, false)}
+    <div class="p-ft"><u>Disclaimer</u> · © 2026 ReadTomato™</div>`});
+  document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=> b.dataset.a==='bo'?boostP(id):rwP(id));
 }
-const label = c => ({h1:'main heading',h2:'section heading',p:'paragraph',img:'image',kick:'label'})[c.t];
 
-/* ── free rewrite, word count enforced ── */
-function rewriteSheet(id){
+function blockedP(id){
   const c = comp(id);
-  const target = words(c.text);
+  open({ ttl: hdr(c), flag: flagOf(c), body:`
+    <div class="box">${esc(c.text)}</div>
+    <div class="note-amber"><b>This one needs you, not a boost.</b><br>${esc(c.blocked)}</div>
+    ${scores(c, false)}
+    <div class="p-ft"><u>Disclaimer</u> · © 2026 ReadTomato™</div>`});
+}
+
+/* ═══════════ free rewrite, word count locked ═══════════ */
+function rwP(id){
+  const c = comp(id);
   if (c.t==='img'){
-    openSheet({ kick:'Edit', step:'Step 2 of 2', title:'Replace this image',
-      sub:'Your replacement has to be the same size, so the page layout stays intact.',
-      body:`<div class="locknote">🔒<span>This slot is <b>1200 × 630</b>. Sitecraft only accepts an image with those exact dimensions — that is what keeps your page from breaking.</span></div>
-        <div class="img" style="margin:0">${esc(c.text)}</div>
-        <div class="price"><span>Upload a replacement</span><span class="sub">1200 × 630 only</span></div>`,
-      foot:`<button class="btn" id="bk">Back</button><button class="btn btn-go" disabled>Choose file</button>` });
-    document.getElementById('bk').onclick = () => editSheet(id);
+    open({ ttl: hdr(c), flag: flagOf(c), step:'Step 2 of 2', body:`
+      <div class="box" style="text-align:center;padding:1.6rem 1rem">
+        <b style="color:var(--navy);display:block;font-size:.92rem">Drop a picture here</b>
+        <span style="font-size:.8rem;color:var(--mut)">or click to choose one from your computer</span></div>
+      <div class="lab">What is in this picture?</div>
+      <div class="box ed" contenteditable="true" id="ed">${esc(c.alt||'')}</div>
+      <div class="help">This tells Google and AI search what the picture is.</div>
+      <div class="note-amber">🔒 <b>1200 × 630 only.</b> Sitecraft only takes a picture the same size as the one there now — that is what stops your layout breaking.</div>
+      <div class="pair"><button class="pill" id="bk">Back</button><button class="g" id="sv">Save</button></div>
+      <div class="p-ft"><u>Disclaimer</u> · © 2026 ReadTomato™</div>`});
+    $('#bk').onclick = ()=>editP(id);
+    $('#sv').onclick = ()=>{
+      const was = c.alt; c.alt = $('#ed').innerText.trim();
+      S.changes.push({id, page:pgOf(id), lbl:c.lbl, old:was||'(nothing)', now:c.alt, when:'just now', kind:'alt'});
+      shut(); draw(); flash(id);
+      toast('Saved', ()=>{ c.alt=was; S.changes.pop(); draw(); bdg(); });
+    };
     return;
   }
-  openSheet({
-    kick:'Edit', step:'Step 2 of 2', title:'Change the wording',
-    sub:`Keep it to ${target} words and your page layout will not shift.`,
-    body:`<div class="ba"><div class="ba-lab">Your text</div>
-        <div class="ed" contenteditable="true" id="ed">${esc(c.text)}</div>
-        <div class="wc" id="wc"></div></div>
-      <div class="locknote">🔒<span>The word count is locked to <b>${target}</b>. This is the one rule Sitecraft enforces — it is what stops an edit from breaking your design.</span></div>`,
-    foot:`<button class="btn" id="bk">Back</button><button class="btn btn-go" id="sv">Save</button>`
-  });
-  const ed = document.getElementById('ed'), wc = document.getElementById('wc'), sv = document.getElementById('sv');
+  const target = W(c.text);
+  open({ ttl: hdr(c), flag: flagOf(c), step:'Step 2 of 2', body:`
+    <div class="lab">Your words<span class="n" id="wcn"></span></div>
+    <div class="box ed" contenteditable="true" id="ed">${esc(c.text)}</div>
+    <div class="wc" id="wc"></div>
+    <div class="note-amber">🔒 <b>Locked to ${target} words.</b> This is the one rule Sitecraft enforces, and it is what stops an edit from breaking your design.</div>
+    <div class="pair"><button class="pill" id="rv">Revert</button><button class="g" id="sv">Save</button></div>
+    <div class="p-ft"><u>Disclaimer</u> · © 2026 ReadTomato™</div>`});
+  const ed = $('#ed'), wc = $('#wc'), sv = $('#sv');
   const tick = () => {
-    const n = words(ed.innerText);
-    const ok = n===target;
-    wc.className = 'wc ' + (ok?'good':'bad');
-    wc.innerHTML = ok ? `<b>${n} / ${target} words</b> — good to save`
-      : `<b>${n} / ${target} words</b> — ${n>target?(n-target)+' too many':(target-n)+' more needed'}`;
+    const n = W(ed.innerText), ok = n===target;
+    wc.className = 'wc ' + (ok?'ok':'bad');
+    wc.textContent = ok ? `${n} / ${target} words — good to save`
+      : `${n} / ${target} words — ${n>target?(n-target)+' too many':(target-n)+' more needed'}`;
     sv.disabled = !ok;
   };
   ed.addEventListener('input', tick); tick(); ed.focus();
-  document.getElementById('bk').onclick = () => editSheet(id);
-  sv.onclick = () => {
+  $('#rv').onclick = ()=>{ ed.innerText = c.text; tick(); };
+  sv.onclick = ()=>{
     const was = c.text, now = ed.innerText.trim();
-    if (words(now)!==target) return;
+    if (W(now)!==target) return;
     c.text = now;
-    S.changes.push({ id, page:pageOf(id), what:`${label(c)} reworded`, was, now });
-    closeSheet(); drawPage(); flash(id);
-    toast('Saved', () => { c.text = was; S.changes.pop(); drawPage(); badges(); });
-  };
-}
-function flash(id){
-  const el = document.querySelector(`[data-id="${id}"]`);
-  if (!el) return;
-  el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
-  el.scrollIntoView({behavior:'smooth', block:'center'});
-}
-
-/* ══════════════════ THE BOOST FLOW ══════════════════ */
-function boostSheet(id){
-  const c = comp(id);
-  const d = diff(c.text, c.up);
-  const rows = [0,1,2].map(i=>{
-    const before = c.s[i], after = c.u[i], col = meterColor(after);
-    const cells = Array.from({length:10},(_,k)=>{
-      const cls = k<before ? 'f' : k<after ? 'gain' : '';
-      return `<i class="${cls}"></i>`;
-    }).join('');
-    return `<div class="score" style="--g:${col}">
-      <button class="score-hd" data-toggle="why${i}" aria-expanded="false">
-        <span class="score-nm"><span class="chev">▶</span>${WHY[i].n}</span>
-        <span class="meter">${cells}</span>
-        <span class="score-num"><s>${before}</s> → <b>${after}</b>/10</span>
-      </button>
-      <div class="score-why" id="why${i}" hidden>${WHY[i].d}</div>
-    </div>`;
-  }).join('');
-
-  openSheet({
-    kick:'Boost', step:'Step 1 of 2', title:'Here is a stronger version',
-    sub:`Compare it with what you have now. Nothing is charged yet.`,
-    body:`
-      <div class="ba" id="pane-up">
-        <div class="ba-lab">What it could say<span class="n">${c.t==='img'?'new alt text':words(c.up)+' words'}</span></div>
-        <div class="copy up">${render(d,'+')}</div>
-      </div>
-      <div class="ba" id="pane-now" hidden>
-        <div class="ba-lab">What it says now<span class="n">${c.t==='img'?'current alt text':words(c.text)+' words'}</span></div>
-        <div class="copy now">${render(d,'-')}</div>
-      </div>
-      <button class="btn btn-sm" id="flip" style="justify-self:start">Show me my original</button>
-      <div class="scores">${rows}</div>
-      <div class="price"><span>Boost this ${label(c)}</span><span class="sub">one-off</span><span class="amt">${money(c.price)}</span></div>`,
-    foot:`<button class="btn" id="bk">Back</button><button class="btn btn-go" id="nx">Continue</button>`
-  });
-
-  let showing = 'up';
-  document.getElementById('flip').onclick = (e) => {
-    showing = showing==='up' ? 'now' : 'up';
-    document.getElementById('pane-up').hidden = showing==='now';
-    document.getElementById('pane-now').hidden = showing==='up';
-    e.target.textContent = showing==='up' ? 'Show me my original' : 'Show the boosted version';
-  };
-  document.getElementById('bk').onclick = () => editSheet(id);
-  document.getElementById('nx').onclick = () => S.skipConfirm ? applyBoost(id) : confirmSheet(id);
-}
-
-function confirmSheet(id){
-  const c = comp(id);
-  openSheet({
-    kick:'Boost', step:'Step 2 of 2', title:`Boost this ${label(c)} for ${money(c.price)}?`,
-    sub:'This replaces the wording on your live page. You can undo it straight after.',
-    body:`
-      <div class="ba"><div class="ba-lab">Going live</div><div class="copy up">${esc(c.up)}</div></div>
-      <div class="price"><span>This boost</span><span class="amt">${money(c.price)}</span></div>
-      <div class="tot plan"><span>Boosts this month</span><span class="amt">${money(spend())}</span></div>
-      <div class="tot plan"><span>Subscription</span><span class="amt">$299.00 / mo</span></div>`,
-    foot:`<button class="btn" id="bk">Back</button><button class="btn btn-go" id="go">Boost for ${money(c.price)}</button>`
-  });
-  document.getElementById('bk').onclick = () => boostSheet(id);
-  document.getElementById('go').onclick = () => applyBoost(id);
-}
-
-function applyBoost(id){
-  const c = comp(id);
-  const was = c.text;
-  c.text = c.up;
-  S.boosts.push({ id, page:pageOf(id), price:c.price, what:label(c), gain:c.u.map((v,i)=>v-c.s[i]) });
-  S.boostCount++;
-  closeSheet(); drawPage(); flash(id); badges();
-  toast(`Boosted for ${money(c.price)}`, () => {
-    c.text = was; S.boosts.pop(); S.boostCount--; drawPage(); badges();
-  });
-  if (S.boostCount===3 && !S.skipConfirm && !S.offered) { S.offered = true; setTimeout(offerSkip, 1200); }
-}
-
-/* the system watching for a habit and offering to shorten the flow */
-function offerSkip(){
-  openSheet({
-    kick:'Sitecraft', title:'Want to skip the confirmation step?',
-    sub:'You have boosted three times and confirmed every one.',
-    body:`<div class="learn"><span>⚡</span><span><b>We noticed a habit</b>From now on, Sitecraft can boost as soon as you press Continue — one step instead of two. You will still see the comparison first, and you can still undo straight after.</span></div>
-      <p style="font-size:.83rem;color:var(--ui-mut);margin:0">You can switch this back at any time from Account.</p>`,
-    foot:`<button class="btn" id="no">Keep asking me</button><button class="btn btn-go" id="yes">Skip it from now on</button>`
-  });
-  document.getElementById('no').onclick = () => { closeSheet(); toast('No problem — we will keep confirming.'); };
-  document.getElementById('yes').onclick = () => { S.skipConfirm = true; closeSheet(); toast('Done. Boosts now apply in one step.'); };
-}
-
-/* ══════════════════ notes ══════════════════ */
-function noteSheet(id){
-  const c = comp(id);
-  const mine = S.notes.filter(n=>n.id===id);
-  openSheet({
-    kick:'Notes', title:'Leave a note',
-    sub:`On the ${label(c)} of your ${SITE[S.page].name} page.`,
-    body:`<div class="copy now">${esc(c.text.slice(0,180))}${c.text.length>180?'…':''}</div>
-      ${mine.length ? `<div class="grp"><button class="grp-hd" data-toggle="nt" aria-expanded="true"><span class="chev" style="transform:rotate(90deg)">▶</span>Notes already here<span class="cnt">${mine.length}</span></button>
-        <div class="grp-bd" id="nt">${mine.map(n=>`<div class="thread">
-          <div class="msg"><span class="m-who">You</span>${esc(n.text)}</div>
-          ${n.reply?`<div class="msg them"><span class="m-who">${esc(n.to)}</span>${esc(n.reply)}</div>`:''}
-        </div>`).join('')}</div></div>` : ''}
-      <div class="ba"><div class="ba-lab">Your note</div>
-        <textarea class="note-in" id="nin" placeholder="e.g. Can we mention the Saturday hours here?"></textarea></div>
-      <div class="ba"><div class="ba-lab">Who should look at this?</div>
-        <div class="who" id="who">${COLL.slice(0,S.seats).map((p,i)=>`<button data-who="${esc(p)}" class="${i===0?'on':''}">${esc(p)}</button>`).join('')}
-        ${S.seats<2?`<button data-add="1" style="border-style:dashed">+ Add someone · $9/mo</button>`:''}</div></div>`,
-    foot:`<span class="hint">Notes gather in Review so you can send them in one go.</span><button class="btn btn-go" id="add">Save note</button>`
-  });
-  S.noteTo = COLL[0];
-  document.querySelectorAll('[data-who]').forEach(b=>b.onclick=()=>{
-    document.querySelectorAll('[data-who]').forEach(x=>x.classList.remove('on'));
-    b.classList.add('on'); S.noteTo = b.dataset.who;
-  });
-  const addBtn = document.querySelector('[data-add]');
-  if (addBtn) addBtn.onclick = () => seatsSheet();
-  document.getElementById('add').onclick = () => {
-    const t = document.getElementById('nin').value.trim();
-    if (!t) { toast('Type your note first'); return; }
-    S.notes.push({ id, page:pageOf(id), text:t, to:S.noteTo, sent:false,
-      reply: S.notes.length===0 ? null : null });
-    closeSheet(); drawPage(); badges();
-    toast('Note saved', () => { S.notes.pop(); drawPage(); badges(); });
+    S.changes.push({id, page:pgOf(id), lbl:c.lbl, old:was, now, when:'just now', kind:'copy'});
+    shut(); draw(); flash(id);
+    toast('Saved', ()=>{ c.text=was; S.changes.pop(); draw(); bdg(); });
   };
 }
 
-function seatsSheet(){
-  openSheet({
-    kick:'Account', title:'Add someone to your account',
-    sub:'They can read your site and reply to notes. They cannot make edits.',
-    body:`<div class="tot plan"><span>Included with your plan</span><span class="amt">1 person</span></div>
-      <div class="price"><span>One more reviewer</span><span class="sub">cancel any time</span><span class="amt">$9.00 / mo</span></div>
-      <p style="font-size:.82rem;color:var(--ui-mut);margin:0;line-height:1.5">Reviewers see the live site and every note. They can reply in the note thread, which keeps approvals in one place instead of scattered across email.</p>`,
-    foot:`<button class="btn" id="no">Not now</button><button class="btn btn-go" id="yes">Add for $9/mo</button>`
+/* ═══════════ THE BOOST ═══════════ */
+function boostP(id, proj = true){
+  const c = comp(id), d = c.t!=='img' ? dif(c.text, c.up) : null;
+  open({ ttl: hdr(c), flag: flagOf(c), step:'Step 1 of 2', body:`
+    ${d ? `<div class="lab">${proj?'What it could say':'What it says now'}<span class="n">${W(proj?c.up:c.text)} words</span></div>
+      <div class="box">${rend(d, proj?'+':'-')}</div>`
+        : `<div class="lab">${proj?'The description it would get':'The description now'}</div>
+      <div class="box">${esc(proj?c.up:(c.alt||'(no description)'))}</div>`}
+    ${scores(c, proj)}
+    <button class="pill" id="flip" style="width:100%">${proj?'Show my scores again':'Show me the boost again'}</button>
+    <div class="help">${proj?'That is where a boost would take you. <b>Nothing on your page has changed.</b>':'This is what you have right now.'}</div>
+    <div class="pair"><button class="pill" id="bk">Back</button><button class="g" id="nx">Visibility Boost ${M(c.price)}</button></div>
+    <div class="p-ft"><u>Disclaimer</u> · © 2026 ReadTomato™</div>`});
+  $('#flip').onclick = ()=>boostP(id, !proj);
+  $('#bk').onclick = ()=>editP(id);
+  $('#nx').onclick = ()=> S.skipConfirm ? apply(id) : confirmP(id);
+}
+function confirmP(id){
+  const c = comp(id);
+  open({ ttl: hdr(c), flag: flagOf(c), step:'Step 2 of 2', body:`
+    <div class="ca-t">Boost this ${esc(c.lbl.toLowerCase())} for ${M(c.price)}?</div>
+    <div class="lab">Going live on your page</div>
+    <div class="box" style="border-color:var(--green);background:var(--card);color:var(--ink)">${esc(c.t==='img'?c.up:c.up)}</div>
+    <div class="itm" style="border:0"><span></span><span class="bdy"><span class="new">This boost</span></span><span class="amt">${M(c.price)}</span></div>
+    <div class="itm" style="border:0;padding-top:0"><span></span><span class="bdy"><span class="stamp">On this session so far</span></span><span class="amt">${M(S.session)}</span></div>
+    <div class="note-amber">Boosts are agreed as you choose them and settle as <b>one amount</b> when you press Done.</div>
+    <div class="pair"><button class="pill" id="bk">Back</button><button class="g" id="go">Boost for ${M(c.price)}</button></div>
+    <div class="p-ft"><u>Disclaimer</u> · © 2026 ReadTomato™</div>`});
+  $('#bk').onclick = ()=>boostP(id);
+  $('#go').onclick = ()=>apply(id);
+}
+function apply(id){
+  const c = comp(id), was = c.t==='img' ? c.alt : c.text;
+  if (c.t==='img') c.alt = c.up; else c.text = c.up;
+  S.boosts.push({id, page:pgOf(id), lbl:c.lbl, price:c.price, gain:c.u.map((v,i)=>+(v-c.s[i]).toFixed(1))});
+  S.session += c.price; S.boostCount++;
+  shut(); draw(); flash(id); bdg();
+  toast(`Boosted. <b>${M(c.price)}</b> added to this session — nothing charged until Done.`, ()=>{
+    if (c.t==='img') c.alt = was; else c.text = was;
+    S.boosts.pop(); S.session -= c.price; S.boostCount--; draw(); bdg();
   });
-  document.getElementById('no').onclick = closeSheet;
-  document.getElementById('yes').onclick = () => { S.seats = 2; closeSheet(); toast('Priya Raman added as a reviewer'); };
+  if (S.boostCount===3 && !S.skipConfirm && !S.offered){ S.offered = true; setTimeout(offer, 1400); }
+}
+function offer(){
+  open({ ttl:'<b>Sitecraft noticed a habit</b>', body:`
+    <div class="note-amber" style="background:var(--green-pale);color:var(--green-ink)">
+      You have boosted three times and said yes every time. Sitecraft can skip that confirm step from now on — you will still see the comparison first, and Undo still works straight after.</div>
+    <div class="help">You can switch this back whenever you like, from My Account.</div>
+    <div class="pair"><button class="pill" id="no">Keep asking me</button><button class="g" id="yes">Skip it from now on</button></div>`});
+  $('#no').onclick = ()=>{ shut(); toast('No problem — Sitecraft will keep asking.'); };
+  $('#yes').onclick = ()=>{ S.skipConfirm = true; shut(); toast('Done. Boosts now take one step.'); };
 }
 
-/* ══════════════════ review ══════════════════ */
-function showReview(){
-  const byPage = k => Object.keys(SITE).map(p=>{
-    const items = S[k].filter(x=>x.page===p);
-    if (!items.length) return '';
-    return `<div class="row"><span class="where">${SITE[p].name}</span><span class="what">${items.length} item${items.length>1?'s':''}</span>${k==='boosts'?`<span class="amt">${money(items.reduce((t,i)=>t+i.price,0))}</span>`:'<span></span>'}</div>`;
-  }).join('');
-
-  const changeRows = S.changes.length ? S.changes.map(c=>
-    `<div class="row"><span class="where">${SITE[c.page].name}</span><span class="what">${esc(c.what)} — <em>“${esc(c.now.slice(0,52))}${c.now.length>52?'…':''}”</em></span><span></span></div>`
-  ).join('') : `<div class="empty">No wording changes yet.</div>`;
-
-  const noteRows = S.notes.length ? S.notes.map((n,i)=>
-    `<div class="row"><input type="checkbox" data-note="${i}" ${S.picked.has(i)?'checked':''}><span class="what">${esc(n.text)}<br><em>${SITE[n.page].name} · for ${esc(n.to)}${n.sent?' · sent':''}</em></span><span></span></div>`
-  ).join('') : `<div class="empty">No notes yet. Use the Notes button, then click any part of your page.</div>`;
-
-  const boostRows = S.boosts.length ? (byPage('boosts') + S.boosts.map(b=>
-    `<div class="row"><span class="where">${SITE[b.page].name}</span><span class="what">${esc(b.what)} — <em>AI +${b.gain[0]}, AEO +${b.gain[1]}, SEO +${b.gain[2]}</em></span><span class="amt">${money(b.price)}</span></div>`
-  ).join('')) : `<div class="empty">No boosts yet.</div>`;
-
-  const unsent = S.notes.filter(n=>!n.sent).length;
-  openSheet({
-    kick:'Review', title:'Everything you have done',
-    sub:'Three lists: what changed, what people need to look at, and what you have boosted.',
-    body:`
-      <div class="grp"><button class="grp-hd" data-toggle="g1" aria-expanded="false"><span class="chev">▶</span>Changes to wording<span class="cnt">${S.changes.length}</span></button><div class="grp-bd" id="g1" hidden>${changeRows}</div></div>
-      <div class="grp"><button class="grp-hd" data-toggle="g2" aria-expanded="${unsent?'true':'false'}"><span class="chev" ${unsent?'style="transform:rotate(90deg)"':''}>▶</span>Notes<span class="cnt">${S.notes.length}${unsent?' · '+unsent+' unsent':''}</span></button>
-        <div class="grp-bd" id="g2" ${unsent?'':'hidden'}>${noteRows}
-        ${S.notes.length?`<div class="row" style="grid-template-columns:1fr auto"><span class="what" style="font-size:.79rem;color:var(--ui-faint)">Pick the notes you want reviewed, then send them all in one email.</span><button class="btn btn-sm" id="sendnotes">Send selected</button></div>`:''}</div></div>
-      <div class="grp"><button class="grp-hd" data-toggle="g3" aria-expanded="false"><span class="chev">▶</span>Boosts<span class="cnt">${S.boosts.length} · ${money(spend())}</span></button><div class="grp-bd" id="g3" hidden>${boostRows}</div></div>
-      <div class="tot"><span>Boosts this month</span><span class="amt">${money(spend())}</span></div>
-      <div class="tot plan"><span>Subscription</span><span class="amt">$299.00 / mo</span></div>`,
-    foot:`<span class="hint">${S.boosts.length?`Average ${money(spend()/S.boosts.length)} per boost.`:'Boost a component to see it here.'}</span><button class="btn" id="cx">Close</button>`
+/* ═══════════ comments ═══════════ */
+function noteP(id){
+  const c = comp(id), mine = S.notes.filter(n=>n.id===id);
+  open({ ttl: hdr(c), flag: flagOf(c), body:`
+    <div class="box">${esc(c.text.slice(0,150))}${c.text.length>150?'…':''}</div>
+    ${mine.length?`<div class="sec"><button class="sec-hd" data-t="nt" aria-expanded="true">Notes already here<span class="tw">✕</span></button>
+      <div class="sec-bd" id="nt">${mine.map(n=>`<div style="padding:.5rem 0;display:grid;gap:.35rem">
+        <div class="msg"><b>You · ${esc(n.when)}</b>${esc(n.text)}</div>
+        ${n.reply?`<div class="msg them"><b>${esc(n.to)}</b>${esc(n.reply)}</div>`:''}</div>`).join('')}</div></div>`:''}
+    <div class="lab">Your note</div>
+    <textarea class="ta" id="tx" placeholder="e.g. Can we mention the Saturday hours here?"></textarea>
+    <div class="lab">Who is it for?</div>
+    <div class="who-pick" id="wp">${PEOPLE.slice(0,S.seats).map((p,i)=>`<button data-w="${esc(p)}" class="${i?'':'on'}">${esc(p)}</button>`).join('')}
+      ${S.seats<2?'<button data-add="1" style="border-style:dashed">+ Add someone · $9/mo</button>':''}</div>
+    <button class="g wide" id="ad">Save this note</button>
+    <div class="help">Notes gather in Review, so you can send them in one go.</div>
+    <div class="p-ft"><u>Disclaimer</u> · © 2026 ReadTomato™</div>`});
+  S.noteTo = PEOPLE[0];
+  document.querySelectorAll('[data-w]').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('[data-w]').forEach(x=>x.classList.remove('on')); b.classList.add('on'); S.noteTo = b.dataset.w;
   });
-  document.getElementById('cx').onclick = () => setMode('review');
-  document.querySelectorAll('[data-note]').forEach(cb=>cb.onchange=()=>{
-    const i = +cb.dataset.note;
-    cb.checked ? S.picked.add(i) : S.picked.delete(i);
+  const a = document.querySelector('[data-add]'); if (a) a.onclick = seats;
+  $('#ad').onclick = ()=>{
+    const t = $('#tx').value.trim(); if (!t) return toast('Type your note first.');
+    S.notes.push({id, page:pgOf(id), lbl:c.lbl, text:t, to:S.noteTo, when:'just now', sent:false, done:false, reply:null});
+    shut(); draw(); bdg();
+    toast('Note saved', ()=>{ S.notes.pop(); draw(); bdg(); });
+  };
+}
+function seats(){
+  open({ ttl:'<b>Add someone to your account</b>', body:`
+    <div class="chips"><span class="chip gr">1 seat included</span><span class="chip">${S.seats} of ${S.seats} used</span></div>
+    <div class="itm" style="border:0"><span></span><span class="bdy"><span class="new">One more reviewer</span><span class="stamp">Cancel any time</span></span><span class="amt">$9.00/mo</span></div>
+    <div class="help">Reviewers see the live site and every note, and can reply in the thread. They cannot make edits.</div>
+    <div class="pair"><button class="pill" id="no">Not now</button><button class="g" id="yes">Add for $9/mo</button></div>`});
+  $('#no').onclick = shut;
+  $('#yes').onclick = ()=>{ S.seats = 2; shut(); toast(`${PEOPLE[1]} added as a reviewer.`); };
+}
+
+/* ═══════════ review ═══════════ */
+function review(){
+  const chg = S.changes.length ? S.changes.map((c,i)=>`<div class="itm">
+      <span class="who">${esc(c.lbl)} <i>on ${SITE[c.page].name}</i></span>
+      <span class="bdy">${c.kind==='copy'?`<span class="old">${esc(c.old.slice(0,64))}${c.old.length>64?'…':''}</span>`:''}
+        <span class="new">${esc(c.now.slice(0,72))}${c.now.length>72?'…':''}</span>
+        <span class="stamp">Marshall · ${esc(c.when)}</span></span>
+      <span class="acts"><button class="pill" data-show="${c.id}">Show me</button><button class="pill" data-undo="${i}">Undo</button></span>
+    </div>`).join('') : '<div class="empty">Nothing changed yet.</div>';
+
+  const openN = S.notes.filter(n=>!n.done).length;
+  const nts = S.notes.length ? S.notes.map((n,i)=>`<div class="itm ${n.done?'gone':''}">
+      <input type="checkbox" data-n="${i}" ${S.picked.has(i)?'checked':''} ${n.done?'disabled':''}>
+      <span class="bdy"><span class="who">${esc(n.lbl)} ${n.to?`<i>for ${esc(n.to)}</i>`:'<em>nobody chosen yet</em>'}</span>
+        <span class="new">${esc(n.text)}</span>
+        <span class="stamp">Marshall · ${esc(n.when)}${n.sent?' · sent':''}</span>
+        ${n.reply?`<span class="msg them" style="margin-top:.2rem"><b>${esc(n.to)}</b>${esc(n.reply)}</span>`:''}</span>
+      <span class="acts"><button class="pill" data-show="${n.id}">Show me</button>
+        <button class="pill" data-sort="${i}">${n.done?'Reopen':'Sorted'}</button></span>
+    </div>`).join('') : '<div class="empty">No notes yet. Use Comment, then click part of your page.</div>';
+
+  const bst = S.boosts.length ? S.boosts.map(b=>`<div class="itm">
+      <span class="who">${esc(b.lbl)}</span>
+      <span class="bdy"><span class="new">On ${SITE[b.page].name}</span>
+        <span class="stamp">AI +${b.gain[0]} · AEO +${b.gain[1]} · SEO +${b.gain[2]}</span></span>
+      <span class="acts"><span class="amt">${M(b.price)}</span><button class="pill" data-show="${b.id}">Show me</button></span>
+    </div>`).join('') : '<div class="empty">No boosts yet.</div>';
+
+  open({ ttl:'<b>Review the whole site</b>', body:`
+    <div class="sec"><button class="sec-hd" data-t="r1" aria-expanded="true">What changed (${S.changes.length})<span class="tw">✕</span></button>
+      <div class="sec-bd" id="r1">${chg}</div></div>
+    <div class="sec"><button class="sec-hd" data-t="r2" aria-expanded="${openN?'true':'false'}">Notes (${openN} open of ${S.notes.length})<span class="tw">${openN?'✕':'+'}</span></button>
+      <div class="sec-bd" id="r2" ${openN?'':'hidden'}>${nts}
+        ${S.notes.length?`<div class="help" style="padding-top:.5rem">Tick the notes you want to send</div>
+        <button class="g wide" id="send" ${S.picked.size?'':'disabled'}>Send the ticked notes</button>
+        <div class="mini" style="padding-top:.3rem">Each note goes to the person it was already meant for — one message each, holding only their notes.</div>`:''}</div></div>
+    <div class="sec"><button class="sec-hd" data-t="r3" aria-expanded="true">Boosts on this page (${S.boosts.filter(b=>b.page===S.page).length})<span class="tw">✕</span></button>
+      <div class="sec-bd" id="r3">${bst}
+        <div class="spent"><span>Spent on this page</span><span class="amt">${M(pageSpend(S.page))}</span></div>
+        <div class="mini">Across the whole site so far: ${M(S.boosts.reduce((t,b)=>t+b.price,0))} · settles when you press Done.</div></div></div>
+    <div class="p-ft">Approved by <b>Marshall</b>, just now.</div>`});
+
+  document.querySelectorAll('[data-show]').forEach(b=>b.onclick=()=>showMe(b.dataset.show));
+  document.querySelectorAll('[data-undo]').forEach(b=>b.onclick=()=>{
+    const c = S.changes[+b.dataset.undo], k = comp(c.id);
+    if (c.kind==='alt') k.alt = c.old==='(nothing)'?'':c.old; else k.text = c.old;
+    S.changes.splice(+b.dataset.undo,1); draw(); review(); bdg(); toast('Change undone.');
   });
-  const sn = document.getElementById('sendnotes');
-  if (sn) sn.onclick = () => {
-    if (!S.picked.size) { toast('Tick the notes you want to send'); return; }
-    const to = [...S.picked].map(i=>S.notes[i].to);
-    const who = [...new Set(to)];
-    [...S.picked].forEach(i=>{ S.notes[i].sent = true; S.notes[i].reply = 'Looks good — happy for you to publish this one.'; });
-    const n = S.picked.size; S.picked.clear();
-    showReview(); badges();
-    toast(`${n} note${n>1?'s':''} sent to ${who.join(' and ')} in one email`);
+  document.querySelectorAll('[data-sort]').forEach(b=>b.onclick=()=>{
+    const n = S.notes[+b.dataset.sort]; n.done = !n.done; S.picked.delete(+b.dataset.sort);
+    draw(); review(); bdg();
+  });
+  document.querySelectorAll('[data-n]').forEach(cb=>cb.onchange=()=>{
+    const i = +cb.dataset.n; cb.checked ? S.picked.add(i) : S.picked.delete(i);
+    const s = $('#send'); if (s) s.disabled = !S.picked.size;
+  });
+  const s = $('#send');
+  if (s) s.onclick = ()=>{
+    if (!S.picked.size) return;
+    const by = {};
+    [...S.picked].forEach(i=>{ const n = S.notes[i]; (by[n.to] = by[n.to]||[]).push(n);
+      n.sent = true; n.reply = 'Looks good — happy for you to publish this.'; });
+    const names = Object.keys(by), n = S.picked.size; S.picked.clear();
+    review(); bdg();
+    toast(`${n} note${n>1?'s':''} sent on — ${names.map(k=>`<b>${k}</b> got ${by[k].length}`).join(', ')}, one message each. Carry on looking around whenever you like.`);
   };
 }
 
-/* ══════════════════ account ══════════════════ */
-function showAccount(){
-  openSheet({
-    kick:'Account', title:'Your plan',
-    sub:'Northgate Family Dental · northgatefamilydental.com',
-    body:`<div class="tot plan"><span>Sitecraft subscription</span><span class="amt">$299.00 / mo</span></div>
-      <div class="tot"><span>Boosts this month</span><span class="amt">${money(spend())}</span></div>
-      <div class="grp"><button class="grp-hd" data-toggle="a1" aria-expanded="false"><span class="chev">▶</span>People on your account<span class="cnt">${S.seats} of ${S.seats}</span></button>
-        <div class="grp-bd" id="a1" hidden>
-          <div class="row"><span class="where">Owner</span><span class="what">You — can edit and boost</span><span></span></div>
-          ${COLL.slice(0,S.seats).map(p=>`<div class="row"><span class="where">Reviewer</span><span class="what">${esc(p)} — notes only, no edits</span><span></span></div>`).join('')}
-          ${S.seats<2?`<div class="row" style="grid-template-columns:1fr auto"><span class="what" style="color:var(--ui-faint);font-size:.8rem">One reviewer is included. Extra reviewers are $9/mo.</span><button class="btn btn-sm" id="addseat">Add</button></div>`:''}
-        </div></div>
-      <div class="grp"><button class="grp-hd" data-toggle="a2" aria-expanded="false"><span class="chev">▶</span>How you like to work<span class="cnt">${S.skipConfirm?'1 shortcut on':'default'}</span></button>
-        <div class="grp-bd" id="a2" hidden>
-          <div class="row" style="grid-template-columns:1fr auto"><span class="what">Confirm before each boost<br><em>${S.skipConfirm?'Off — boosts apply as soon as you press Continue':'On — we show a confirmation step'}</em></span>
-          <button class="btn btn-sm" id="flipconf">${S.skipConfirm?'Turn back on':'Turn off'}</button></div>
-        </div></div>`,
-    foot:`<span class="hint">Boosts are billed monthly with your subscription.</span><button class="btn" id="cx">Close</button>`
-  });
-  document.getElementById('cx').onclick = () => setMode('account');
-  const a = document.getElementById('addseat'); if (a) a.onclick = seatsSheet;
-  document.getElementById('flipconf').onclick = () => { S.skipConfirm = !S.skipConfirm; showAccount(); };
+/* ═══════════ account ═══════════ */
+function account(){
+  open({ ttl:'<b>Your account</b>', body:`
+    <div class="itm" style="border:0;grid-template-columns:auto 1fr">
+      <span style="width:2.4rem;height:2.4rem;border-radius:50%;background:var(--bar);color:#fff;display:grid;place-items:center;font-weight:800">M</span>
+      <span class="bdy"><span class="new" style="font-weight:700">Marshall</span><span class="stamp">mg@readtomato.com</span></span></div>
+    <div class="chips"><span class="chip gr">Account active</span><span class="chip ${S.session?'am':'gr'}">${S.session?M(S.session)+' on this session':'Nothing outstanding'}</span></div>
+    <div class="sec"><button class="sec-hd" data-t="a1" aria-expanded="true">Your sites (1)<span class="tw">✕</span></button>
+      <div class="sec-bd" id="a1"><div class="itm">
+        <span class="who" style="color:var(--green-ink)">Northgate Family Dental</span>
+        <span class="bdy"><span class="stamp">L2 Constrained Copy Edit · you are owner</span>
+          <span class="chips" style="margin-top:.25rem"><span class="chip">${S.changes.length} of 3 change rounds used</span><span class="chip ${S.seats>1?'am':''}">${S.seats} of 2 reviewer seats</span></span></span>
+        <span class="amt">${M(S.boosts.reduce((t,b)=>t+b.price,0))}</span></div></div></div>
+    <div class="sec"><button class="sec-hd" data-t="a2" aria-expanded="false">Receipts (${S.receipts.length})<span class="tw">+</span></button>
+      <div class="sec-bd" id="a2" hidden>${S.receipts.map(r=>`<div class="itm">
+          <span class="stamp">${esc(r.when)}</span><span class="bdy"><span class="new">${r.n} item${r.n>1?'s':''}</span></span><span class="amt">${M(r.amt)}</span></div>`).join('')}
+        <div class="spent"><span>Paid to date</span><span class="amt">${M(paidTotal())}</span></div>
+        <div class="mini">Each line is one settled session, not one boost.</div></div></div>
+    <div class="sec"><button class="sec-hd" data-t="a3" aria-expanded="false">People on your account<span class="tw">+</span></button>
+      <div class="sec-bd" id="a3" hidden>
+        <div class="itm"><span class="who">Owner</span><span class="bdy"><span class="new">You — edit and boost</span></span><span></span></div>
+        ${PEOPLE.slice(0,S.seats).map(p=>`<div class="itm"><span class="who"><i>Reviewer</i></span><span class="bdy"><span class="new">${esc(p)} — notes only</span></span><span></span></div>`).join('')}
+        ${S.seats<2?'<div class="itm"><span></span><span class="bdy"><span class="stamp">One seat is included. A second is $9/mo.</span></span><span class="acts"><button class="pill" id="as">Add</button></span></div>':''}</div></div>
+    <div class="sec"><button class="sec-hd" data-t="a4" aria-expanded="false">How you like to work<span class="tw">+</span></button>
+      <div class="sec-bd" id="a4" hidden><div class="itm">
+        <span></span><span class="bdy"><span class="new">Confirm before each boost</span><span class="stamp">${S.skipConfirm?'Off — boosts apply in one step':'On — Sitecraft asks first'}</span></span>
+        <span class="acts"><button class="pill" id="fc">${S.skipConfirm?'Turn on':'Turn off'}</button></span></div></div></div>
+    <div class="note-amber">Your plan is <b>$299/mo</b>. Boosts are agreed as you pick them and settle as one amount each time you press Done.</div>
+    <div class="p-ft"><u>All my details</u> · © 2026 ReadTomato™</div>`});
+  const a = $('#as'); if (a) a.onclick = seats;
+  $('#fc').onclick = ()=>{ S.skipConfirm = !S.skipConfirm; account(); };
 }
 
-/* ══════════════════ identify ══════════════════ */
-function showIdentify(){
-  const pg = SITE[S.page];
-  const list = pg.comps.filter(c=>c.up);
-  const total = list.filter(c=>!S.boosts.some(b=>b.id===c.id)).reduce((t,c)=>t+c.price,0);
-  openSheet({
-    kick:'Identify', title:`What can be boosted on ${pg.name}`,
-    sub:'Every part of your page that could score better in AI search, with what it costs.',
-    body:`<div class="grp"><div class="grp-bd">${list.map(c=>{
-        const done = S.boosts.some(b=>b.id===c.id);
-        const now = Math.round(c.s.reduce((a,b)=>a+b,0)/3), up = Math.round(c.u.reduce((a,b)=>a+b,0)/3);
-        return `<div class="row"><span class="where">${label(c)}</span>
-          <span class="what">${esc(c.text.slice(0,46))}${c.text.length>46?'…':''}<br><em>now ${now}/10 → could be ${up}/10</em></span>
-          <span class="amt">${done?'✓ done':money(c.price)}</span></div>`;
-      }).join('')}</div></div>
-      ${total?`<div class="tot"><span>Boost everything left on this page</span><span class="amt">${money(total)}</span></div>`:''}`,
-    foot:`<span class="hint">Click anything on the page to boost it on its own.</span>${total?`<button class="btn btn-go" id="all">Boost whole page · ${money(total)}</button>`:'<button class="btn" id="cx">Close</button>'}`
-  });
-  const cx = document.getElementById('cx'); if (cx) cx.onclick = () => setMode('identify');
-  const all = document.getElementById('all');
-  if (all) all.onclick = () => {
-    const todo = list.filter(c=>!S.boosts.some(b=>b.id===c.id));
-    const snap = todo.map(c=>({c, was:c.text}));
-    todo.forEach(c=>{ c.text = c.up; S.boosts.push({id:c.id,page:pageOf(c.id),price:c.price,what:label(c),gain:c.u.map((v,i)=>v-c.s[i])}); });
-    S.boostCount += todo.length;
-    closeSheet(); drawPage(); badges();
-    toast(`Boosted ${todo.length} items for ${money(total)}`, () => {
-      snap.forEach(({c,was})=>c.text=was);
-      S.boosts.splice(S.boosts.length-todo.length, todo.length);
-      S.boostCount -= todo.length; drawPage(); badges();
+/* ═══════════ the ? guide ═══════════ */
+function guide(){
+  const pg = SITE[S.page], list = pg.comps.filter(c=>c.price);
+  const left = list.filter(c=>!isBoosted(c.id));
+  const tot = left.reduce((t,c)=>t+c.price,0);
+  open({ ttl:`<b>What is on ${pg.name}</b>`, flag: pg.critical?'SEO/AEO Critical Page':'', body:`
+    <div class="help">Everything Sitecraft can see on this page, and what each part scores right now. Outlined on the page behind this.</div>
+    <div class="sec-bd">${pg.comps.map(c=>{
+      const b = isBoosted(c.id);
+      return `<div class="itm"><span class="who">${esc(c.lbl)}</span>
+        <span class="bdy"><span class="new">${esc(c.text.slice(0,40))}${c.text.length>40?'…':''}</span>
+          <span class="stamp">now ${avg(c.s).toFixed(1)}/10${c.u?` → could be ${avg(c.u).toFixed(1)}/10`:''}</span></span>
+        <span class="acts"><span class="amt" style="color:${b?'var(--green-d)':c.price?'var(--navy)':'var(--amber-ink)'}">${b?'✓ done':c.price?M(c.price):'needs you'}</span>
+        <button class="pill" data-show="${c.id}">Show me</button></span></div>`;
+    }).join('')}</div>
+    ${tot?`<div class="spent"><span>Boost all ${left.length} left on this page</span><span class="amt">${M(tot)}</span></div>
+      <button class="g wide" id="all">Boost the whole page · ${M(tot)}</button>
+      <div class="mini">Adds to this session. Nothing charged until you press Done.</div>`:'<div class="help">Everything boostable on this page is done.</div>'}
+    <div class="p-ft"><u>Disclaimer</u> · © 2026 ReadTomato™</div>`});
+  document.querySelectorAll('[data-show]').forEach(b=>b.onclick=()=>showMe(b.dataset.show));
+  const a = $('#all');
+  if (a) a.onclick = ()=>{
+    const snap = left.map(c=>({c, was: c.t==='img'?c.alt:c.text}));
+    left.forEach(c=>{ if(c.t==='img') c.alt=c.up; else c.text=c.up;
+      S.boosts.push({id:c.id,page:pgOf(c.id),lbl:c.lbl,price:c.price,gain:c.u.map((v,i)=>+(v-c.s[i]).toFixed(1))}); });
+    S.session += tot; S.boostCount += left.length;
+    shut(); draw(); bdg();
+    toast(`Boosted ${left.length} parts of ${pg.name}. <b>${M(tot)}</b> on this session.`, ()=>{
+      snap.forEach(({c,was})=>{ if(c.t==='img') c.alt=was; else c.text=was; });
+      S.boosts.splice(S.boosts.length-left.length, left.length);
+      S.session -= tot; S.boostCount -= left.length; draw(); bdg();
     });
   };
 }
 
-/* ══════════════════ wiring ══════════════════ */
-document.querySelectorAll('.bar button[data-mode]').forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
-document.getElementById('b-done').onclick = done;
-document.getElementById('sh-x').onclick = () => { if (S.mode==='review'||S.mode==='account'||S.mode==='identify') setMode(S.mode); else closeSheet(); };
-scrim.onclick = () => document.getElementById('sh-x').click();
-document.addEventListener('keydown', e => { if (e.key==='Escape') document.getElementById('sh-x').click(); });
+/* ═══════════ wiring ═══════════ */
+document.querySelectorAll('.bar [data-mode]').forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
+document.querySelector('[data-done]').onclick = done;
+$('#p-x').onclick = ()=> ['review','account','ident'].includes(S.mode) ? setMode(S.mode) : shut();
+$('#scrim').onclick = ()=>$('#p-x').click();
+document.addEventListener('keydown', e=>{ if (e.key==='Escape') $('#p-x').click(); });
 document.querySelectorAll('nav.site a').forEach(a=>a.onclick=e=>{
   e.preventDefault();
-  if (S.editing) { toast('Press Done to save and unlock navigation'); return; }
-  S.page = a.dataset.go; drawPage(); window.scrollTo({top:0,behavior:'smooth'});
+  if (S.editing) return toast('Press <b>Done</b> to settle up and unlock the other pages.');
+  S.page = a.dataset.go; draw(); window.scrollTo({top:0,behavior:'smooth'});
 });
-drawPage();
+draw();
 </script>
