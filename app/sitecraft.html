@@ -89,8 +89,14 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 /* ═══════ panel ═══════ */
 .scrim{position:fixed;inset:0;background:rgba(12,18,28,.4);z-index:70;display:none}
 .scrim.open{display:block}
-.pan{position:fixed;left:50%;top:50%;transform:translate(-50%,-48%) scale(.98);width:min(27rem,calc(100vw - 1.5rem));max-height:min(82vh,46rem);background:var(--card);border-radius:14px;box-shadow:var(--sh);z-index:80;display:grid;grid-template-rows:auto 1fr;opacity:0;pointer-events:none;transition:opacity .16s,transform .16s;overflow:hidden}
-.pan.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
+.pan{position:fixed;left:50%;top:50%;transform:translate(-50%,-48%) scale(.98);width:min(27rem,calc(100vw - 1.5rem));max-height:92vh;height:auto;background:var(--card);border-radius:14px;box-shadow:var(--sh);z-index:80;display:grid;grid-template-rows:auto 1fr;opacity:0;pointer-events:none;transition:opacity .16s,transform .16s;overflow:hidden}
+.pan.open{opacity:1;pointer-events:auto;transform:translate(calc(-50% + var(--swipe,0px)),-50%) scale(1)}
+.pan.open.moved{transform:translate(var(--swipe,0px),0)}
+.pan.swiping{transition:none;cursor:grabbing}
+@keyframes slidein{from{opacity:.35;transform:translate(calc(-50% + var(--from,26px)),-50%)}
+                   to{opacity:1;transform:translate(-50%,-50%)}}
+.pan.open.slide{animation:slidein .22s cubic-bezier(.32,.72,.32,1)}
+.pan.open.moved.slide{animation:none}
 .pan.moved{transition:opacity .16s}
 .pan.dragging{transition:none}
 .p-hd{position:relative;padding:.85rem 1.1rem .3rem;display:flex;align-items:center;gap:.5rem;cursor:grab;user-select:none}
@@ -102,15 +108,16 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .flagchip.v3{color:var(--red)}
 .flagchip.v2{color:var(--ink-2)}
 .flagchip.v1{color:var(--faint)}
-.qmark{border:0;background:var(--rule);color:var(--mut);width:1rem;height:1rem;border-radius:50%;font-size:.62rem;font-weight:800;line-height:1;padding:0;display:inline-grid;place-items:center;vertical-align:middle;flex:none}
-.qmark:hover,.qmark:focus-visible{background:var(--navy);color:var(--card)}
-.flagchip .qmark{margin-left:.28rem;background:var(--sunk)}
+.qmark{border:1.5px solid var(--green);background:var(--card);color:var(--green-d);width:1.05rem;height:1.05rem;border-radius:50%;font-size:.64rem;font-weight:800;line-height:1;padding:0;display:inline-grid;place-items:center;vertical-align:middle;flex:none;transition:background .12s,color .12s}
+.qmark:hover,.qmark:focus-visible{background:var(--green);color:#fff}
+.flagchip .qmark{margin-left:.28rem}
 /* the header tooltip, capped at two lines so it can never wreck the panel */
 .headtip{position:absolute;top:2.3rem;left:1.1rem;right:1.1rem;z-index:9;background:var(--bar);color:#fff;font-size:.75rem;line-height:1.4;border-radius:8px;padding:.42rem .6rem;opacity:0;pointer-events:none;transition:opacity .12s;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .headtip.on{opacity:1}
 .p-x{margin-left:auto;border:0;background:transparent;color:var(--green);font-size:1.05rem;line-height:1;font-weight:800;padding:0 .1rem;flex:none}
-.p-bd{overflow-y:auto;padding:.9rem 1.05rem 1.05rem;display:flex;flex-direction:column;gap:.7rem}
+.p-bd{overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none;padding:.9rem 1.05rem 1.05rem;display:flex;flex-direction:column;gap:.7rem}
+.p-bd::-webkit-scrollbar{display:none}
 .p-ft{font-size:.68rem;color:var(--faint);text-align:center;padding-top:.35rem}
 .p-ft u{cursor:pointer}
 
@@ -153,7 +160,8 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .zoomrow input[type=range]{flex:1;min-width:0;accent-color:var(--green);height:1.1rem}
 .reset{border:0;background:var(--green);color:#fff;font-size:.72rem;font-weight:700;padding:.26rem .7rem;border-radius:999px;flex:none}
 .reset:hover{background:var(--green-d)}
-.fld{width:100%;font-family:var(--f);font-size:.9rem;padding:.7rem .8rem;border:0;border-radius:10px;background:var(--sunk);color:var(--ink);outline:none}
+.fld{width:100%;font-family:var(--f);font-size:.9rem;line-height:1.45;padding:.7rem .8rem;border:0;border-radius:10px;background:var(--sunk);color:var(--ink);outline:none}
+.fld.grow{resize:none;overflow:hidden;display:block}
 .fld:focus{outline:2px solid var(--green);outline-offset:-2px}
 
 /* copy boxes */
@@ -161,7 +169,7 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .box.ed{background:var(--card);color:var(--ink);outline:2px solid var(--blue);outline-offset:-2px}
 .box ins{background:var(--green-pale);color:var(--green-ink);text-decoration:none;border-radius:2px;padding:0 .08rem}
 .box del{background:color-mix(in srgb,var(--red) 13%,transparent);color:var(--red);border-radius:2px;padding:0 .08rem}
-.lab{font-size:.64rem;letter-spacing:.09em;text-transform:uppercase;color:var(--mut);font-weight:700;display:flex;align-items:center;gap:.4rem}
+.lab{font-size:.6rem;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-2);font-weight:700;display:flex;align-items:center;gap:.4rem}
 .lab .n{margin-left:auto;font-family:var(--m);letter-spacing:0;text-transform:none;font-weight:500}
 .wc{font-variant-numeric:tabular-nums;font-family:var(--m);font-size:.72rem;font-weight:500;color:var(--mut)}
 .wc.bad{color:var(--red)}.wc.ok{color:var(--green-ink)}
@@ -170,15 +178,15 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .note-amber b{font-weight:700}
 
 /* content analysis */
-.ca{border-radius:10px;background:var(--sunk)}
-.ca-hd{width:100%;border:0;background:var(--green-pale);display:flex;align-items:center;gap:.62rem;padding:.62rem .7rem;text-align:left;border-radius:9px 9px 0 0}
+.ca{border-radius:10px;background:transparent}
+.ca-hd{width:100%;border:0;background:transparent;display:flex;align-items:center;gap:.62rem;padding:.62rem .7rem .5rem;text-align:left}
 .ca-sc{font-variant-numeric:tabular-nums;width:2.05rem;height:2.05rem;border-radius:50%;background:var(--red);color:#fff;font-size:.78rem;font-weight:800;display:grid;place-items:center;flex:none;font-family:var(--m)}
 .ca-hd.up .ca-sc{background:var(--green-d)}
 .ca-nm{display:grid;gap:.05rem;min-width:0}
 .ca-nm b{font-size:.86rem;font-weight:700;color:var(--navy)}
 .ca-nm span{font-size:.73rem;color:var(--ink-2);line-height:1.35}
 .ca-hd .tw{margin-left:auto;color:var(--green);font-weight:800;font-size:1rem;flex:none}
-.ca-bd{padding:.75rem .7rem;display:grid;gap:.65rem;background:var(--card);border-radius:0 0 9px 9px}
+.ca-bd{padding:0 .7rem .2rem;display:grid;gap:.6rem;background:transparent}
 .ca-bd[hidden]{display:none}
 .ca-t{text-align:center;font-size:.84rem;font-weight:700;color:var(--navy)}
 
@@ -202,11 +210,12 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .tipline.on{opacity:1}
 .tipline b{color:#9BD35F;font-weight:700}
 .ca-hd .ca-q{margin-left:auto;flex:none}
-.tile .tl .qmark{width:.82rem;height:.82rem;font-size:.55rem;margin-left:.22rem;background:var(--rule);color:var(--mut)}
-.tile .tl .qmark:hover{background:var(--navy);color:var(--card)}
-.tile.up .tl .qmark{background:color-mix(in srgb,var(--green-ink) 22%,transparent);color:var(--green-ink)}
-.tagrow2{display:flex;gap:.3rem;flex-wrap:wrap}
-.tag0,.tag1{font-size:.7rem;font-weight:600;padding:.14rem .5rem;border-radius:999px}
+.tile .tl .qmark{width:.88rem;height:.88rem;font-size:.56rem;margin-left:.22rem}
+.tagrow2{display:flex;gap:.3rem;flex-wrap:nowrap;overflow:hidden;align-items:center;min-height:1.35rem}
+.tag0,.tag1,.tagadd{font-size:.7rem;font-weight:600;padding:.14rem .5rem;border-radius:999px;white-space:nowrap;flex:none}
+.tagadd{border:1.5px solid var(--green);background:var(--card);color:var(--green-d)}
+.tagadd:hover{background:var(--green);color:#fff}
+.tagmine{background:var(--sunk);color:var(--ink-2)}
 .tag0{background:var(--sunk);color:var(--faint)}
 .tag1{background:var(--green-pale);color:var(--green-ink)}
 .ba{display:grid;gap:.3rem}
@@ -313,49 +322,49 @@ const SITE = {
   home:{ name:'Home', value:3, comps:[
     {id:'h-k', lbl:'Eyebrow', t:'kick', hero:1, price:0.99, text:'Northgate · Seattle',
       up:'Family Dentistry · Northgate, Seattle', s:[2.0,1.5,2.5], u:[6.5,7.0,7.5],
-      rec:'A place name alone gives search nothing to match against.'},
+      rec:'A place name alone provides no service term to match.'},
     {id:'h-h1',lbl:'Heading', t:'h1', hero:1, price:5.99, text:'Gentle Family Dentistry in Northgate, Seattle',
       up:'Same-Day Crowns and Gentle Family Dentistry in Northgate, Seattle', s:[3.0,2.5,4.5], u:[8.5,9.0,8.5],
-      rec:'Searches for same-day crowns find other practices, not yours.'},
+      rec:'Searches for same-day crowns return other practices in this area.'},
     {id:'h-p1',lbl:'Body copy', t:'p', hero:1, price:3.99, text:'We have been caring for families across North Seattle since 2004. Same-day crowns, clear aligners, and emergency appointments, from a team that remembers your name.',
       up:'We have cared for families across North Seattle since 2004. You can get a same-day crown, clear aligners, or an emergency appointment from a team that remembers your name.', s:[4.0,3.5,5.0], u:[8.5,8.0,8.0],
-      rec:"Assistants skip paragraphs they can't lift as one whole thought."},
+      rec:'Each sentence depends on the one before it for meaning.'},
     {id:'h-img',lbl:'Feature Photo', t:'img', price:1.99, text:'Waiting room · 1200 × 630', alt:'Waiting room', dim:{w:1200,h:630},
       up:'The Northgate Family Dental waiting room in Seattle, where families wait for same-day crown appointments', s:[0.0,0.0,0.0], u:[3.5,3.5,3.5],
-      rec:"Search engines can't see photos, so yours is simply ignored."},
+      rec:'Search engines receive no readable description for this image.'},
     {id:'h-h2',lbl:'Heading', t:'h2', price:2.99, text:'Our Services',
       up:'Same-Day Crowns Mean You Leave With Your Tooth Restored', s:[1.0,1.0,3.0], u:[9.0,9.0,8.5],
-      rec:'A plain label gives assistants nothing worth quoting to anyone.'},
+      rec:'This heading is a label and contains no quotable statement.'},
     {id:'h-p2',lbl:'Body copy', t:'p', price:3.99, text:'Our practice offers a comprehensive range of general and cosmetic dental services designed to meet the needs of patients at every stage of life, and we pride ourselves on staying current with the latest techniques available in modern dentistry today.',
       up:'We offer general and cosmetic dental services for patients at every stage of life. We stay current with the latest techniques in modern dentistry. Whether you need a routine cleaning or a crown, you are cared for by a practice that keeps its skills sharp.', s:[3.5,3.0,5.0], u:[8.5,9.0,8.0],
-      rec:"Assistants skip paragraphs they can't lift as one whole thought."},
+      rec:'Each sentence depends on the one before it for meaning.'},
     {id:'h-band',lbl:'List item', t:'band', price:0, text:'Rated 5 stars by 200+ patients · 9 out of 10 patients say they felt no pain', s:[3.0,2.0,3.0],
       blocked:'To show star ratings in search results the reviews have to be visible on this page. Sitecraft never invents a rating or a patient count, so this one needs you: publish the reviews and the next scan will pick them up.'},
   ]},
   services:{ name:'Services', value:2, comps:[
     {id:'s-h1',lbl:'Heading', t:'h1', hero:1, price:5.99, text:'Our Dental Services',
       up:'Dental Services in Northgate, From Cleanings to Same-Day Crowns', s:[2.0,2.0,4.0], u:[9.0,8.5,9.0],
-      rec:'People searching your services are shown other practices instead.'},
+      rec:'Searches for these services return other practices in this area.'},
     {id:'s-p1',lbl:'Body copy', t:'p', hero:1, price:2.99, text:'Everything we do is aimed at keeping your visit short and your results lasting. Below are the treatments patients ask for most.',
       up:'Every treatment is aimed at keeping your visit short and your results lasting. These are the treatments Northgate patients ask for most.', s:[5.0,4.5,6.0], u:[8.5,9.0,8.0],
-      rec:'Advice that fits anywhere rarely gets matched to your area.'},
+      rec:'The wording applies to any location rather than this one.'},
     {id:'s-h2',lbl:'Heading', t:'h2', price:2.99, text:'Same-Day Crowns',
       up:'Same-Day Crowns Are Milled In Our Own Lab, So You Leave Restored', s:[4.0,3.0,6.0], u:[9.0,9.0,8.5],
-      rec:'A plain label gives assistants nothing worth quoting to anyone.'},
+      rec:'This heading is a label and contains no quotable statement.'},
     {id:'s-p2',lbl:'Body copy', t:'p', price:3.99, text:'We mill crowns in our own lab. Most patients arrive with a damaged tooth and leave the same afternoon with the permanent crown already fitted. No temporary, no second visit.',
       up:'We mill crowns in our own lab. Most patients arrive with a damaged tooth and leave the same afternoon with the permanent crown fitted. There is no temporary crown and no second visit.', s:[7.0,6.5,7.0], u:[9.5,9.0,9.0],
-      rec:'Untagged, engines guess at what this says and often misread.'},
+      rec:'The structured markup that engines read is absent here.'},
   ]},
   about:{ name:'About', value:1, comps:[
     {id:'a-h1',lbl:'Heading', t:'h1', hero:1, price:4.99, text:'About Our Practice',
       up:'A Northgate Dental Practice Caring For Seattle Families Since 2004', s:[2.0,2.0,4.0], u:[9.0,8.5,9.0],
-      rec:'Searches for a local dentist land on another practice instead.'},
+      rec:'Searches for a local dentist return other practices nearby.'},
     {id:'a-p1',lbl:'Body copy', t:'p', hero:1, price:2.99, text:'Dr. Amara Okoye opened the practice in 2004 with one chair and a small waiting room above a bakery on Northgate Way.',
       up:'Dr. Amara Okoye opened this Northgate practice in 2004 with one chair and a small waiting room above a bakery on Northgate Way.', s:[6.0,5.0,5.5], u:[9.0,8.5,8.0],
-      rec:'Advice that fits anywhere rarely gets matched to your area.'},
+      rec:'The wording applies to any location rather than this one.'},
     {id:'a-h2',lbl:'Heading', t:'h2', price:2.99, text:'Why Patients Stay',
       up:'Patients Stay Because The Same Team Sees Them Every Visit', s:[3.0,2.0,4.0], u:[9.0,9.0,8.5],
-      rec:'A plain label gives assistants nothing worth quoting to anyone.'},
+      rec:'This heading is a label and contains no quotable statement.'},
   ]},
 };
 const SCORE_NM = ['AI retrieval','AEO optimized','SEO optimized'];
@@ -365,6 +374,14 @@ const TAGS_AFTER = {
   h2:   ['Section subject', 'Heading level'],
   p:    ['Answer block', 'Article body'],
   kick: ['Place', 'Category'],
+  band: [],
+};
+const TAG_SUGGEST = {
+  img:  ['Interior', 'Team', 'Location'],
+  h1:   ['Service', 'Location'],
+  h2:   ['Service', 'Treatment'],
+  p:    ['Service', 'Practice'],
+  kick: ['Location', 'Category'],
   band: [],
 };
 const SCORE_TL = ['AI RETRIEVAL','AEO OPTIMIZED','SEO OPTIMIZED'];
@@ -453,6 +470,11 @@ function open({ttl, flag, body}){
   if (!pan.classList.contains('moved')) pan.style.transform = '';
   pan.classList.add('open'); $('#scrim').classList.add('open');
   wireTips();
+  document.querySelectorAll('[data-addtag]').forEach(b=>b.onclick=()=>{
+    const c = comp(S.flow && S.flow.id); if (!c) return;
+    c.userTags = [...(c.userTags||[]), b.dataset.addtag];
+    flow();
+  });
   const ht = $('#headtip'), q = document.querySelector('.qmark');
   if (q && ht){
     const on = () => { ht.textContent = q.dataset.help; ht.classList.add('on'); };
@@ -554,7 +576,11 @@ function scores(c, proj){
   /* what it says now, and only after a preview, what it would say */
   const isImg = c.t === 'img';
   const nowText = isImg ? (c.alt || 'No description yet') : c.text;
-  const tagsNow = '<span class="tag0">None yet</span>';
+  const mine = c.userTags || (c.userTags = []);
+  const left = (TAG_SUGGEST[c.t] || []).filter(t => !mine.includes(t)).slice(0, 3 - mine.length);
+  const tagsNow = (mine.length ? mine.map(t=>`<span class="tag1 tagmine">${t}</span>`).join('')
+                               : '<span class="tag0">None yet</span>')
+    + left.map(t=>`<button class="tagadd" data-addtag="${t}">+ ${t}</button>`).join('');
   const tagsUp  = (TAGS_AFTER[c.t] || []).map(t=>`<span class="tag1">${t}</span>`).join('');
 
   return `<div class="ca">
@@ -569,16 +595,16 @@ function scores(c, proj){
       ${c.rec?`<div class="rec"><span>Right now:</span> ${esc(c.rec)}</div>`:''}
 
       <div class="ba">
-        <div class="lab">${isImg?'Your description now':'Your words now'}</div>
+        <div class="lab">Current ${isImg?'Description':'Words'}</div>
         <div class="box">${esc(nowText)}</div>
-        <div class="lab">Tags on it now</div>
+        <div class="lab">Current Tags</div>
         <div class="tagrow2">${tagsNow}</div>
       </div>
 
       ${proj ? `<div class="ba up">
-        <div class="lab up">${isImg?'After the boost':'After the boost'}</div>
+        <div class="lab up">After the Boost</div>
         <div class="box upbox">${esc(isImg ? c.up : c.up)}</div>
-        <div class="lab up">Tags it would get</div>
+        <div class="lab up">Tags It Would Get</div>
         <div class="tagrow2">${tagsUp || '<span class="tag1">Structured markup</span>'}</div>
       </div>` : ''}
     </div></div>`;
@@ -613,6 +639,8 @@ function editP(id){
   flow();
 }
 
+let lastStage = '';
+function stageKey(F){ return [F.id, !!F.photo, F.desc !== null, F.words !== null, !!F.analysed, !!F.previewed].join('|'); }
 function flow(){
   const c = comp(S.flow.id), F = S.flow, img = c.t === 'img';
   if (c.blocked) return blockedP(c.id);
@@ -650,7 +678,7 @@ function flow(){
   if (img && F.photo && F.desc === null){
     parts.push(`<div class="stage">
       <div class="ask">What is in this picture?</div>
-      <input class="fld" id="dsc" value="${esc(F.draftDesc ?? c.alt ?? '')}" placeholder="A short, plain description">
+      <textarea class="fld grow" id="dsc" rows="1" placeholder="A short, plain description">${esc(F.draftDesc ?? c.alt ?? '')}</textarea>
       <div class="sub">Search can't see this picture yet. <b>Boost it</b> and we'll describe and tag it so it counts.</div>
     </div>`);
   }
@@ -666,17 +694,20 @@ function flow(){
   else if (canBoost(c) && !isBoosted(c.id)) cta = `<button class="g" id="go">Boost this ${esc(c.lbl.toLowerCase())}<span class="amt2">${M(c.price)}</span></button>`;
   else if (isBoosted(c.id)) cta = `<div class="sdone"><span class="tick">✓</span><span class="lbl2">Boosted, ${M(S.boosts.find(x=>x.id===c.id).price)} on this session</span></div>`;
 
-  if (F.analysed && !F.previewed && canBoost(c) && !isBoosted(c.id))
-    cta += `<div class="help">See exactly what changes. Nothing's charged.</div>`;
-  if (F.previewed) cta += `<div class="help">That's where a boost takes you. Nothing on your page has changed.</div>`;
-
   const canBack = img && F.photo && F.desc === null;
   const secondary = canBack
     ? `<button class="ghost" id="bk">← Use my original photo instead</button>`
     : ((img && !F.photo && F.desc === null) || (!img && F.words === null)
         ? '' : `<button class="ghost" id="sv">Boost This ${esc(shortOf(c))} Later</button>`);
 
+  const key = stageKey(F), fwd = key > lastStage;
   open({ ttl: hdr(c), flag: flagOf(c), body: parts.join('') + cta + secondary });
+  if (key !== lastStage){
+    const pan = $('#pan');
+    pan.style.setProperty('--from', (fwd ? 26 : -26) + 'px');
+    pan.classList.remove('slide'); void pan.offsetWidth; pan.classList.add('slide');
+    lastStage = key;
+  }
 
   /* ── wiring ── */
   const re = document.querySelector('[data-re]');
@@ -739,8 +770,12 @@ function flow(){
 
   const dsc = $('#dsc');
   if (dsc){
+    /* grow with the text, so nothing runs off the right edge */
+    const grow = () => { dsc.style.height = 'auto'; dsc.style.height = dsc.scrollHeight + 'px'; };
+    dsc.addEventListener('input', grow); grow();
     dsc.focus();
-    dsc.onkeydown = e => { if (e.key === 'Enter'){ e.preventDefault(); commitDesc(); } };
+    dsc.setSelectionRange(dsc.value.length, dsc.value.length);
+    dsc.onkeydown = e => { if (e.key === 'Enter'){ e.preventDefault(); const g=$('#go'); if (g) g.click(); } };
   }
 
   const ed = $('#ed'), wc = $('#wc');
@@ -1055,6 +1090,74 @@ function guide(){
     pan.style.left = nx + 'px'; pan.style.top = ny + 'px';
   });
   ['pointerup','pointercancel'].forEach(k => hd.addEventListener(k, () => { d = null; pan.classList.remove('dragging'); }));
+})();
+
+/* the stages behave like an iPhone carousel: drag the panel sideways to move
+   between them. Back is always allowed; forward only where a next step exists. */
+function canStepBack(){
+  const F = S.flow; if (!F) return false;
+  const c = comp(F.id); if (!c) return false;
+  if (F.previewed || F.analysed) return true;
+  return c.t === 'img' && (F.desc !== null || !!F.photo);
+}
+function stepBack(){
+  const F = S.flow, c = comp(F.id);
+  if (F.previewed) F.previewed = false;
+  else if (F.analysed) F.analysed = false;
+  else if (c.t === 'img' && F.desc !== null) F.desc = null;
+  else if (c.t === 'img' && F.photo) { c.src = F.wasSrc || null; c.fit = F.wasFit || null; F.photo = null; draw(); }
+  flow();
+}
+function canStepFwd(){
+  const F = S.flow; if (!F) return false;
+  const c = comp(F.id); if (!c) return false;
+  if (!F.analysed) return true;
+  return !F.previewed && canBoost(c) && !isBoosted(c.id);
+}
+function stepFwd(){
+  const F = S.flow, c = comp(F.id);
+  if (!F.analysed) F.analysed = true;
+  else if (!F.previewed) F.previewed = true;
+  flow();
+}
+
+(function(){
+  const pan = $('#pan');
+  const SKIP = 'button,input,textarea,select,[contenteditable],.crop,.p-hd';
+  let sw = null;
+  const EDGE = 26;   /* an iPhone-style edge zone, so a swipe is always available
+                        even where the panel is wall-to-wall controls */
+  pan.addEventListener('pointerdown', e => {
+    if (!S.flow) return;
+    const r = pan.getBoundingClientRect();
+    const onEdge = (e.clientX - r.left) < EDGE || (r.right - e.clientX) < EDGE;
+    if (!onEdge && e.target.closest(SKIP)) return;
+    if (onEdge) e.stopPropagation();          /* the edge beats whatever sits under it */
+    sw = { x:e.clientX, y:e.clientY, dx:0, live:false };
+  }, true);
+  pan.addEventListener('pointermove', e => {
+    if (!sw) return;
+    const dx = e.clientX - sw.x, dy = e.clientY - sw.y;
+    if (!sw.live){
+      if (Math.abs(dx) < 12 || Math.abs(dx) < Math.abs(dy)) return;   // let vertical gestures be
+      sw.live = true; pan.classList.add('dragging');
+      try { pan.setPointerCapture(e.pointerId); } catch (_) {}
+    }
+    /* resist the direction that has nowhere to go */
+    const room = dx > 0 ? (canStepBack() ? 1 : .25) : (canStepFwd() ? 1 : .25);
+    sw.dx = dx * room;
+    pan.style.setProperty('--swipe', sw.dx + 'px');
+    pan.classList.add('swiping');
+  });
+  const end = () => {
+    if (!sw){ return; }
+    const dx = sw.dx; sw = null;
+    pan.classList.remove('dragging','swiping');
+    pan.style.removeProperty('--swipe');
+    if (dx > 70 && canStepBack()) stepBack();
+    else if (dx < -70 && canStepFwd()) stepFwd();
+  };
+  ['pointerup','pointercancel'].forEach(k => pan.addEventListener(k, end));
 })();
 
 document.querySelectorAll('.bar [data-mode]').forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
