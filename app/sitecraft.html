@@ -160,7 +160,6 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .slinks{display:flex;gap:1.1rem;align-items:center;flex-wrap:wrap;margin-top:-.2rem}
 .slink{border:0;background:transparent;color:var(--mut);font-size:.74rem;font-weight:600;padding:.2rem .1rem}
 .slink:hover{color:var(--green-d)}
-.cfm{display:grid;gap:.55rem;margin-top:.35rem}
 .ask{font-size:1.02rem;font-weight:700;color:var(--navy);letter-spacing:-.015em;line-height:1.3;display:flex;align-items:center;gap:.4rem}
 .sub{font-size:.82rem;color:var(--mut);line-height:1.45;margin-top:-.25rem}
 
@@ -938,26 +937,18 @@ function flow(){
   /* ── the analysis ── */
   if (F.analysed) parts.push(scores(c, !!F.previewed));
 
-  /* ── the confirmation lands under the analysis, never in place of it ── */
-  if (F.confirming) parts.push(`<div class="cfm">
-    <div class="ask">Boost this ${esc(c.lbl.toLowerCase())} for ${M(c.price)}?</div>
-    <div class="sdone sflat"><span class="lbl2">On this session so far</span><span class="amt">${M(S.session)}</span></div>
-    <div class="sub">Nothing is charged until you press <b>Done</b>.</div>
-  </div>`);
-
   /* ── the single next action ── */
   const started = img ? (photoSet || descSet) : wordsSet;
   let cta = '';
-  if (F.confirming) cta = `<button class="g" id="go">Yes, boost it<span class="amt2">${M(c.price)}</span></button>`;
+  /* one press arms it, the next one buys it: nothing else on the panel moves */
+  if (F.confirming) cta = `<button class="g" id="go">Boost this ${esc(shortOf(c).toLowerCase())}!<span class="amt2">${M(c.price)}</span></button>`;
   else if (!F.analysed) cta = `<button class="g" id="go">See How AI Reads This <span class="arw">→</span></button>`;
   else if (canBoost(c) && !isBoosted(c.id) && !F.previewed)
     cta = `<button class="g" id="go">Preview Your Boost <span class="arw">→</span></button>`;
   else if (canBoost(c) && !isBoosted(c.id)) cta = `<button class="g" id="go">Boost this ${esc(c.lbl.toLowerCase())}<span class="amt2">${M(c.price)}</span></button>`;
   else if (isBoosted(c.id)) cta = `<div class="sdone"><span class="tick">✓</span><span class="lbl2">Boosted, ${M(S.boosts.find(x=>x.id===c.id).price)} on this session</span></div>`;
 
-  const secondary = F.confirming
-    ? `<button class="ghost" id="cbk">Back</button>`
-    : (started ? `<button class="ghost" id="sv">Boost This ${esc(shortOf(c))} Later</button>` : '');
+  const secondary = started ? `<button class="ghost" id="sv">Boost This ${esc(shortOf(c))} Later</button>` : '';
 
   open({ ttl: hdr(c), flag: flagOf(c), back: canStepBack(), key: 'flow:' + c.id,
          body: parts.join('') + cta + secondary });
@@ -1044,9 +1035,6 @@ function flow(){
     $('#rs').onclick = () => { f.x = 50; f.y = 50; f.z = 100; $('#zoom').value = 100; crop.classList.remove('moved'); paint(); };
   }
 
-  const cbk = $('#cbk');
-  if (cbk) cbk.onclick = () => { F.confirming = false; flow(); };
-
   const bkBtn = $('#orig');
   if (bkBtn) bkBtn.onclick = () => {
     c.src = F.wasSrc || null;
@@ -1087,7 +1075,7 @@ function flow(){
     if (!F.analysed){ F.analysed = true; return flow(); }
     if (!F.previewed && canBoost(c)){ F.previewed = true; return flow(); }
     if (S.skipConfirm) return apply(c.id);
-    F.confirming = true; return flow();
+    F.scroll = false; F.confirming = true; return flow();
   };
   const sv = $('#sv');
   if (sv) sv.onclick = () => { if (ed && !commitWords()) return; if (dsc) commitDesc(); shut(); draw(); flash(c.id); };
