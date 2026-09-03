@@ -190,7 +190,7 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .reset:hover{background:var(--green-d)}
 .fld{width:100%;font-family:var(--f);font-size:.9rem;line-height:1.45;padding:.7rem .8rem;border:0;border-radius:10px;background:var(--sunk);color:var(--ink);outline:none}
 .fld.grow{resize:none;overflow:hidden;display:block}
-.fld:focus{background:var(--card)}
+/* clicking into a field must not take its background away, here or anywhere */
 
 /* copy boxes */
 .box{background:var(--sunk);border:0;border-radius:7px;padding:.65rem .75rem;font-size:.9rem;line-height:1.6;color:var(--ink-2)}
@@ -243,15 +243,14 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .ca-hd .ca-nm{flex:none}
 .tile .tl .qmark{margin-left:.2rem}
 .tagrow2{display:flex;gap:.3rem;flex-wrap:nowrap;overflow:hidden;align-items:center;min-height:1.35rem}
-.tag0,.tag1,.tagadd{font-size:.7rem;font-weight:600;padding:.14rem .5rem;border-radius:999px;white-space:nowrap;flex:none}
+.tag0,.tag1,.tagadd,.taginput{font-size:.7rem;font-weight:600;line-height:1.45;padding:.14rem .5rem;border-radius:999px;white-space:nowrap;flex:none}
 .tagadd{border:1.5px solid var(--green);background:var(--card);color:var(--green-d)}
 .tagadd:hover{background:var(--green);color:#fff}
 .tagmine{background:var(--sunk);color:var(--ink-2);display:inline-flex;align-items:center;gap:.24rem}
 .tagkept{background:var(--sunk);color:var(--green-ink)}
 .tagx{border:0;background:transparent;color:var(--faint);font-size:.82rem;line-height:1;padding:0;font-weight:700}
 .tagx:hover{color:var(--red)}
-.taginput{border:0;outline:2px solid var(--green);outline-offset:-2px;background:var(--card);color:var(--ink);
-  font-family:var(--f);font-size:.7rem;font-weight:600;padding:.14rem .5rem;border-radius:999px;width:7rem;flex:none}
+.taginput{border:1.5px solid var(--green);outline:none;background:var(--card);color:var(--ink);font-family:var(--f)}
 .tagmore{border:0;background:var(--sunk);color:var(--green-d);font-size:.7rem;font-weight:700;padding:.14rem .5rem;border-radius:999px;white-space:nowrap;flex:none}
 .tagmore:hover{background:var(--green);color:#fff}
 .tagctl{display:flex;align-items:center;gap:.45rem;margin-top:.1rem}
@@ -263,7 +262,7 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .tag1{background:var(--green-pale);color:var(--green-ink)}
 .ba{display:grid;gap:.3rem}
 .ba+.ba{margin-top:.15rem}
-.ba.up{padding-top:.55rem;border-top:1px solid var(--rule-2)}
+.ba.up{padding-top:.55rem}
 .lab.up{color:var(--green-ink)}
 .box.upbox{background:var(--green-pale);color:var(--green-x);font-weight:500}
 .rec.done span{color:var(--green-x)}
@@ -315,6 +314,12 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .mini-g:hover{background:var(--green-d)}
 .lastcall{display:grid;gap:.5rem;padding:.7rem;margin-top:.5rem;background:var(--green-pale);border-radius:12px;font-size:.79rem;color:var(--green-ink);line-height:1.4}
 .lastcall b{color:var(--green-x);font-weight:700}
+/* the rows inside the offer belong to it, so they take its colours */
+.lastcall .itm{border-bottom-color:color-mix(in srgb,var(--green-x) 22%,transparent);padding:.5rem 0;align-items:center}
+.lastcall .itm:last-of-type{border-bottom:0}
+.lastcall .itm .who{color:var(--green-x)}
+.lastcall .itm .new{color:var(--green-ink);font-size:.8rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lastcall .itm .stamp{color:var(--green-ink);opacity:.75;white-space:nowrap}
 .spent{display:flex;align-items:baseline;gap:.6rem;padding-top:.6rem;font-size:.88rem;font-weight:700;color:var(--navy)}
 .spent .amt{font-variant-numeric:tabular-nums;margin-left:auto;font-family:var(--m);font-size:1.35rem;font-weight:800}
 .mini{font-size:.73rem;color:var(--faint);text-align:center}
@@ -502,7 +507,8 @@ const PEOPLE = ['Jo Castellane','Priya Raman'];
 /* ═══════════ state ═══════════ */
 const S = { page:'home', mode:null, editing:false, sel:null, open:null,
   flows:{}, changes:[], notes:[], boosts:[], receipts:[{when:'2026-09-02 16:06', site:'Real Estate Excellence', n:1, amt:0.99}],
-  seats:1, session:0, boostCount:0, skipConfirm:false, offered:false, picked:new Set(), noteTo:PEOPLE[0], projecting:null };
+  seats:1, session:0, boostCount:0, skipConfirm:false, offered:false, picked:new Set(), noteTo:PEOPLE[0], projecting:null,
+  later:new Set() };
 
 const $ = s => document.querySelector(s);
 const M = n => '$' + n.toFixed(2);
@@ -621,7 +627,7 @@ function open({ttl, flag, body, back, key}){
   wireTips();
   const flowComp = () => comp(S.flow && S.flow.id);
   const nb = document.querySelector('[data-newtag]');
-  if (nb) nb.onclick = () => { S.flow.addingTag = true; flow(); };
+  if (nb) nb.onclick = () => { S.flow.addWide = nb.offsetWidth; S.flow.addingTag = true; flow(); };
   document.querySelectorAll('[data-deltag]').forEach(b=>b.onclick=()=>{
     const c = flowComp(); if (!c) return;
     c.userTags = (c.userTags||[]).filter(t => t !== b.dataset.deltag);
@@ -773,7 +779,7 @@ function scores(c, proj){
   const chips = mine.map(t=>`<span class="tag1 tagmine">${esc(t)}<button class="tagx" data-deltag="${esc(t)}" aria-label="Remove ${esc(t)}">&times;</button></span>`).join('');
   const tagsNow = (mine.length ? '' : '<span class="tag0">None yet</span>') + chips;
   const slot = F.addingTag
-    ? `<input class="taginput" id="taginput" maxlength="18" placeholder="Type a tag" autocomplete="off">`
+    ? `<input class="taginput" id="taginput" maxlength="18" placeholder="Tag" autocomplete="off"${F.addWide?` style="width:${F.addWide}px"`:''}>`
     : (mine.length < MAX_OWN_TAGS ? `<button class="tagadd" data-newtag="1">+ Add tag</button>` : '');
   const helpLink = (canBoost(c) && !isBoosted(c.id))
     ? `<button class="taghelp" data-taghelp="1">Want help adding tags?</button>` : '';
@@ -900,6 +906,10 @@ function editP(id){
   S.flow = S.flows[id] || setFlow({id, photo:null, desc:null, words:null, analysed:false,
                                    wasSrc:c.src||null, wasFit:c.fit?{...c.fit}:null,
                                    altWas:c.alt||'', textWas:c.text||''});
+  /* one they set aside opens where they left off: on the boost */
+  if (S.later.has(id) && canBoost(c) && !isBoosted(id)){
+    S.flow.analysed = true; S.flow.previewed = true; S.flow.rolled = true; S.flow.open = null;
+  }
   flow();
 }
 
@@ -1117,7 +1127,18 @@ function flow(){
     F.scroll = false; F.confirming = true; return flow();
   };
   const sv = $('#sv');
-  if (sv) sv.onclick = () => { if (ed && !commitWords()) return; if (dsc) commitDesc(); shut(); draw(); flash(c.id); };
+  if (sv) sv.onclick = () => {
+    if (ed && !commitWords()) return;
+    if (dsc) commitDesc();
+    /* set aside, not abandoned: it comes back on the boost stage, and the
+       review panel asks for it again before the session settles */
+    if (canBoost(c) && !isBoosted(c.id)){
+      S.later.add(c.id);
+      F.analysed = true; F.previewed = true; F.rolled = true; F.confirming = false; F.open = null;
+    }
+    draw();
+    setMode('review');
+  };
 }
 
 function logChange(c, kind, was, now){
@@ -1180,6 +1201,7 @@ function apply(id){
   if (c.t === 'img') c.alt = c.up; else c.text = c.up;
   S.boosts.push({id, page:pgOf(id), lbl:c.lbl, price:c.price, gain:c.u.map((v,i)=>+(v-liveScores(c)[i]).toFixed(1))});
   S.session += c.price; S.boostCount++;
+  S.later.delete(id);
   shut(); draw(); flash(id); bdg();
   toast(`Boosted. <b>${M(c.price)}</b> added to this session. Nothing's charged until Done.`, () => {
     if (c.t === 'img') c.alt = was; else c.text = was;
@@ -1249,6 +1271,23 @@ function review(){
         <button class="pill" data-show="${c.id}">Show me</button><button class="pill" data-undo="${i}">Undo</button></span>
     </div>`;}).join('') : '<div class="empty">Nothing changed yet.</div>';
 
+  /* what they set aside gets asked for once more, at the top, before anything else */
+  const aside = [...S.later].map(comp).filter(k => k && canBoost(k) && !isBoosted(k.id));
+  const asideTotal = aside.reduce((t,k)=>t+k.price, 0);
+  const asideBlock = aside.length ? `<div class="lastcall">
+    <div><b>${aside.length===1
+        ? `Your ${esc(aside[0].lbl.toLowerCase())} on ${esc(SITE[pgOf(aside[0].id)].name)} is set aside.`
+        : `${aside.length} parts are set aside.`}</b>
+      Search engines read the tagging, not the words. ${aside.length===1 ? 'It stays unreadable until it is boosted.' : 'They stay unreadable until they are boosted.'}</div>
+    ${aside.map(k=>`<div class="itm">
+      <span class="who">${esc(k.lbl)}</span>
+      <span class="bdy"><span class="new">${esc((k.t==='img' ? (k.alt||'No description yet') : k.text).slice(0,60))}</span>
+        <span class="stamp">now ${avg(liveScores(k)).toFixed(1)}/10 &rarr; could be ${avg(k.u).toFixed(1)}/10</span></span>
+      <span class="acts"><button class="mini-g" data-boostnow="${k.id}">Boost ${M(k.price)}</button></span>
+    </div>`).join('')}
+    ${aside.length>1 ? `<button class="g" id="boostaside">Boost them all<span class="amt2">${M(asideTotal)}</span></button>` : ''}
+  </div>` : '';
+
   /* one last offer before they close the session */
   const openBoosts = uniq(S.changes.map(c=>c.id)).map(comp).filter(k=>canBoost(k) && !isBoosted(k.id));
   const openTotal = openBoosts.reduce((t,k)=>t+k.price,0);
@@ -1272,6 +1311,7 @@ function review(){
     </div>`).join('') : '<div class="empty">No boosts yet.</div>';
 
   open({ ttl:'<b>Review the whole site</b>', body:`
+    ${asideBlock}
     <div class="sec"><button class="sec-hd" data-t="r1" aria-expanded="true">What changed (${S.changes.length})<span class="tw">✕</span></button>
       <div class="sec-bd" id="r1">${chg}
         ${openTotal?`<div class="lastcall">
@@ -1294,6 +1334,20 @@ function review(){
     const id = b.dataset.boostnow; shut(); S.page = pgOf(id); draw();
     setTimeout(()=>{ setFlow({id, photo:null, desc:null, words:null, analysed:true, previewed:true}); editP(id); }, 140);
   });
+  const bas = $('#boostaside');
+  if (bas) bas.onclick = () => {
+    const snap = aside.map(k=>({k, was: k.t==='img'?k.alt:k.text}));
+    aside.forEach(k=>{ if (k.t==='img') k.alt = k.up; else k.text = k.up;
+      S.boosts.push({id:k.id, page:pgOf(k.id), lbl:k.lbl, price:k.price, gain:k.u.map((v,i)=>+(v-liveScores(k)[i]).toFixed(1))});
+      S.later.delete(k.id); });
+    S.session += asideTotal; S.boostCount += aside.length;
+    draw(); review(); bdg();
+    toast(`Boosted ${aside.length}. <b>${M(asideTotal)}</b> on this session.`, ()=>{
+      snap.forEach(({k,was})=>{ if (k.t==='img') k.alt = was; else k.text = was; S.later.add(k.id); });
+      S.boosts.splice(S.boosts.length-aside.length, aside.length);
+      S.session -= asideTotal; S.boostCount -= aside.length; draw(); review(); bdg();
+    });
+  };
   const ba = $('#boostall');
   if (ba) ba.onclick = () => {
     const snap = openBoosts.map(k=>({k, was: k.t==='img'?k.alt:k.text}));
