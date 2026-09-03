@@ -226,6 +226,8 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .tile.up .tl{color:var(--green-ink)}
 .tile .tv{font-variant-numeric:tabular-nums;font-family:var(--m);font-size:1.2rem;font-weight:700;color:var(--red);letter-spacing:-.02em}
 .tile.up .tv{color:var(--green-x)}
+.tile.mid .tv{color:var(--amber-ink)}
+.tile.hi .tv{color:var(--green-x)}
 .tile .tu{font-size:.7rem;font-weight:600;color:var(--mut)}
 .tile.up .tu{color:var(--green-ink)}
 .tile .tw{display:block;font-size:.62rem;letter-spacing:.02em;font-weight:700;color:var(--green-x);margin-top:.18rem}
@@ -513,6 +515,36 @@ const paidTotal = () => S.receipts.reduce((t,r)=>t+r.amt,0);
 const pageSpend = p => S.boosts.filter(b=>b.page===p).reduce((t,b)=>t+b.price,0);
 const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const avg = a => a.reduce((x,y)=>x+y,0)/a.length;
+/* A description and their own tags move the numbers on their own merit. They
+   never close the gap a boost closes, so there is always something left to buy. */
+function earned(c){
+  const own  = Math.min(3, (c.userTags || []).length);
+  /* a fuller description is worth more than a bare one, so the numbers answer
+     every word as it is typed rather than waiting for the first character */
+  const desc = c.t === 'img' ? Math.min(1, W(c.alt || '') / 10) : 0;
+  return Math.min(.55, desc * .30 + own * .08);
+}
+function liveScores(c){
+  if (!c.u) return c.s;
+  const f = earned(c);
+  return f ? c.s.map((v,i) => +(v + (c.u[i] - v) * f).toFixed(1)) : c.s;
+}
+/* red as found, amber once the client has improved it, green is a boost outcome:
+   the self-help ceiling of .55 sits below the .60 the green band starts at */
+function bandOf(v, i, c){
+  if (!c.u) return '';
+  const span = c.u[i] - c.s[i];
+  if (span <= 0) return '';
+  const r = (v - c.s[i]) / span;
+  return r >= .60 ? 'hi' : r >= .20 ? 'mid' : '';
+}
+/* the line has to describe the picture as it stands, not as it arrived */
+function recOf(c){
+  if (c.t !== 'img' || !(c.alt || '').trim()) return c.rec;
+  return (c.userTags || []).length
+    ? "Your tags are plain words. A boost turns them into markup search can read."
+    : "Nothing tags your description yet, so search can't file this picture.";
+}
 const uniq = a => [...new Set(a)];
 
 function dif(a,b){
@@ -715,10 +747,10 @@ function showMe(id){ shut(); S.page = pgOf(id); draw(); setTimeout(()=>flash(id)
 
 /* ═══════════ scores block ═══════════ */
 function scores(c, proj){
-  const cur = c.s, up = c.u;
+  const cur = liveScores(c), up = c.u;
   const shown = proj && up ? up : cur;
   const badge = (proj ? avg(up) : avg(cur)).toFixed(1);
-  const tiles = shown.map((v,i)=>`<div class="tile ${proj?'up':''}">
+  const tiles = shown.map((v,i)=>`<div class="tile ${proj?'up':bandOf(v,i,c)}">
       <span class="tl">${SCORE_TL[i]}<button class="qmark" data-tip="${i}" aria-label="What is ${SCORE_NM[i]}?"></button></span>
       <span class="tv">${v.toFixed(1)}</span><span class="tu">/10</span>${proj?`<span class="tp">was ${cur[i].toFixed(1)}</span><span class="tw">Projected</span>`:''}
     </div>`).join('');
@@ -727,14 +759,11 @@ function scores(c, proj){
   const isImg = c.t === 'img';
   const done = isBoosted(c.id) && !!DONE_BY_TYPE[c.t];
   const nowText = isImg ? (c.alt || 'No description yet') : c.text;
-  /* once they have written a description, the old line about not having one is a lie */
-  const recNow = (isImg && (c.alt || '').trim())
-    ? "Nothing tags your description yet, so search can't file this picture."
-    : c.rec;
+  const recNow = recOf(c);
   const mine = c.userTags || (c.userTags = []);
   const F = S.flow || {};
-  /* whatever is already standing in a folded line above is not repeated here */
-  const bodyFolded = F.id === c.id && (isImg ? F.desc !== null : F.words !== null);
+  /* whatever already stands above, folded or still being typed, is not repeated */
+  const bodyFolded = F.id === c.id && (isImg ? (F.desc !== null || F.analysed) : F.words !== null);
   const chips = mine.map(t=>`<span class="tag1 tagmine">${esc(t)}<button class="tagx" data-deltag="${esc(t)}" aria-label="Remove ${esc(t)}">&times;</button></span>`).join('');
   const tagsNow = (mine.length ? '' : '<span class="tag0">None yet</span>') + chips;
   const slot = F.addingTag
@@ -813,7 +842,7 @@ function rollScores(c){
   const tv = [...document.querySelectorAll('.tile .tv')];
   const badge = document.querySelector('.ca-sc');
   if (!tv.length) return;
-  const from = c.s, to = c.u, a = avg(from), b = avg(to);
+  const from = liveScores(c), to = c.u, a = avg(from), b = avg(to);
   const clamp = v => Math.max(0, Math.min(10, v)).toFixed(1);
   const DUR = 780, t0 = performance.now();
   const tick = now => {
@@ -863,7 +892,8 @@ function editP(id){
   const c = comp(id);
   /* resume where they left off: clicking away is a dismissal, not a discard */
   S.flow = S.flows[id] || setFlow({id, photo:null, desc:null, words:null, analysed:false,
-                                   wasSrc:c.src||null, wasFit:c.fit?{...c.fit}:null});
+                                   wasSrc:c.src||null, wasFit:c.fit?{...c.fit}:null,
+                                   altWas:c.alt||'', textWas:c.text||''});
   flow();
 }
 
@@ -878,7 +908,7 @@ function flow(){
   const photoSet  = img && !!F.photo, descSet = img && F.desc !== null;
   const wordsSet  = !img && F.words !== null;
   const photoOpen = img && (!photoSet || !descSet || F.open === 'photo');
-  const descOpen  = img && photoSet && (!descSet || F.open === 'desc');
+  const descOpen  = img && (photoSet || F.analysed) && (!descSet || F.open === 'desc');
   const wordsOpen = !img && (!wordsSet || F.open === 'words');
   const parts = [];
   /* the fold only offers itself once the flow has moved past that step */
@@ -913,7 +943,7 @@ function flow(){
   }
 
   /* ── what is in it ── */
-  if (img && photoSet){
+  if (img && (photoSet || F.analysed)){
     if (descSet) parts.push(fold('desc', c.alt || 'No description yet', F.analysed));
     if (descOpen) parts.push(`<div class="stage">
       <div class="tipwrap">
@@ -938,7 +968,7 @@ function flow(){
   if (F.analysed) parts.push(scores(c, !!F.previewed));
 
   /* ── the single next action ── */
-  const started = img ? (photoSet || descSet) : wordsSet;
+  const started = F.analysed || (img ? (photoSet || descSet) : wordsSet);
   let cta = '';
   /* one press arms it, the next one buys it: nothing else on the panel moves */
   if (F.confirming) cta = `<button class="g" id="go">Boost this ${esc(shortOf(c).toLowerCase())}!<span class="amt2">${M(c.price)}</span></button>`;
@@ -1047,9 +1077,12 @@ function flow(){
   if (dsc){
     /* grow with the text, so nothing runs off the right edge */
     const grow = () => { dsc.style.height = 'auto'; dsc.style.height = dsc.scrollHeight + 'px'; };
-    dsc.addEventListener('input', grow); grow();
-    dsc.focus();
-    dsc.setSelectionRange(dsc.value.length, dsc.value.length);
+    dsc.addEventListener('input', () => { grow(); liveDesc(); }); grow();
+    /* it takes the caret when it is the step being asked, not when it is offered */
+    if (!F.analysed || F.open === 'desc'){
+      dsc.focus();
+      dsc.setSelectionRange(dsc.value.length, dsc.value.length);
+    }
     dsc.onkeydown = e => { if (e.key === 'Enter'){ e.preventDefault(); const g=$('#go'); if (g) g.click(); } };
   }
 
@@ -1081,24 +1114,50 @@ function flow(){
   if (sv) sv.onclick = () => { if (ed && !commitWords()) return; if (dsc) commitDesc(); shut(); draw(); flash(c.id); };
 }
 
+function logChange(c, kind, was, now){
+  const at = S.changes.findIndex(x => x.id === c.id && x.kind === kind);
+  if (was === now){ if (at > -1) S.changes.splice(at, 1); return; }
+  if (at > -1){ S.changes[at].now = now; S.changes[at].when = 'just now'; }
+  else S.changes.push({id:c.id, page:pgOf(c.id), lbl:c.lbl,
+                       old:was || '(no description)', now, when:'just now', kind});
+}
+/* typing lands straight on the component, so the numbers can answer for it */
+function liveDesc(){
+  const c = comp(S.flow.id), d = $('#dsc');
+  if (!d) return;
+  const v = d.value.trim();
+  if (v === (c.alt || '')) return;
+  logChange(c, 'alt', S.flow.altWas || '', v);
+  c.alt = v; bdg(); draw(); paintScores(c);
+}
 function commitDesc(){
-  const c = comp(S.flow.id), v = $('#dsc') ? $('#dsc').value.trim() : null;
-  if (v === null) return;
-  const was = c.alt;
-  c.alt = v; S.flow.desc = v;
-  if (v !== was) S.changes.push({id:c.id, page:pgOf(c.id), lbl:c.lbl, old:was||'(no description)', now:v, when:'just now', kind:'alt'});
-  bdg();
+  const d = $('#dsc'); if (!d) return;
+  liveDesc();
+  S.flow.desc = d.value.trim();
 }
 function commitWords(){
   const c = comp(S.flow.id), ed = $('#ed');
   if (!ed) return true;
   const now = ed.innerText.trim(), target = W(c.text);
   if (W(now) !== target){ toast(`Keep it to ${target} words and this will save.`); return false; }
-  if (now !== c.text){
-    S.changes.push({id:c.id, page:pgOf(c.id), lbl:c.lbl, old:c.text, now, when:'just now', kind:'copy'});
-    c.text = now; draw();
-  }
+  logChange(c, 'copy', S.flow.textWas || '', now);
+  if (now !== c.text){ c.text = now; draw(); }
   S.flow.words = now; bdg(); return true;
+}
+/* the tiles are rewritten in place: a re-render would take the caret with it */
+function paintScores(c){
+  if ((S.flow || {}).previewed) return;
+  const cur = liveScores(c);
+  document.querySelectorAll('.ca .tile').forEach((t,i)=>{
+    if (cur[i] === undefined) return;
+    t.querySelector('.tv').textContent = cur[i].toFixed(1);
+    t.classList.remove('mid','hi');
+    const b = bandOf(cur[i], i, c); if (b) t.classList.add(b);
+  });
+  const sc = document.querySelector('.ca-sc');
+  if (sc) sc.textContent = avg(cur).toFixed(1);
+  const rec = document.querySelector('.rec:not(.done):not(.quiet)');
+  if (rec && recOf(c)) rec.innerHTML = `<span>Right now:</span> ${esc(recOf(c))}`;
 }
 
 function blockedP(id){
@@ -1113,7 +1172,7 @@ function blockedP(id){
 function apply(id){
   const c = comp(id), was = c.t === 'img' ? c.alt : c.text;
   if (c.t === 'img') c.alt = c.up; else c.text = c.up;
-  S.boosts.push({id, page:pgOf(id), lbl:c.lbl, price:c.price, gain:c.u.map((v,i)=>+(v-c.s[i]).toFixed(1))});
+  S.boosts.push({id, page:pgOf(id), lbl:c.lbl, price:c.price, gain:c.u.map((v,i)=>+(v-liveScores(c)[i]).toFixed(1))});
   S.session += c.price; S.boostCount++;
   shut(); draw(); flash(id); bdg();
   toast(`Boosted. <b>${M(c.price)}</b> added to this session. Nothing's charged until Done.`, () => {
@@ -1312,7 +1371,7 @@ function guide(){
       const b = isBoosted(c.id);
       return `<div class="itm"><span class="who">${esc(c.lbl)}</span>
         <span class="bdy"><span class="new">${esc(c.text.slice(0,40))}${c.text.length>40?'…':''}</span>
-          <span class="stamp">now ${avg(c.s).toFixed(1)}/10${c.u?` → could be ${avg(c.u).toFixed(1)}/10`:''}</span></span>
+          <span class="stamp">now ${avg(liveScores(c)).toFixed(1)}/10${c.u?` → could be ${avg(c.u).toFixed(1)}/10`:''}</span></span>
         <span class="acts"><span class="amt" style="color:${b?'var(--green-d)':canBoost(c)?'var(--navy)':'var(--amber-ink)'}">${b?'✓ done':canBoost(c)?M(c.price):'needs you'}</span>
         <button class="pill" data-show="${c.id}">Show me</button></span></div>`;
     }).join('')}</div>
@@ -1324,7 +1383,7 @@ function guide(){
   if (a) a.onclick = ()=>{
     const snap = left.map(c=>({c, was: c.t==='img'?c.alt:c.text}));
     left.forEach(c=>{ if(c.t==='img') c.alt=c.up; else c.text=c.up;
-      S.boosts.push({id:c.id,page:pgOf(c.id),lbl:c.lbl,price:c.price,gain:c.u.map((v,i)=>+(v-c.s[i]).toFixed(1))}); });
+      S.boosts.push({id:c.id,page:pgOf(c.id),lbl:c.lbl,price:c.price,gain:c.u.map((v,i)=>+(v-liveScores(c)[i]).toFixed(1))}); });
     S.session += tot; S.boostCount += left.length;
     shut(); draw(); bdg();
     toast(`Boosted ${left.length} parts of ${pg.name}. <b>${M(tot)}</b> on this session.`, ()=>{
