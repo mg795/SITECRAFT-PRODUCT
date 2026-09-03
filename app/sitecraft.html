@@ -95,7 +95,8 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 /* ═══════ panel ═══════ */
 .scrim{position:fixed;inset:0;background:rgba(12,18,28,.4);z-index:70;display:none}
 .scrim.open{display:block}
-.pan{position:fixed;left:50%;top:50%;transform:translate(-50%,-48%) scale(.98);width:min(27rem,calc(100vw - 1.5rem));max-height:92vh;height:auto;background:var(--card);border-radius:14px;box-shadow:var(--sh);z-index:80;display:grid;grid-template-rows:auto 1fr;opacity:0;pointer-events:none;transition:opacity .16s,transform .16s;overflow:hidden}
+/* the stack grows downward, so the panel is sized to stop clear of the bar */
+.pan{position:fixed;left:50%;top:calc(50% - 2.3rem);transform:translate(-50%,-48%) scale(.98);width:min(27rem,calc(100vw - 1.5rem));max-height:calc(100vh - 6rem);height:auto;background:var(--card);border-radius:14px;box-shadow:var(--sh);z-index:80;display:grid;grid-template-rows:auto 1fr;opacity:0;pointer-events:none;transition:opacity .16s,transform .16s;overflow:hidden}
 .pan.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
 .pan.open.moved{transform:none}
 .pan.moved{transition:opacity .16s}
@@ -124,6 +125,8 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .p-x{border:0;background:transparent;color:var(--green);font-size:1.05rem;line-height:1;font-weight:800;padding:0 .1rem 0 .55rem;flex:none}
 .p-bd{overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none;padding:.9rem 1.05rem 1.05rem;display:flex;flex-direction:column;gap:.7rem}
 .p-bd::-webkit-scrollbar{display:none}
+/* the scrollbar is hidden, so a soft top edge is the only cue that more sits above */
+.p-bd.up{-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 1.4rem);mask-image:linear-gradient(180deg,transparent 0,#000 1.4rem)}
 .p-ft{font-size:.68rem;color:var(--faint);text-align:center;padding-top:.35rem}
 .p-ft u{cursor:pointer}
 
@@ -147,6 +150,17 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .sdone .tick{width:1.15rem;height:1.15rem;border-radius:50%;background:var(--green-d);color:#fff;display:grid;place-items:center;font-size:.7rem;font-weight:800;flex:none}
 .sdone .lbl2{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sdone button{margin-left:auto;border:0;background:transparent;color:var(--green-ink);font-size:.78rem;font-weight:700;text-decoration:underline;padding:0;flex:none}
+.sdone.sflat{background:var(--sunk);color:var(--ink-2)}
+.sdone .amt{margin-left:auto;font-variant-numeric:tabular-nums;font-family:var(--m);font-weight:700;flex:none}
+.sdone .sthumb{width:2.7rem;height:1.45rem;border-radius:5px;background-repeat:no-repeat;background-color:var(--rule);flex:none}
+/* a step that has been reopened is in progress again, so it drops the green */
+.sdone.on{background:var(--sunk);color:var(--ink-2)}
+.sdone.on .tick{background:var(--mut)}
+.sdone.on button{color:var(--green-ink)}
+.slinks{display:flex;gap:1.1rem;align-items:center;flex-wrap:wrap;margin-top:-.2rem}
+.slink{border:0;background:transparent;color:var(--mut);font-size:.74rem;font-weight:600;padding:.2rem .1rem}
+.slink:hover{color:var(--green-d)}
+.cfm{display:grid;gap:.55rem;margin-top:.35rem}
 .ask{font-size:1.02rem;font-weight:700;color:var(--navy);letter-spacing:-.015em;line-height:1.3;display:flex;align-items:center;gap:.4rem}
 .sub{font-size:.82rem;color:var(--mut);line-height:1.45;margin-top:-.25rem}
 
@@ -263,7 +277,7 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .tagrow2.mini .tag0,.tagrow2.mini .tag1{font-size:.62rem;padding:.06rem .38rem}
 .tagrow2.mini .tagadd{display:none}
 .tile,.tile .tv,.tile .tl,.tile .tu{transition:background .55s,color .55s}
-.rec{font-size:.83rem;font-weight:700;color:var(--navy);text-align:center;line-height:1.45}
+.rec{font-size:.83rem;font-weight:700;color:var(--navy);text-align:left;line-height:1.45}
 .rec span{color:var(--red)}
 
 /* collapsibles */
@@ -547,12 +561,22 @@ function bdg(){
 }
 
 /* ═══════════ panel ═══════════ */
-function open({ttl, flag, body, back}){
+function open({ttl, flag, body, back, key}){
   $('#p-ttl').innerHTML = (ttl||'') + (flag?` <span class="dot">·</span> <span class="flagchip ${flag.cls}">${flag.label}<button class="qmark" data-help="${esc(flag.help)}" aria-label="What is a ${flag.label}?"></button></span>`:'');
   const bk = $('#p-back');
   bk.hidden = !back;
   bk.onclick = () => stepBack();
-  $('#p-bd').innerHTML = body || '';
+  /* re-rendering the same stack must not throw the reader back to the top */
+  const bd = $('#p-bd');
+  const keep = (key && key === open._key) ? bd.scrollTop : 0;
+  open._key = key || null;
+  bd.innerHTML = body || '';
+  bd.scrollTop = keep;
+  if (!open._wired){
+    open._wired = true;
+    bd.addEventListener('scroll', () => bd.classList.toggle('up', bd.scrollTop > 6));
+  }
+  bd.classList.toggle('up', bd.scrollTop > 6);
   $('#toast').hidden = true; clearTimeout(toast._t);
   const pan = $('#pan');
   if (!pan.classList.contains('moved')) pan.style.transform = '';
@@ -619,6 +643,7 @@ function shut(){
   const pan = $('#pan');
   pan.classList.remove('open','moved');
   pan.style.left = ''; pan.style.top = '';   /* always back to centre */
+  open._key = null;
   $('#scrim').classList.remove('open');
   S.sel = null; S.projecting = null;
   document.querySelectorAll('.c.sel').forEach(e=>e.classList.remove('sel'));
@@ -703,8 +728,14 @@ function scores(c, proj){
   const isImg = c.t === 'img';
   const done = isBoosted(c.id) && !!DONE_BY_TYPE[c.t];
   const nowText = isImg ? (c.alt || 'No description yet') : c.text;
+  /* once they have written a description, the old line about not having one is a lie */
+  const recNow = (isImg && (c.alt || '').trim())
+    ? "Nothing tags your description yet, so search can't file this picture."
+    : c.rec;
   const mine = c.userTags || (c.userTags = []);
   const F = S.flow || {};
+  /* whatever is already standing in a folded line above is not repeated here */
+  const bodyFolded = F.id === c.id && (isImg ? F.desc !== null : F.words !== null);
   const chips = mine.map(t=>`<span class="tag1 tagmine">${esc(t)}<button class="tagx" data-deltag="${esc(t)}" aria-label="Remove ${esc(t)}">&times;</button></span>`).join('');
   const tagsNow = (mine.length ? '' : '<span class="tag0">None yet</span>') + chips;
   const slot = F.addingTag
@@ -727,14 +758,14 @@ function scores(c, proj){
       <div class="tilewrap"><div class="tiles">${tiles}</div>
         <div class="tipline" id="tip"></div></div>
       ${done ? `<div class="rec done"><span>Now in place:</span> ${esc(DONE_BY_TYPE[c.t] || '')}</div>`
-             : (c.rec ? `<div class="rec ${proj?'quiet':''}"><span>Right now:</span> ${esc(c.rec)}</div>` : '')}
+             : (recNow ? `<div class="rec ${proj?'quiet':''}"><span>Right now:</span> ${esc(recNow)}</div>` : '')}
 
       ${proj ? `<div class="ba squash">
         <div class="cline"><span class="lab">Current ${isImg?'Description':'Words'}</span><span class="ctext">${esc(nowText)}</span></div>
         <div class="cline"><span class="lab">Current Tags</span><span class="tagrow2 mini">${tagsNow}</span></div>
       </div>` : `<div class="ba">
-        <div class="lab">Current ${isImg?'Description':'Words'}</div>
-        <div class="box">${esc(nowText)}</div>
+        ${bodyFolded ? '' : `<div class="lab">Current ${isImg?'Description':'Words'}</div>
+        <div class="box">${esc(nowText)}</div>`}
         <div class="lab">Current Tags</div>
         <div class="tagrow2">${tagsNow}</div>
         ${tagCtl}
@@ -822,6 +853,13 @@ function wireTips(){
    next action appears as the single primary button naming what it does. */
 
 const setFlow = f => { S.flow = f; S.flows[f.id] = f; return f; };
+/* the stack grows past the panel, so the newest stage comes to meet the reader */
+function toBottom(){
+  const bd = $('#p-bd');
+  requestAnimationFrame(() => {
+    if (bd.scrollHeight - bd.clientHeight > 4) bd.scrollTo({top:bd.scrollHeight, behavior:'smooth'});
+  });
+}
 function editP(id){
   const c = comp(id);
   /* resume where they left off: clicking away is a dismissal, not a discard */
@@ -834,40 +872,51 @@ function flow(){
   const c = comp(S.flow.id), F = S.flow, img = c.t === 'img';
   if (c.blocked) return blockedP(c.id);
 
-  const editDone = img ? (F.photo || F.desc !== null) : (F.words !== null);
+  /* Every step that settles folds into a line and stays there. The panel only
+     ever grows: nothing already on screen is taken away to make room for what
+     comes next, and a folded line reopens in place with everything below it
+     left standing. */
+  const photoSet  = img && !!F.photo, descSet = img && F.desc !== null;
+  const wordsSet  = !img && F.words !== null;
+  const photoOpen = img && (!photoSet || !descSet || F.open === 'photo');
+  const descOpen  = img && photoSet && (!descSet || F.open === 'desc');
+  const wordsOpen = !img && (!wordsSet || F.open === 'words');
   const parts = [];
+  /* the fold only offers itself once the flow has moved past that step */
+  const fold = (key, label, foldable, extra = '') => {
+    const on = F.open === key;
+    return `<div class="sdone${on ? ' on' : ''}"><span class="tick">✓</span>${extra}
+      <span class="lbl2">${esc(label)}</span>
+      ${foldable ? `<button data-step="${key}">${on ? 'Done' : 'Change'}</button>` : ''}</div>`;
+  };
 
-  /* ── stage 1: the change ── */
-  if (editDone){
-    const onOriginal = img && F.wasSrc && c.src === F.wasSrc;
-    parts.push(`<div class="sdone"><span class="tick">✓</span>
-      <span class="lbl2">${img ? (onOriginal ? 'Original photo in place' : 'New photo added') : 'Your words saved'}</span>
-      <button data-re="1">Change</button></div>`);
-    if (img) parts.push(`<input type="file" id="fi2" accept="image/*" hidden>`);
-    if (img && F.photo && F.desc === null){
-      const f = c.fit || (c.fit = {x:50, y:50, z:100});
-      parts.push(`<div class="stage">
-        <div class="crop" id="crop" style="background-image:url(${c.src});background-size:${f.z}%;background-position:${f.x}% ${f.y}%">
-          <span class="hint">Drag to reposition</span></div>
-        <div class="zoomrow"><span>Zoom</span><input type="range" id="zoom" min="100" max="260" value="${f.z}"><button class="reset" id="rs">Reset</button></div>
-      </div>`);
-    }
+  /* ── the picture ── */
+  if (img && photoSet){
+    const f = c.fit || (c.fit = {x:50, y:50, z:100});
+    const onOriginal = F.wasSrc && c.src === F.wasSrc;
+    parts.push(fold('photo', onOriginal ? 'Original photo in place' : 'New photo added',
+      descSet || F.analysed,
+      /* while the step is open the picture itself is right below, so no thumbnail */
+      photoOpen ? '' : `<span class="sthumb" style="background-image:url(${c.src});background-size:${f.z}%;background-position:${f.x}% ${f.y}%"></span>`));
+    if (photoOpen) parts.push(`<div class="stage">
+      <div class="crop" id="crop" style="background-image:url(${c.src});background-size:${f.z}%;background-position:${f.x}% ${f.y}%">
+        <span class="hint">Drag to reposition</span></div>
+      <div class="zoomrow"><span>Zoom</span><input type="range" id="zoom" min="100" max="260" value="${f.z}"><button class="reset" id="rs">Reset</button></div>
+      <div class="slinks"><button class="slink" id="rep">Replace this photo</button>${
+        F.wasSrc && c.src !== F.wasSrc ? `<button class="slink" id="orig">Use my original photo instead</button>` : ''}</div>
+      <input type="file" id="fi2" accept="image/*" hidden>
+    </div>`);
   } else if (img){
     parts.push(`<div class="stage">
       <div class="drop${c.src ? ' onphoto' : ''}" id="dz"${c.src ? ` style="background-image:url(${c.src})"` : ''}><b>Drag a New Photo Here</b><span>or Click to Choose One</span><em>Any size, you position it next (now ${c.dim ? c.dim.w + ' × ' + c.dim.h : '1200 × 630'})</em></div>
       <input type="file" id="fi" accept="image/*" hidden>
     </div>`);
-  } else {
-    parts.push(`<div class="stage">
-      <div class="ask">Change the wording</div>
-      <div class="box ed" contenteditable="true" id="ed">${esc(F.draftWords ?? c.text)}</div>
-      <div class="wc" id="wc"></div>
-    </div>`);
   }
 
-  /* ── stage 2 (photos only): what is in it ── */
-  if (img && F.photo && F.desc === null){
-    parts.push(`<div class="stage">
+  /* ── what is in it ── */
+  if (img && photoSet){
+    if (descSet) parts.push(fold('desc', c.alt || 'No description yet', F.analysed));
+    if (descOpen) parts.push(`<div class="stage">
       <div class="tipwrap">
         <div class="ask">What is in this picture?<button class="qmark" data-tiptext="${esc(PIC_HELP)}" aria-label="Why this matters"></button></div>
         <div class="tipline"></div>
@@ -876,34 +925,63 @@ function flow(){
     </div>`);
   }
 
-  /* ── stage 3: the analysis ── */
+  /* ── the wording, for everything that is not a picture ── */
+  if (!img){
+    if (wordsSet) parts.push(fold('words', c.text, F.analysed));
+    if (wordsOpen) parts.push(`<div class="stage">
+      <div class="ask">Change the wording</div>
+      <div class="box ed" contenteditable="true" id="ed">${esc(F.draftWords ?? c.text)}</div>
+      <div class="wc" id="wc"></div>
+    </div>`);
+  }
+
+  /* ── the analysis ── */
   if (F.analysed) parts.push(scores(c, !!F.previewed));
 
+  /* ── the confirmation lands under the analysis, never in place of it ── */
+  if (F.confirming) parts.push(`<div class="cfm">
+    <div class="ask">Boost this ${esc(c.lbl.toLowerCase())} for ${M(c.price)}?</div>
+    <div class="sdone sflat"><span class="lbl2">On this session so far</span><span class="amt">${M(S.session)}</span></div>
+    <div class="sub">Nothing is charged until you press <b>Done</b>.</div>
+  </div>`);
+
   /* ── the single next action ── */
+  const started = img ? (photoSet || descSet) : wordsSet;
   let cta = '';
-  if (!F.analysed) cta = `<button class="g" id="go">See How AI Reads This <span class="arw">→</span></button>`;
+  if (F.confirming) cta = `<button class="g" id="go">Yes, boost it<span class="amt2">${M(c.price)}</span></button>`;
+  else if (!F.analysed) cta = `<button class="g" id="go">See How AI Reads This <span class="arw">→</span></button>`;
   else if (canBoost(c) && !isBoosted(c.id) && !F.previewed)
     cta = `<button class="g" id="go">Preview Your Boost <span class="arw">→</span></button>`;
   else if (canBoost(c) && !isBoosted(c.id)) cta = `<button class="g" id="go">Boost this ${esc(c.lbl.toLowerCase())}<span class="amt2">${M(c.price)}</span></button>`;
   else if (isBoosted(c.id)) cta = `<div class="sdone"><span class="tick">✓</span><span class="lbl2">Boosted, ${M(S.boosts.find(x=>x.id===c.id).price)} on this session</span></div>`;
 
-  const canBack = img && F.photo && F.desc === null && F.wasSrc && c.src !== F.wasSrc;
-  const secondary = canBack
-    ? `<button class="ghost" id="bk">← Use my original photo instead</button>`
-    : ((img && !F.photo && F.desc === null) || (!img && F.words === null)
-        ? '' : `<button class="ghost" id="sv">Boost This ${esc(shortOf(c))} Later</button>`);
+  const secondary = F.confirming
+    ? `<button class="ghost" id="cbk">Back</button>`
+    : (started ? `<button class="ghost" id="sv">Boost This ${esc(shortOf(c))} Later</button>` : '');
 
-  open({ ttl: hdr(c), flag: flagOf(c), back: canStepBack(), body: parts.join('') + cta + secondary });
+  open({ ttl: hdr(c), flag: flagOf(c), back: canStepBack(), key: 'flow:' + c.id,
+         body: parts.join('') + cta + secondary });
   if (F.previewed && !F.rolled){ F.rolled = true; rollScores(c); }
+  if (F.scroll){ F.scroll = false; toBottom(); }
 
   /* ── wiring ── */
-  const re = document.querySelector('[data-re]');
-  const fi2 = $('#fi2');
-  if (re) re.onclick = () => {
-    if (img && fi2) return fi2.click();            /* pick a new one right here */
-    setFlow({id:c.id, photo:null, desc:null, words:null, analysed:F.analysed, wasSrc:F.wasSrc, wasFit:F.wasFit});
+  document.querySelectorAll('[data-step]').forEach(b => b.onclick = () => {
+    const k = b.dataset.step;
+    if (F.open === k){                              /* Done: fold it back up */
+      if (k === 'desc') commitDesc();
+      if (k === 'words' && !commitWords()) return;
+      F.open = null;
+    } else {
+      if (k === 'desc')  F.draftDesc  = null;       /* reopen on what is in place */
+      if (k === 'words') F.draftWords = null;
+      F.open = k;
+    }
     flow();
-  };
+    const row = document.querySelector(`[data-step="${k}"]`);
+    if (row) row.closest('.sdone').scrollIntoView({block:'nearest', behavior:'smooth'});
+  });
+  const fi2 = $('#fi2'), rep = $('#rep');
+  if (rep) rep.onclick = () => fi2 && fi2.click();
   if (fi2) fi2.onchange = e => {
     const file = e.target.files[0];
     if (!file || !file.type.startsWith('image/')) return toast('That needs to be an image file.');
@@ -966,7 +1044,10 @@ function flow(){
     $('#rs').onclick = () => { f.x = 50; f.y = 50; f.z = 100; $('#zoom').value = 100; crop.classList.remove('moved'); paint(); };
   }
 
-  const bkBtn = $('#bk');
+  const cbk = $('#cbk');
+  if (cbk) cbk.onclick = () => { F.confirming = false; flow(); };
+
+  const bkBtn = $('#orig');
   if (bkBtn) bkBtn.onclick = () => {
     c.src = F.wasSrc || null;
     c.fit = F.wasFit ? {...F.wasFit} : {x:50, y:50, z:100};
@@ -1000,9 +1081,13 @@ function flow(){
   if (go) go.onclick = () => {
     if (dsc) commitDesc();
     if (ed && !commitWords()) return;
+    if (F.confirming) return apply(c.id);
+    F.open = null;                                  /* the CTA settles any reopened step */
+    F.scroll = true;
     if (!F.analysed){ F.analysed = true; return flow(); }
     if (!F.previewed && canBoost(c)){ F.previewed = true; return flow(); }
-    return S.skipConfirm ? apply(c.id) : confirmP(c.id);
+    if (S.skipConfirm) return apply(c.id);
+    F.confirming = true; return flow();
   };
   const sv = $('#sv');
   if (sv) sv.onclick = () => { if (ed && !commitWords()) return; if (dsc) commitDesc(); shut(); draw(); flash(c.id); };
@@ -1036,20 +1121,7 @@ function blockedP(id){
     ${scores(c, false)}`});
 }
 
-/* ═══════════ boost: confirm, then apply ═══════════ */
-function confirmP(id){
-  const c = comp(id);
-  open({ ttl: hdr(c), flag: flagOf(c), body:`
-    <div class="ask">Boost this ${esc(c.lbl.toLowerCase())} for ${M(c.price)}?</div>
-    <div class="box upbox">${esc(c.up)}</div>
-    <div class="sdone" style="background:var(--sunk);color:var(--ink-2)"><span class="lbl2">On this session so far</span>
-      <span class="amt" style="margin-left:auto">${M(S.session)}</span></div>
-    <div class="sub">Boosts are agreed as you pick them and settle as <b>one amount</b> when you press Done.</div>
-    <button class="g" id="go">Yes, boost it<span class="amt2">${M(c.price)}</span></button>
-    <button class="ghost" id="bk">Back</button>`});
-  $('#bk').onclick = () => { setFlow({...S.flows[id], previewed:true}); flow(); };
-  $('#go').onclick = () => apply(id);
-}
+/* ═══════════ boost: apply ═══════════ */
 function apply(id){
   const c = comp(id), was = c.t === 'img' ? c.alt : c.text;
   if (c.t === 'img') c.alt = c.up; else c.text = c.up;
@@ -1302,12 +1374,14 @@ function guide(){
 function canStepBack(){
   const F = S.flow; if (!F) return false;
   const c = comp(F.id); if (!c) return false;
-  if (F.previewed || F.analysed) return true;
+  if (F.confirming || F.previewed || F.analysed) return true;
   return c.t === 'img' && (F.desc !== null || !!F.photo);
 }
 function stepBack(){
   const F = S.flow, c = comp(F.id);
-  if (F.previewed){ F.previewed = false; F.rolled = false; }
+  F.open = null;
+  if (F.confirming) F.confirming = false;
+  else if (F.previewed){ F.previewed = false; F.rolled = false; }
   else if (F.analysed) F.analysed = false;
   else if (c.t === 'img' && F.desc !== null) F.desc = null;
   else if (c.t === 'img' && F.photo) { c.src = F.wasSrc || null; c.fit = F.wasFit || null; F.photo = null; draw(); }
