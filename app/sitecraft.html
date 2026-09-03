@@ -267,19 +267,19 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .lab.up{color:var(--green-ink)}
 .box.upbox{background:var(--green-pale);color:var(--green-x);font-weight:500}
 .rec.done span{color:var(--green-x)}
-.rec.quiet{font-size:.74rem;font-weight:500;color:var(--mut)}
-.rec.quiet span{color:var(--mut)}
+.rec.quiet{font-weight:600;color:var(--mut)}
 /* the previous stage stays on screen, compressed, so the new one reads as growth */
 .ba.squash{display:grid;gap:.25rem;padding:.45rem .55rem;background:var(--sunk);border-radius:9px}
 .ba.squash .cline{display:flex;align-items:center;gap:.5rem;min-width:0}
-.ba.squash .lab{flex:none;font-size:.55rem;color:var(--mut)}
+.ba.squash .lab{flex:none;color:var(--mut)}
 .ba.squash .ctext{font-size:.76rem;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .tagrow2.mini{min-height:0}
-.tagrow2.mini .tag0,.tagrow2.mini .tag1{font-size:.62rem;padding:.06rem .38rem}
+.tagrow2.mini .tag0,.tagrow2.mini .tag1{padding:.08rem .42rem}
 .tagrow2.mini .tagadd{display:none}
 .tile,.tile .tv,.tile .tl,.tile .tu{transition:background .55s,color .55s}
-.rec{font-size:.83rem;font-weight:700;color:var(--navy);text-align:left;line-height:1.45}
-.rec span{color:var(--red)}
+/* one line, the weight of the labels around it, in the dark blue rather than green */
+.rec{display:flex;align-items:center;gap:.3rem;font-size:.56rem;letter-spacing:0;font-weight:700;color:var(--navy);text-align:left;line-height:1.5}
+.rec span{flex:none;font-size:.68rem;line-height:1}
 
 /* collapsibles */
 .coll{border-top:1px solid var(--rule-2)}
@@ -542,8 +542,8 @@ function bandOf(v, i, c){
 function recOf(c){
   if (c.t !== 'img' || !(c.alt || '').trim()) return c.rec;
   return (c.userTags || []).length
-    ? "Your tags are plain words. A boost turns them into markup search can read."
-    : "Nothing tags your description yet, so search can't file this picture.";
+    ? "Your tags are plain words. A boost makes them readable markup."
+    : "Search engines can't find this picture, nothing tags your description.";
 }
 const uniq = a => [...new Set(a)];
 
@@ -581,6 +581,12 @@ function draw(){
     if (!document.body.classList.contains('pick')) return;
     e.preventDefault(); e.stopPropagation(); pick(el.dataset.id);
   });
+  /* redrawing the page rebuilds its markup, so anything the state still holds
+     has to be put back: the selection ring belongs to the state, not the markup */
+  if (S.sel){
+    const el = document.querySelector(`[data-id="${S.sel}"]`);
+    if (el) el.classList.add('sel');
+  }
   bdg();
 }
 function bdg(){
@@ -786,7 +792,7 @@ function scores(c, proj){
       <div class="tilewrap"><div class="tiles">${tiles}</div>
         <div class="tipline" id="tip"></div></div>
       ${done ? `<div class="rec done"><span>Now in place:</span> ${esc(DONE_BY_TYPE[c.t] || '')}</div>`
-             : (recNow ? `<div class="rec ${proj?'quiet':''}"><span>Right now:</span> ${esc(recNow)}</div>` : '')}
+             : (recNow ? `<div class="rec ${proj?'quiet':''}"><span>&#10071;</span>${esc(recNow)}</div>` : '')}
 
       ${proj ? `<div class="ba squash">
         <div class="cline"><span class="lab">Current ${isImg?'Description':'Words'}</span><span class="ctext">${esc(nowText)}</span></div>
@@ -1157,7 +1163,7 @@ function paintScores(c){
   const sc = document.querySelector('.ca-sc');
   if (sc) sc.textContent = avg(cur).toFixed(1);
   const rec = document.querySelector('.rec:not(.done):not(.quiet)');
-  if (rec && recOf(c)) rec.innerHTML = `<span>Right now:</span> ${esc(recOf(c))}`;
+  if (rec && recOf(c)) rec.innerHTML = `<span>&#10071;</span>${esc(recOf(c))}`;
 }
 
 function blockedP(id){
@@ -1443,6 +1449,7 @@ document.addEventListener('keydown', e=>{ if (e.key==='Escape') $('#p-x').click(
 document.querySelectorAll('nav.site a').forEach(a=>a.onclick=e=>{
   e.preventDefault();
   if (S.editing) return toast('Press <b>Done</b> to settle up and unlock the other pages.');
+  S.sel = null;                       /* the ring belongs to the page you left */
   S.page = a.dataset.go; draw(); window.scrollTo({top:0,behavior:'smooth'});
 });
 document.getElementById('thp-logo').src = THP.logo;
