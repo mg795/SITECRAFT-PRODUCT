@@ -84,6 +84,9 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 
 /* ═══════ floating bar ═══════ */
 .bar{position:fixed;left:50%;bottom:1.1rem;transform:translateX(-50%);background:var(--bar);border:1px solid rgba(255,255,255,.09);border-radius:999px;display:flex;gap:.2rem;padding:.4rem;box-shadow:var(--sh);z-index:100;max-width:calc(100vw - 1rem);overflow-x:auto}
+/* the mark reads on the dark bar; on a narrow screen the buttons matter more */
+.sc-logo{height:1.15rem;width:auto;flex:none;margin:0 .6rem 0 .5rem;align-self:center;user-select:none;-webkit-user-drag:none}
+@media (max-width:560px){.sc-logo{display:none}}
 .bar button{border:0;background:transparent;color:#C7D0DE;border-radius:999px;padding:.5rem .85rem;display:flex;align-items:center;gap:.42rem;font-size:.82rem;font-weight:600;white-space:nowrap;position:relative}
 .bar button svg{width:1rem;height:1rem;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
 .bar button:hover{background:var(--bar-2);color:#fff}
@@ -328,9 +331,20 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .sh-ttl{font-size:1.06rem;font-weight:800;color:var(--navy);letter-spacing:-.018em;line-height:1.25}
 .sh-sub{font-size:.83rem;line-height:1.5;color:var(--ink-2)}
 .sh-sub b{color:var(--navy);font-weight:700}
-.sh-lock{display:flex;gap:.5rem;align-items:flex-start;background:var(--sunk);border-radius:10px;
-  padding:.6rem .7rem;font-size:.78rem;line-height:1.45;color:var(--ink-2)}
-.sh-lock span{flex:none;font-size:.8rem;line-height:1.35}
+/* a boosted part is settled: shown, dimmed, and out of reach */
+.lockwrap{position:relative;display:grid;gap:.55rem}
+.lockback{display:grid;gap:.55rem;opacity:.3;filter:saturate(.35);pointer-events:none;user-select:none}
+.lockshot{width:100%;aspect-ratio:1200/630;border-radius:12px;background-repeat:no-repeat;background-color:var(--sunk)}
+.locknote{position:absolute;left:.4rem;right:.4rem;top:50%;transform:translateY(-50%);
+  background:var(--card);border-radius:12px;padding:.9rem .85rem;display:grid;gap:.3rem;
+  justify-items:center;text-align:center}
+.locknote .lm{width:2rem;height:2rem;border-radius:50%;background:var(--green-pale);
+  display:grid;place-items:center;font-size:.95rem}
+.locknote .lt{font-size:.95rem;font-weight:800;color:var(--navy);letter-spacing:-.015em;line-height:1.3}
+.locknote .ls{font-size:.79rem;line-height:1.45;color:var(--mut)}
+.locknote .ls b{color:var(--green-x);font-weight:700}
+.sh-term{margin-top:-.35rem;text-align:center;font-size:.71rem;line-height:1.45;color:var(--faint)}
+.sh-term b{color:var(--mut);font-weight:700}
 .sh-line{display:flex;align-items:center;gap:.5rem;font-size:.84rem;font-weight:600;color:var(--ink-2)}
 .sh-line .amt{margin-left:auto;font-family:var(--m);font-variant-numeric:tabular-nums;font-weight:700;color:var(--navy)}
 .sh-win{display:grid;gap:.35rem;justify-items:center;text-align:center;background:var(--green-pale);
@@ -400,6 +414,7 @@ body.editing </style>
 <main id="page"></main>
 
 <div class="bar" role="toolbar" aria-label="Sitecraft">
+  <img class="sc-logo" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAAAkCAYAAABrA8OcAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAydpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDEwLjAtYzAwMCA3OS5kMjBlNDY2MzAsIDIwMjUvMTIvMDktMDI6MTE6MjMgICAgICAgICI+IDxyZGY6UkRGIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyI+IDxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PSIiIHhtbG5zOnhtcE1NPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvbW0vIiB4bWxuczpzdFJlZj0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlUmVmIyIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjFBRDAwQ0E4QTdERDExRjE4Q0YwRDBEQjQ1MEI1MUY0IiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjFBRDAwQ0E3QTdERDExRjE4Q0YwRDBEQjQ1MEI1MUY0IiB4bXA6Q3JlYXRvclRvb2w9IkFkb2JlIFBob3Rvc2hvcCAyNy45IChXaW5kb3dzKSI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOjM2RERFNDNGQTdEQzExRjE5NUE4RUFFREFCQUNBMEEwIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjM2RERFNDQwQTdEQzExRjE5NUE4RUFFREFCQUNBMEEwIi8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+CCC14wAAC8hJREFUeNrs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" alt="SiteCraft" width="150" height="36">
   <button data-mode="account"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-2.87 1.2V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 7 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 3 15H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 7a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 2.6h.1a2 2 0 1 1 4 0V3a1.7 1.7 0 0 0 2.87 1.2l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 21 9v.1a2 2 0 1 1 0 4H21a1.7 1.7 0 0 0-1.6 1.9z"/></svg>My Account</button>
   <button data-mode="edit"><svg viewBox="0 0 24 24"><path d="M4 20h4L20 8l-4-4L4 16z"/><path d="M14.5 5.5 18.5 9.5"/></svg>Edit</button>
   <button data-mode="comment"><svg viewBox="0 0 24 24"><path d="M20 14.5a2.5 2.5 0 0 1-2.5 2.5H9l-4 3.5v-15A2.5 2.5 0 0 1 7.5 3h10A2.5 2.5 0 0 1 20 5.5z"/></svg>Comment<span class="bdg" data-bdg="notes" hidden></span></button>
@@ -567,7 +582,8 @@ function earned(c){
   return Math.min(.55, desc * .30 + own * .08);
 }
 function liveScores(c){
-  if (!c.u) return c.s;
+  if (!Array.isArray(c.u)) return c.s;
+  if (isBoosted(c.id)) return c.u;           /* a boost is applied, not projected */
   const f = earned(c);
   return f ? c.s.map((v,i) => +(v + (c.u[i] - v) * f).toFixed(1)) : c.s;
 }
@@ -818,9 +834,10 @@ function scores(c, proj){
   const bodyFolded = F.id === c.id && (isImg ? (F.desc !== null || F.analysed) : F.words !== null);
   const chips = mine.map(t=>`<span class="tag1 tagmine">${esc(t)}<button class="tagx" data-deltag="${esc(t)}" aria-label="Remove ${esc(t)}">&times;</button></span>`).join('');
   const tagsNow = (mine.length ? '' : '<span class="tag0">None yet</span>') + chips;
-  const slot = F.addingTag
+  /* settled work takes no more tags */
+  const slot = isBoosted(c.id) ? '' : (F.addingTag
     ? `<input class="taginput" id="taginput" maxlength="18" placeholder="Tag" autocomplete="off"${F.addWide?` style="width:${F.addWide}px"`:''}>`
-    : (mine.length < MAX_OWN_TAGS ? `<button class="tagadd" data-newtag="1">+ Add tag</button>` : '');
+    : (mine.length < MAX_OWN_TAGS ? `<button class="tagadd" data-newtag="1">+ Add tag</button>` : ''));
   const helpLink = (canBoost(c) && !isBoosted(c.id))
     ? `<button class="taghelp" data-taghelp="1">Want help adding tags?</button>` : '';
   const tagCtl = (slot || helpLink) ? `<div class="tagctl">${slot}${helpLink}</div>` : '';
@@ -966,6 +983,7 @@ function flow(){
   if (!c) return shut();                     /* the component went away; do not render half a panel */
   const img = c.t === 'img';
   if (c.blocked) return blockedP(c.id);
+  if (isBoosted(c.id)) return lockedP(c);    /* settled work is read-only until the term is up */
 
   /* Every step that settles folds into a line and stays there. The panel only
      ever grows: nothing already on screen is taken away to make room for what
@@ -1240,6 +1258,35 @@ function paintScores(c){
   if (rec && recOf(c)) rec.innerHTML = `<span>&#10071;</span>${esc(recOf(c))}`;
 }
 
+/* what a boosted part looks like: itself, dimmed, with the reason over it */
+function lockedP(c){
+  const page = pgOf(c.id), nxt = nextUp(page, c.id);
+  const img = c.t === 'img' && c.src;
+  const f = c.fit || {x:50, y:50, z:100};
+  const back = img
+    ? `<div class="lockshot" style="background-image:url(${c.src});background-size:${f.z}%;background-position:${f.x}% ${f.y}%"></div>
+       <div class="box">${esc(c.alt || '')}</div>`
+    : `<div class="box">${esc(c.text)}</div>`;
+  open({ ttl: hdr(c), flag: flagOf(c), key: 'lock:' + c.id, body: `
+    <div class="lockwrap">
+      <div class="lockback">${back}${scores(c, false)}</div>
+      <div class="locknote">
+        <span class="lm">&#128274;</span>
+        <div class="lt">This ${esc(c.lbl.toLowerCase())} is already boosted</div>
+        <div class="ls">Locked in for <b>90 days</b> while the results build.</div>
+      </div>
+    </div>
+    ${nxt ? `<button class="g" id="lk-next">Next piece of content<span class="arw">&rarr;</span></button>`
+          : `<button class="g" id="lk-rev">See the whole site<span class="arw">&rarr;</span></button>`}
+    <button class="ghost" id="lk-close">Back to my page</button>`});
+
+  const nb = $('#lk-next');
+  if (nb) nb.onclick = () => { shut(); setTimeout(() => pick(nxt.id), 160); };
+  const rb = $('#lk-rev');
+  if (rb) rb.onclick = () => setMode('review');
+  $('#lk-close').onclick = () => { shut(); draw(); };
+}
+
 function blockedP(id){
   const c = comp(id);
   open({ ttl: hdr(c), flag: flagOf(c), body:`
@@ -1280,9 +1327,9 @@ function askBoost(list){
   sheet(`
     <div class="sh-ttl">${many ? `Boost ${list.length} parts of ${esc(pg)}?` : `Boost this ${esc(one.lbl.toLowerCase())}?`}</div>
     <div class="sh-sub">${many ? 'Each one is' : 'This is'} rewritten and tagged on your live page so answer engines can read ${many ? 'them' : 'it'}.</div>
-    <div class="sh-lock"><span>&#128274;</span><div>A boost holds for <b>90 days</b>. Once you say yes, it can't be cancelled before then.</div></div>
     ${list.map(k=>`<div class="sh-line">${esc(k.lbl)} <span style="color:var(--faint);font-weight:500">on ${esc(pageOf(k.id).name)}</span><span class="amt">${M(k.price)}</span></div>`).join('')}
     <button class="g" id="sh-go">${many ? `Boost all ${list.length}` : `Boost this ${esc(shortOf(one).toLowerCase())}`}<span class="amt2">${M(tot)}</span></button>
+    <div class="sh-term">Runs for <b>90 days</b>, the time it takes to show trackable results.</div>
     <button class="ghost" id="sh-no">Not yet</button>`);
   $('#sh-no').onclick = sheetShut;
   $('#sh-go').onclick = () => applyAll(list);
@@ -1527,7 +1574,7 @@ function account(){
         ${S.seats<2?'<div class="itm"><span></span><span class="bdy"><span class="stamp">One seat is included. A second is $9/mo.</span></span><span class="acts"><button class="pill" id="as">Add</button></span></div>':''}</div></div>
     <div class="sec"><button class="sec-hd" data-t="a4" aria-expanded="false">How you like to work<span class="tw">+</span></button>
       <div class="sec-bd" id="a4" hidden><div class="itm">
-        <span></span><span class="bdy"><span class="new">Confirm before each boost</span><span class="stamp">Always on. A boost holds for 90 days, so Sitecraft asks every time.</span></span>
+        <span></span><span class="bdy"><span class="new">Confirm before each boost</span><span class="stamp">Always on. Boosts run for 90 days, so Sitecraft asks every time.</span></span>
         <span></span></div></div></div>
     <div class="note-amber">Your plan is <b>$299/mo</b>. Boosts are agreed as you pick them and settle as one amount each time you press Done.</div>
     <div class="p-ft"><u>All my details</u> · © 2026 ReadTomato™</div>`});
