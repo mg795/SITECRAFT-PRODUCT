@@ -102,8 +102,9 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .flagchip.v3{color:var(--red)}
 .flagchip.v2{color:var(--ink-2)}
 .flagchip.v1{color:var(--faint)}
-.flagchip .qmark{border:0;background:var(--sunk);color:var(--mut);width:.95rem;height:.95rem;border-radius:50%;font-size:.6rem;font-weight:800;line-height:1;margin-left:.28rem;padding:0;display:inline-grid;place-items:center;vertical-align:middle}
-.flagchip .qmark:hover{background:var(--navy);color:var(--card)}
+.qmark{border:0;background:var(--rule);color:var(--mut);width:1rem;height:1rem;border-radius:50%;font-size:.62rem;font-weight:800;line-height:1;padding:0;display:inline-grid;place-items:center;vertical-align:middle;flex:none}
+.qmark:hover,.qmark:focus-visible{background:var(--navy);color:var(--card)}
+.flagchip .qmark{margin-left:.28rem;background:var(--sunk)}
 /* the header tooltip, capped at two lines so it can never wreck the panel */
 .headtip{position:absolute;top:2.3rem;left:1.1rem;right:1.1rem;z-index:9;background:var(--bar);color:#fff;font-size:.75rem;line-height:1.4;border-radius:8px;padding:.42rem .6rem;opacity:0;pointer-events:none;transition:opacity .12s;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -182,10 +183,10 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .ca-t{text-align:center;font-size:.84rem;font-weight:700;color:var(--navy)}
 
 .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem}
-.tile{background:var(--card);border-radius:10px;padding:.55rem .35rem .5rem;text-align:center;cursor:help;transition:background .14s}
+.tile{background:var(--sunk);border-radius:10px;padding:.55rem .35rem .5rem;text-align:center;cursor:help;transition:background .14s}
 .tile:hover,.tile:focus-visible{background:var(--green-pale)}
 .tile.up{background:var(--green-pale)}
-.tile .tl{font-size:.6rem;letter-spacing:.04em;text-transform:uppercase;font-weight:700;color:var(--ink-2);display:block;margin-bottom:.1rem;line-height:1.25}
+.tile .tl{display:flex;align-items:center;justify-content:center;gap:.1rem;font-size:.6rem;letter-spacing:.04em;text-transform:uppercase;font-weight:700;color:var(--ink-2);display:block;margin-bottom:.1rem;line-height:1.25}
 .tile.up .tl{color:var(--green-ink)}
 .tile .tv{font-variant-numeric:tabular-nums;font-family:var(--m);font-size:1.2rem;font-weight:700;color:var(--red);letter-spacing:-.02em}
 .tile.up .tv{color:var(--green-x)}
@@ -200,6 +201,19 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .tipline.on{opacity:1}
 .tipline b{color:#9BD35F;font-weight:700}
+.ca-hd .ca-q{margin-left:auto;flex:none}
+.tile .tl .qmark{width:.82rem;height:.82rem;font-size:.55rem;margin-left:.22rem;background:var(--rule);color:var(--mut)}
+.tile .tl .qmark:hover{background:var(--navy);color:var(--card)}
+.tile.up .tl .qmark{background:color-mix(in srgb,var(--green-ink) 22%,transparent);color:var(--green-ink)}
+.tagrow2{display:flex;gap:.3rem;flex-wrap:wrap}
+.tag0,.tag1{font-size:.7rem;font-weight:600;padding:.14rem .5rem;border-radius:999px}
+.tag0{background:var(--sunk);color:var(--faint)}
+.tag1{background:var(--green-pale);color:var(--green-ink)}
+.ba{display:grid;gap:.3rem}
+.ba+.ba{margin-top:.15rem}
+.ba.up{padding-top:.55rem;border-top:1px solid var(--rule-2)}
+.lab.up{color:var(--green-ink)}
+.box.upbox{background:var(--green-pale);color:var(--green-x);font-weight:500}
 .rec{font-size:.83rem;font-weight:700;color:var(--navy);text-align:center;line-height:1.45}
 .rec span{color:var(--red)}
 
@@ -345,6 +359,14 @@ const SITE = {
   ]},
 };
 const SCORE_NM = ['AI retrieval','AEO optimized','SEO optimized'];
+const TAGS_AFTER = {
+  img:  ['ImageObject', 'Caption', 'Alt text'],
+  h1:   ['Page subject', 'Heading level'],
+  h2:   ['Section subject', 'Heading level'],
+  p:    ['Answer block', 'Article body'],
+  kick: ['Place', 'Category'],
+  band: [],
+};
 const SCORE_TL = ['AI RETRIEVAL','AEO OPTIMIZED','SEO OPTIMIZED'];
 const WHY = [
   '<b>Why this matters.</b> AI tools pull out one paragraph at a time, not whole pages. If a paragraph only makes sense after reading the one above it, it gets left behind when an assistant is putting an answer together.',
@@ -352,6 +374,7 @@ const WHY = [
   '<b>Why this matters.</b> Whether Google can rank this. It rewards the words people really search for appearing early, sensible lengths, and text that reads naturally rather than stuffed with keywords.',
 ];
 const TAGGING = '<b>What does tagging mean?</b> Tagging means adding extra notes into your page\'s code. Visitors never see them. Google and AI search engines read them to work out what each part of your page actually is.<br><br>Writing it better lifts part of these scores on its own. The tagging only comes with a boost, which is why the numbers keep climbing after you have done your best with the words.';
+const HEAD_TIP = "These three numbers are how search engines and AI assistants read this part of your page today.";
 const TIP = [
   "Can an assistant quote this on its own? Short, self-contained lines win.",
   "Will AI answers name you? Claims beat labels, and your area beats anywhere.",
@@ -519,23 +542,45 @@ function flash(id){
 function showMe(id){ shut(); S.page = pgOf(id); draw(); setTimeout(()=>flash(id), 120); }
 
 /* ═══════════ scores block ═══════════ */
-function scores(c, proj, openByDefault){
+function scores(c, proj){
   const cur = c.s, up = c.u;
   const shown = proj && up ? up : cur;
   const badge = (proj ? avg(up) : avg(cur)).toFixed(1);
-  const tiles = shown.map((v,i)=>`<div class="tile ${proj?'up':''}" data-tip="${i}" tabindex="0">
-      <span class="tl">${SCORE_TL[i]}</span>
+  const tiles = shown.map((v,i)=>`<div class="tile ${proj?'up':''}">
+      <span class="tl">${SCORE_TL[i]}<button class="qmark" data-tip="${i}" aria-label="What is ${SCORE_NM[i]}?">?</button></span>
       <span class="tv">${v.toFixed(1)}</span><span class="tu">/10</span>${proj?`<span class="tp">was ${cur[i].toFixed(1)}</span><span class="tw">Projected</span>`:''}
     </div>`).join('');
+
+  /* what it says now, and only after a preview, what it would say */
+  const isImg = c.t === 'img';
+  const nowText = isImg ? (c.alt || 'No description yet') : c.text;
+  const tagsNow = '<span class="tag0">None yet</span>';
+  const tagsUp  = (TAGS_AFTER[c.t] || []).map(t=>`<span class="tag1">${t}</span>`).join('');
+
   return `<div class="ca">
-    <button class="ca-hd ${proj?'up':''}" data-t="cab" aria-expanded="${!!openByDefault}">
+    <div class="ca-hd ${proj?'up':''}">
       <span class="ca-sc">${badge}</span>
-      <span class="ca-nm"><b>Content Analysis</b><span>How AI reads this, and what it could be</span></span>
-      <span class="tw">${openByDefault?'✕':'+'}</span></button>
-    <div class="ca-bd" id="cab" ${openByDefault?'':'hidden'}>
+      <span class="ca-nm"><b>${esc(tc(c.lbl))} Content Analysis</b></span>
+      <button class="qmark ca-q" data-tip="head" aria-label="What is this?">?</button>
+    </div>
+    <div class="ca-bd">
       <div class="tilewrap"><div class="tiles">${tiles}</div>
         <div class="tipline" id="tip"></div></div>
       ${c.rec?`<div class="rec"><span>Right now:</span> ${esc(c.rec)}</div>`:''}
+
+      <div class="ba">
+        <div class="lab">${isImg?'Your description now':'Your words now'}</div>
+        <div class="box">${esc(nowText)}</div>
+        <div class="lab">Tags on it now</div>
+        <div class="tagrow2">${tagsNow}</div>
+      </div>
+
+      ${proj ? `<div class="ba up">
+        <div class="lab up">${isImg?'After the boost':'After the boost'}</div>
+        <div class="box upbox">${esc(isImg ? c.up : c.up)}</div>
+        <div class="lab up">Tags it would get</div>
+        <div class="tagrow2">${tagsUp || '<span class="tag1">Structured markup</span>'}</div>
+      </div>` : ''}
     </div></div>`;
 }
 
@@ -543,8 +588,11 @@ function scores(c, proj, openByDefault){
 function wireTips(){
   const tip = $('#tip'); if (!tip) return;
   document.querySelectorAll('[data-tip]').forEach(t=>{
-    const i = +t.dataset.tip;
-    const show = () => { tip.innerHTML = `<b>${SCORE_NM[i]}.</b> ${TIP[i]}`; tip.classList.add('on'); };
+    const k = t.dataset.tip, i = +k;
+    const show = () => {
+      tip.innerHTML = k === 'head' ? HEAD_TIP : `<b>${SCORE_NM[i]}.</b> ${TIP[i]}`;
+      tip.classList.add('on');
+    };
     const hide = () => tip.classList.remove('on');
     t.addEventListener('mouseenter', show); t.addEventListener('focus', show);
     t.addEventListener('mouseleave', hide); t.addEventListener('blur', hide);
@@ -608,13 +656,19 @@ function flow(){
   }
 
   /* ── stage 3: the analysis ── */
-  if (F.analysed) parts.push(scores(c, false));
+  if (F.analysed) parts.push(scores(c, !!F.previewed));
 
   /* ── the single next action ── */
   let cta = '';
   if (!F.analysed) cta = `<button class="g" id="go">See How AI Reads This <span class="arw">→</span></button>`;
+  else if (canBoost(c) && !isBoosted(c.id) && !F.previewed)
+    cta = `<button class="g" id="go">Preview Your Boost <span class="arw">→</span></button>`;
   else if (canBoost(c) && !isBoosted(c.id)) cta = `<button class="g" id="go">Boost this ${esc(c.lbl.toLowerCase())}<span class="amt2">${M(c.price)}</span></button>`;
   else if (isBoosted(c.id)) cta = `<div class="sdone"><span class="tick">✓</span><span class="lbl2">Boosted, ${M(S.boosts.find(x=>x.id===c.id).price)} on this session</span></div>`;
+
+  if (F.analysed && !F.previewed && canBoost(c) && !isBoosted(c.id))
+    cta += `<div class="help">See exactly what changes. Nothing's charged.</div>`;
+  if (F.previewed) cta += `<div class="help">That's where a boost takes you. Nothing on your page has changed.</div>`;
 
   const canBack = img && F.photo && F.desc === null;
   const secondary = canBack
@@ -706,7 +760,8 @@ function flow(){
     if (dsc) commitDesc();
     if (ed && !commitWords()) return;
     if (!F.analysed){ F.analysed = true; return flow(); }
-    return S.skipConfirm ? apply(c.id) : boostP(c.id);
+    if (!F.previewed && canBoost(c)){ F.previewed = true; return flow(); }
+    return S.skipConfirm ? apply(c.id) : confirmP(c.id);
   };
   const sv = $('#sv');
   if (sv) sv.onclick = () => { if (ed && !commitWords()) return; if (dsc) commitDesc(); shut(); draw(); flash(c.id); };
@@ -740,31 +795,18 @@ function blockedP(id){
     ${scores(c, false)}`});
 }
 
-/* ═══════════ boost: projection, then one confirm ═══════════ */
-function boostP(id, proj = true){
-  const c = comp(id), d = c.t !== 'img' ? dif(c.text, c.up) : null;
-  open({ ttl: hdr(c), flag: flagOf(c), body:`
-    <div class="ask">${proj ? 'Where a boost would take you' : 'What you have right now'}</div>
-    ${d ? `<div class="box">${rend(d, proj?'+':'-')}</div>`
-        : `<div class="box">${esc(proj ? c.up : (c.alt || '(no description)'))}</div>`}
-    ${scores(c, proj, true)}
-    <div class="sub" style="text-align:center">${proj?'<b>Nothing on your page has changed.</b>':'This is live on your page now.'}</div>
-    <button class="g" id="go">Boost this ${esc(c.lbl.toLowerCase())}<span class="amt2">${M(c.price)}</span></button>
-    <button class="ghost" id="flip">${proj?'Show my scores again':'Show me the boost again'}</button>`});
-  $('#flip').onclick = () => boostP(id, !proj);
-  $('#go').onclick = () => S.skipConfirm ? apply(id) : confirmP(id);
-}
+/* ═══════════ boost: confirm, then apply ═══════════ */
 function confirmP(id){
   const c = comp(id);
   open({ ttl: hdr(c), flag: flagOf(c), body:`
     <div class="ask">Boost this ${esc(c.lbl.toLowerCase())} for ${M(c.price)}?</div>
-    <div class="box" style="border-color:var(--green);background:var(--card);color:var(--ink)">${esc(c.up)}</div>
+    <div class="box upbox">${esc(c.up)}</div>
     <div class="sdone" style="background:var(--sunk);color:var(--ink-2)"><span class="lbl2">On this session so far</span>
       <span class="amt" style="margin-left:auto">${M(S.session)}</span></div>
     <div class="sub">Boosts are agreed as you pick them and settle as <b>one amount</b> when you press Done.</div>
     <button class="g" id="go">Yes, boost it<span class="amt2">${M(c.price)}</span></button>
     <button class="ghost" id="bk">Back</button>`});
-  $('#bk').onclick = () => boostP(id);
+  $('#bk').onclick = () => { setFlow({...S.flows[id], previewed:true}); flow(); };
   $('#go').onclick = () => apply(id);
 }
 function apply(id){
@@ -884,7 +926,7 @@ function review(){
 
   document.querySelectorAll('[data-boostnow]').forEach(b=>b.onclick=()=>{
     const id = b.dataset.boostnow; shut(); S.page = pgOf(id); draw();
-    setTimeout(()=>{ setFlow({id, photo:null, desc:null, words:null, analysed:true}); boostP(id); }, 140);
+    setTimeout(()=>{ setFlow({id, photo:null, desc:null, words:null, analysed:true, previewed:true}); editP(id); }, 140);
   });
   const ba = $('#boostall');
   if (ba) ba.onclick = () => {
