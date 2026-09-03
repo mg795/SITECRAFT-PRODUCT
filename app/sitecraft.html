@@ -5,7 +5,7 @@
 :root{
   --navy:#16243C; --navy-2:#2C3E5C; --bar:#131A28; --bar-2:#26314A;
   --red:#C41E3A; --red-2:#E8455E;
-  --green:#7EB93F; --green-d:#6BA032; --green-pale:#EAF4DC; --green-ink:#4C7A1F;
+  --green:#7EB93F; --green-d:#6BA032; --green-x:#5A8829; --green-pale:#EAF4DC; --green-ink:#4C7A1F;
   --amber:#E2932B; --amber-bg:#FDF4E3; --amber-ink:#8A6416;
   --blue:#2563EB;
   --page:#F4F5F7; --card:#FFFFFF; --sunk:#EFF1F4; --rule:#E4E7EC; --rule-2:#EEF0F3;
@@ -17,7 +17,7 @@
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --navy:#E7ECF3; --navy-2:#B7C3D4; --bar:#0A0E16; --bar-2:#1E2739;
   --red:#F2647C; --red-2:#F2647C;
-  --green:#8CC64C; --green-d:#7EB93F; --green-pale:#1E2A16; --green-ink:#A8D472;
+  --green:#8CC64C; --green-d:#7EB93F; --green-x:#6FA636; --green-pale:#1E2A16; --green-ink:#A8D472;
   --amber:#E2932B; --amber-bg:#2A2113; --amber-ink:#E0B476;
   --page:#0E1319; --card:#161C25; --sunk:#1E252F; --rule:#2A3240; --rule-2:#222932;
   --ink:#E7ECF3; --ink-2:#B2BECD; --mut:#8494A6; --faint:#66748A;
@@ -26,7 +26,7 @@
 :root[data-theme="dark"]{
   --navy:#E7ECF3; --navy-2:#B7C3D4; --bar:#0A0E16; --bar-2:#1E2739;
   --red:#F2647C; --red-2:#F2647C;
-  --green:#8CC64C; --green-d:#7EB93F; --green-pale:#1E2A16; --green-ink:#A8D472;
+  --green:#8CC64C; --green-d:#7EB93F; --green-x:#6FA636; --green-pale:#1E2A16; --green-ink:#A8D472;
   --amber:#E2932B; --amber-bg:#2A2113; --amber-ink:#E0B476;
   --page:#0E1319; --card:#161C25; --sunk:#1E252F; --rule:#2A3240; --rule-2:#222932;
   --ink:#E7ECF3; --ink-2:#B2BECD; --mut:#8494A6; --faint:#66748A;
@@ -90,27 +90,33 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .scrim.open{display:block}
 .pan{position:fixed;left:50%;top:50%;transform:translate(-50%,-48%) scale(.98);width:min(27rem,calc(100vw - 1.5rem));max-height:min(82vh,46rem);background:var(--card);border-radius:14px;box-shadow:var(--sh);z-index:80;display:grid;grid-template-rows:auto 1fr;opacity:0;pointer-events:none;transition:opacity .16s,transform .16s;overflow:hidden}
 .pan.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
-.p-hd{padding:.9rem 1.1rem .75rem;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid var(--rule-2)}
-.p-hd .ttl{font-size:.9rem;font-weight:700;color:var(--navy);line-height:1.3;min-width:0;display:flex;align-items:center;gap:.42rem;flex-wrap:wrap}
-.p-hd .ttl i{font-style:normal;color:var(--mut);font-weight:500}
-.flagchip{display:inline-flex;align-items:center;gap:.2rem;font-size:.63rem;font-weight:700;color:var(--amber-ink);background:var(--amber-bg);padding:.13rem .4rem;border-radius:999px;white-space:nowrap;letter-spacing:.01em}
+.pan.moved{transition:opacity .16s}
+.pan.dragging{transition:none}
+.p-hd{padding:.85rem 1.1rem .3rem;display:flex;align-items:center;gap:.5rem;cursor:grab;user-select:none}
+.p-hd:active{cursor:grabbing}
+.p-hd .ttl{font-size:.72rem;font-weight:600;color:var(--mut);line-height:1.3;min-width:0;display:flex;align-items:center;gap:.34rem;flex-wrap:wrap;letter-spacing:.005em}
+.p-hd .ttl i{font-style:normal;color:var(--faint);font-weight:500}
+.p-hd .dot{color:var(--rule);font-weight:400}
+.flagchip{display:inline-flex;align-items:center;font-size:.72rem;font-weight:700;padding:.05rem .45rem;border-radius:999px;white-space:nowrap}
+.flagchip.v3{color:var(--amber-ink);background:var(--amber-bg)}
+.flagchip.v2{color:var(--ink-2);background:var(--sunk)}
+.flagchip.v1{color:var(--faint);background:var(--sunk)}
 .p-x{margin-left:auto;border:0;background:transparent;color:var(--green);font-size:1.05rem;line-height:1;font-weight:800;padding:0 .1rem;flex:none}
 .p-bd{overflow-y:auto;padding:.9rem 1.05rem 1.05rem;display:flex;flex-direction:column;gap:.7rem}
 .p-ft{font-size:.68rem;color:var(--faint);text-align:center;padding-top:.2rem;border-top:1px solid var(--rule-2);margin-top:.15rem}
 .p-ft u{cursor:pointer}
 
 /* buttons */
-.g{border:0;background:var(--green);color:#fff;padding:.82rem 1.1rem;border-radius:11px;font-size:.94rem;font-weight:700;letter-spacing:-.008em;text-align:center;width:100%;
-  box-shadow:0 1px 0 rgba(0,0,0,.07),0 6px 16px -6px color-mix(in srgb,var(--green) 60%,transparent);transition:background .14s,transform .08s,box-shadow .14s;
-  display:flex;align-items:center;justify-content:center;gap:.5rem}
-.g:hover{background:var(--green-d);box-shadow:0 1px 0 rgba(0,0,0,.07),0 10px 22px -8px color-mix(in srgb,var(--green) 70%,transparent)}
-.g:active{transform:translateY(1px);box-shadow:none}
-.g[disabled]{background:var(--sunk);color:var(--faint);box-shadow:none;cursor:not-allowed}
+.g{border:0;background:var(--green);color:#fff;padding:.8rem 1.3rem;border-radius:999px;font-size:.94rem;font-weight:700;letter-spacing:-.008em;text-align:center;width:100%;
+  transition:background .14s;display:flex;align-items:center;justify-content:center;gap:.5rem}
+.g:hover{background:var(--green-d)}
+.g:active{background:var(--green-x)}
+.g[disabled]{background:var(--sunk);color:var(--faint);cursor:not-allowed}
 .g .amt2{margin-left:auto;font-family:var(--m);font-weight:700;opacity:.95}
 .g .arw{font-weight:800;opacity:.8}
-.ghost{border:0;background:transparent;color:var(--mut);font-size:.83rem;font-weight:600;padding:.5rem;width:100%;text-align:center;border-radius:9px}
+.ghost{border:0;background:transparent;color:var(--mut);font-size:.83rem;font-weight:600;padding:.5rem;width:100%;text-align:center;border-radius:999px}
 .ghost:hover{background:var(--sunk);color:var(--ink-2)}
-.pill{border:1px solid var(--rule);background:var(--card);color:var(--ink-2);padding:.34rem .7rem;border-radius:8px;font-size:.78rem;font-weight:600;white-space:nowrap;transition:border-color .14s,background .14s}
+.pill{border:1px solid var(--rule);background:var(--card);color:var(--ink-2);padding:.34rem .8rem;border-radius:999px;font-size:.78rem;font-weight:600;white-space:nowrap;transition:border-color .14s,background .14s}
 .pill:hover{border-color:var(--mut);background:var(--sunk)}
 .pair{display:grid;grid-template-columns:auto 1fr;gap:.55rem;align-items:center}
 
@@ -123,13 +129,20 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .ask{font-size:1.02rem;font-weight:700;color:var(--navy);letter-spacing:-.015em;line-height:1.3}
 .sub{font-size:.82rem;color:var(--mut);line-height:1.45;margin-top:-.25rem}
 
-.drop{border:2px dashed var(--rule);border-radius:12px;background:var(--sunk);min-height:9.5rem;display:grid;place-items:center;text-align:center;padding:1.2rem;gap:.2rem;cursor:pointer;transition:border-color .14s,background .14s}
-.drop:hover{border-color:var(--green)}
+.drop{border:1px solid var(--rule);border-radius:14px;background:var(--sunk);min-height:8.5rem;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:1rem;gap:.1rem;cursor:pointer;transition:border-color .14s,background .14s}
+.drop:hover{border-color:var(--green);background:var(--green-pale)}
 .drop.over{border-color:var(--green);background:var(--green-pale)}
-.drop b{display:block;font-size:.92rem;color:var(--navy);font-weight:700}
-.drop span{font-size:.79rem;color:var(--mut)}
-.drop.has{padding:0;border-style:solid;border-color:var(--green);overflow:hidden;min-height:0;background:var(--card)}
+.drop b{font-size:.88rem;color:var(--navy);font-weight:600;line-height:1.3}
+.drop span{font-size:.76rem;color:var(--mut);line-height:1.35}
+.drop em{font-style:normal;font-size:.71rem;color:var(--faint);margin-top:.4rem}
+.drop.has{padding:0;border-color:var(--green);overflow:hidden;min-height:0;background:var(--card)}
 .drop.has img{width:100%;display:block;aspect-ratio:1200/630;object-fit:cover}
+.crop{width:100%;aspect-ratio:1200/630;border-radius:12px;background-repeat:no-repeat;background-color:var(--sunk);cursor:grab;position:relative;overflow:hidden;border:1px solid var(--rule)}
+.crop:active{cursor:grabbing}
+.crop .hint{position:absolute;left:50%;bottom:.5rem;transform:translateX(-50%);background:rgba(10,14,20,.62);color:#fff;font-size:.68rem;font-weight:600;padding:.16rem .55rem;border-radius:999px;pointer-events:none;transition:opacity .2s}
+.crop.moved .hint{opacity:0}
+.zoomrow{display:flex;align-items:center;gap:.6rem;font-size:.72rem;color:var(--mut);font-weight:600}
+.zoomrow input[type=range]{flex:1;accent-color:var(--green);height:1.1rem}
 .fld{width:100%;font-family:var(--f);font-size:.9rem;padding:.7rem .8rem;border:1px solid var(--rule);border-radius:10px;background:var(--card);color:var(--ink);outline:none}
 .fld:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--green-pale)}
 
@@ -160,14 +173,22 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .ca-t{text-align:center;font-size:.84rem;font-weight:700;color:var(--navy)}
 
 .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:.4rem}
-.tile{background:var(--sunk);border-radius:6px;padding:.5rem .3rem;text-align:center}
+.tile{background:var(--sunk);border-radius:10px;padding:.55rem .35rem .5rem;text-align:center;cursor:help;transition:background .14s;border:1px solid transparent}
+.tile:hover,.tile:focus-visible{border-color:var(--green)}
 .tile.up{background:var(--green-pale)}
-.tile .tl{font-size:.57rem;letter-spacing:.05em;text-transform:uppercase;font-weight:700;color:var(--mut);display:block;margin-bottom:.15rem;line-height:1.25}
-.tile .tv{font-family:var(--m);font-size:1.15rem;font-weight:700;color:var(--red);letter-spacing:-.02em}
-.tile.up .tv{color:var(--green-d)}
-.tile .tu{font-size:.66rem;font-weight:600;color:var(--faint)}
-.tile .tw{display:block;font-size:.53rem;letter-spacing:.07em;text-transform:uppercase;font-weight:700;color:var(--green-ink);margin-top:.1rem}
-.tile .tp{display:block;font-family:var(--m);font-size:.62rem;color:var(--faint);margin-top:.05rem}
+.tile .tl{font-size:.6rem;letter-spacing:.04em;text-transform:uppercase;font-weight:700;color:var(--ink-2);display:block;margin-bottom:.1rem;line-height:1.25}
+.tile.up .tl{color:var(--green-ink)}
+.tile .tv{font-family:var(--m);font-size:1.2rem;font-weight:700;color:var(--red);letter-spacing:-.02em}
+.tile.up .tv{color:var(--green-x)}
+.tile .tu{font-size:.7rem;font-weight:600;color:var(--mut)}
+.tile.up .tu{color:var(--green-ink)}
+.tile .tw{display:block;font-size:.62rem;letter-spacing:.02em;font-weight:700;color:var(--green-x);margin-top:.18rem}
+.tile .tp{display:block;font-family:var(--m);font-size:.7rem;font-weight:500;color:var(--ink-2);margin-top:.1rem}
+.tile.up .tp{color:var(--green-ink)}
+/* the tooltip line — replaces a whole dropdown, and only speaks when asked */
+.tipline{min-height:2.4rem;font-size:.78rem;line-height:1.45;color:var(--ink-2);background:var(--sunk);border-radius:9px;padding:.45rem .6rem;transition:color .14s}
+.tipline b{color:var(--navy);font-weight:700}
+.tipline.idle{color:var(--faint)}
 .rec{font-size:.83rem;font-weight:700;color:var(--navy);text-align:center;line-height:1.45}
 .rec span{color:var(--red)}
 
@@ -208,7 +229,7 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .chip.gr{background:var(--green-pale);color:var(--green-ink)}
 .chip.am{background:var(--amber-bg);color:var(--amber-ink)}
 .who-pick{display:flex;gap:.35rem;flex-wrap:wrap}
-.who-pick button{border:1px solid var(--rule);background:var(--card);padding:.3rem .6rem;border-radius:999px;font-size:.78rem;font-weight:600;color:var(--mut)}
+.who-pick button{border:1px solid var(--rule);background:var(--card);padding:.3rem .7rem;border-radius:999px;font-size:.78rem;font-weight:600;color:var(--mut)}
 .who-pick button.on{border-color:var(--green);background:var(--green-pale);color:var(--green-ink)}
 textarea.ta{width:100%;font-family:var(--f);font-size:.87rem;padding:.6rem .7rem;border:1px solid var(--blue);border-radius:7px;background:var(--card);color:var(--ink);resize:vertical;min-height:4.4rem;box-shadow:0 0 0 3px color-mix(in srgb,var(--blue) 14%,transparent)}
 .msg{font-size:.81rem;line-height:1.45;padding:.45rem .6rem;border-radius:6px;background:var(--sunk)}
@@ -257,7 +278,7 @@ body.editing nav.site{margin-top:1.6rem}
 <script>
 /* ═══════════ content ═══════════ */
 const SITE = {
-  home:{ name:'Home', critical:true, comps:[
+  home:{ name:'Home', value:3, comps:[
     {id:'h-k', lbl:'Eyebrow', t:'kick', hero:1, price:0.99, text:'Northgate · Seattle',
       up:'Family Dentistry · Northgate, Seattle', s:[2.0,1.5,2.5], u:[6.5,7.0,7.5],
       rec:'Your label names the service as well as the place, so it reads as a subject and not a postcode.'},
@@ -279,7 +300,7 @@ const SITE = {
     {id:'h-band',lbl:'List item', t:'band', price:0, text:'Rated 5 stars by 200+ patients · 9 out of 10 patients say they felt no pain', s:[3.0,2.0,3.0],
       blocked:'To show star ratings in search results the reviews have to be visible on this page. Sitecraft will never invent a rating or a patient count, so this one needs you: publish the reviews and the next scan will pick them up.'},
   ]},
-  services:{ name:'Services', critical:true, comps:[
+  services:{ name:'Services', value:2, comps:[
     {id:'s-h1',lbl:'Heading', t:'h1', hero:1, price:5.99, text:'Our Dental Services',
       up:'Dental Services in Northgate, From Cleanings to Same-Day Crowns', s:[2.0,2.0,4.0], u:[9.0,8.5,9.0],
       rec:'Your heading names the services people search for, tagged as the page subject.'},
@@ -293,7 +314,7 @@ const SITE = {
       up:'We mill crowns in our own lab. Most patients arrive with a damaged tooth and leave the same afternoon with the permanent crown fitted. There is no temporary crown and no second visit.', s:[7.0,6.5,7.0], u:[9.5,9.0,9.0],
       rec:'Already strong. The boost mainly adds the tagging that engines read.'},
   ]},
-  about:{ name:'About', critical:false, comps:[
+  about:{ name:'About', value:1, comps:[
     {id:'a-h1',lbl:'Heading', t:'h1', hero:1, price:4.99, text:'About Our Practice',
       up:'A Northgate Dental Practice Caring For Seattle Families Since 2004', s:[2.0,2.0,4.0], u:[9.0,8.5,9.0],
       rec:'Your heading names who you are and where, tagged as the page subject.'},
@@ -313,6 +334,11 @@ const WHY = [
   '<b>Why this matters.</b> The traditional side — whether Google can rank this. It rewards the words people really search for appearing early, sensible lengths, and text that reads naturally rather than stuffed with keywords.',
 ];
 const TAGGING = '<b>What does tagging mean?</b> Tagging means adding extra notes into your page\'s code. Visitors never see them. Google and AI search engines read them to work out what each part of your page actually is.<br><br>Writing it better lifts part of these scores on its own. The tagging only comes with a boost, which is why the numbers keep climbing after you have done your best with the words.';
+const TIP = [
+  'Whether an assistant can lift this out on its own. Short, self-contained lines score high; a sentence that only makes sense after the one above it scores low.',
+  'Whether ChatGPT, Perplexity or Google\'s AI answers name you. Claims beat labels, and naming your actual area beats advice that fits anywhere.',
+  'Whether Google can rank it. It wants the words people really search for, near the front, reading naturally.',
+];
 const PEOPLE = ['Jo Castellane','Priya Raman'];
 
 /* ═══════════ state ═══════════ */
@@ -353,7 +379,7 @@ function draw(){
     const pin = nn?`<span class="npin">${nn}</span>`:'';
     const at = canBoost(c)?' data-boost="1"':'';
     if (c.t==='img') return c.src
-      ? `<div class="c" data-id="${c.id}"${at} style="position:relative;margin:0 0 1.2rem">${pin}${tag}<img src="${c.src}" alt="${esc(c.alt||'')}" style="width:100%;display:block;border-radius:4px;aspect-ratio:1200/630;object-fit:cover"></div>`
+      ? `<div class="c" data-id="${c.id}"${at} role="img" aria-label="${esc(c.alt||'')}" style="position:relative;margin:0 0 1.2rem;border-radius:4px;aspect-ratio:1200/630;background-image:url(${c.src});background-repeat:no-repeat;background-size:${(c.fit||{}).z||100}%;background-position:${(c.fit||{}).x??50}% ${(c.fit||{}).y??50}%">${pin}${tag}</div>`
       : `<div class="img c" data-id="${c.id}"${at}>${pin}${tag}${esc(c.text)}</div>`;
     if (c.t==='kick') return `<p class="kick c" data-id="${c.id}"${at}>${pin}${tag}${esc(c.text)}</p>`;
     if (c.t==='band') return `<div class="band c" data-id="${c.id}"${at}>${pin}${tag}${esc(c.text)}</div>`;
@@ -378,10 +404,13 @@ function bdg(){
 
 /* ═══════════ panel ═══════════ */
 function open({ttl, flag, body}){
-  $('#p-ttl').innerHTML = (ttl||'') + (flag?`<span class="flagchip">⚡ ${flag}</span>`:'');
+  $('#p-ttl').innerHTML = (ttl||'') + (flag?` <span class="dot">·</span> <span class="flagchip ${flag.cls}">${flag.label}</span>`:'');
   $('#p-bd').innerHTML = body || '';
   $('#toast').hidden = true; clearTimeout(toast._t);
-  $('#pan').classList.add('open'); $('#scrim').classList.add('open');
+  const pan = $('#pan');
+  if (!pan.classList.contains('moved')) pan.style.transform = '';
+  pan.classList.add('open'); $('#scrim').classList.add('open');
+  wireTips();
   document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{
     const t = document.getElementById(b.dataset.t), o = b.getAttribute('aria-expanded')==='true';
     b.setAttribute('aria-expanded', String(!o)); t.hidden = o;
@@ -389,7 +418,10 @@ function open({ttl, flag, body}){
   });
 }
 function shut(){
-  $('#pan').classList.remove('open'); $('#scrim').classList.remove('open');
+  const pan = $('#pan');
+  pan.classList.remove('open','moved');
+  pan.style.left = ''; pan.style.top = '';   /* always back to centre */
+  $('#scrim').classList.remove('open');
   S.sel = null; S.projecting = null;
   document.querySelectorAll('.c.sel').forEach(e=>e.classList.remove('sel'));
 }
@@ -398,8 +430,11 @@ function toast(m, undo){
   const u = $('#t-undo'); u.style.display = undo?'':'none'; u.onclick = () => { undo&&undo(); $('#toast').hidden = true; };
   $('#toast').hidden = false; clearTimeout(toast._t); toast._t = setTimeout(()=>$('#toast').hidden=true, 5000);
 }
-const hdr = c => `${esc(c.lbl)} <i>On ${SITE[pgOf(c.id)].name}</i>`;
-const flagOf = c => SITE[pgOf(c.id)].critical ? 'SEO/AEO' : '';
+const VALUE = {3:'Critical Page', 2:'Support Page', 1:'Minor Page'};
+const pageValue = pg => ({ label: VALUE[pg.value], cls: 'v' + pg.value });
+const tc = s => String(s).replace(/\b\w/g, m => m.toUpperCase());
+const hdr = c => `${esc(c.lbl)} <span class="dot">·</span> <i>On ${SITE[pgOf(c.id)].name}</i>`;
+const flagOf = c => pageValue(SITE[pgOf(c.id)]);
 
 /* ═══════════ modes ═══════════ */
 function setMode(m){
@@ -446,36 +481,44 @@ function showMe(id){ shut(); S.page = pgOf(id); draw(); setTimeout(()=>flash(id)
 function scores(c, proj){
   const cur = c.s, up = c.u;
   const shown = proj && up ? up : cur;
-  const badge = (proj?avg(up):avg(cur)).toFixed(1);
-  const tiles = shown.map((v,i)=>`<div class="tile ${proj?'up':''}">
+  const badge = (proj ? avg(up) : avg(cur)).toFixed(1);
+  const tiles = shown.map((v,i)=>`<div class="tile ${proj?'up':''}" data-tip="${i}" tabindex="0">
       <span class="tl">${SCORE_TL[i]}</span>
-      <span class="tv">${v.toFixed(1)}</span><span class="tu">/10</span>${proj?`<span class="tp">was ${cur[i].toFixed(1)}</span><span class="tw">projected</span>`:''}
+      <span class="tv">${v.toFixed(1)}</span><span class="tu">/10</span>${proj?`<span class="tp">was ${cur[i].toFixed(1)}</span><span class="tw">Projected</span>`:''}
     </div>`).join('');
-  /* one door, not four — the three meanings plus tagging live behind it */
-  const colls = `<div class="coll">
-      <button class="coll-hd" data-t="wall" aria-expanded="false">What these numbers mean<span class="tw">+</span></button>
-      <div class="coll-bd" id="wall" hidden>
-        ${SCORE_NM.map((n,i)=>`<div><b>${n}.</b> ${WHY[i].replace('<b>Why this matters.</b> ','')}</div>`).join('')}
-        <div>${TAGGING}</div>
-      </div></div>`;
   return `<div class="ca">
     <button class="ca-hd ${proj?'up':''}" data-t="cab" aria-expanded="true">
       <span class="ca-sc">${badge}</span>
       <span class="ca-nm"><b>Content Analysis</b><span>See how AI reads this, and what it could be</span></span>
       <span class="tw">✕</span></button>
     <div class="ca-bd" id="cab">
-      <div class="ca-t">${esc(c.lbl)} Content Analysis</div>
+      <div class="ca-t">${esc(tc(c.lbl))} Content Analysis</div>
       <div class="tiles">${tiles}</div>
+      <div class="tipline idle" id="tip">Hover any score to see what it means.</div>
       ${c.rec?`<div class="rec"><span>Recommendation:</span> ${esc(c.rec)}</div>`:''}
-      ${colls}
     </div></div>`;
+}
+
+/* the tooltip line: one place that speaks only when asked */
+function wireTips(){
+  const tip = $('#tip'); if (!tip) return;
+  const idle = 'Hover any score to see what it means.';
+  document.querySelectorAll('[data-tip]').forEach(t=>{
+    const show = () => { tip.classList.remove('idle'); tip.innerHTML = `<b>${SCORE_NM[+t.dataset.tip]}.</b> ${TIP[+t.dataset.tip]}`; };
+    const hide = () => { tip.classList.add('idle'); tip.textContent = idle; };
+    t.addEventListener('mouseenter', show); t.addEventListener('focus', show);
+    t.addEventListener('mouseleave', hide); t.addEventListener('blur', hide);
+    t.addEventListener('click', show);
+  });
 }
 
 /* ═══════════ edit: one action at a time ═══════════ */
 /* No step labels. Each stage completes, collapses to a ticked line, and the
    next action appears as the single primary button naming what it does. */
 
-function editP(id){ S.flow = {id, photo:null, desc:null, words:null, analysed:false}; flow(); }
+function editP(id){ const c = comp(id);
+  S.flow = {id, photo:null, desc:null, words:null, analysed:false, wasSrc:c.src||null, wasFit:c.fit?{...c.fit}:null};
+  flow(); }
 
 function flow(){
   const c = comp(S.flow.id), F = S.flow, img = c.t === 'img';
@@ -489,12 +532,18 @@ function flow(){
     parts.push(`<div class="sdone"><span class="tick">✓</span>
       <span class="lbl2">${img ? (F.photo ? 'New photo added' : 'Description updated') : 'Your words saved'}</span>
       <button data-re="1">Change</button></div>`);
+    if (img && F.photo && F.desc === null){
+      const f = c.fit || (c.fit = {x:50, y:50, z:100});
+      parts.push(`<div class="stage">
+        <div class="crop" id="crop" style="background-image:url(${c.src});background-size:${f.z}%;background-position:${f.x}% ${f.y}%">
+          <span class="hint">Drag to reposition</span></div>
+        <div class="zoomrow"><span>Zoom</span><input type="range" id="zoom" min="100" max="260" value="${f.z}"></div>
+      </div>`);
+    }
   } else if (img){
     parts.push(`<div class="stage">
-      <div class="ask">Add your new photo</div>
-      <div class="drop" id="dz"><b>Drag a photo here</b><span>or click to choose one</span></div>
+      <div class="drop" id="dz"><b>Drag a photo here</b><span>or click to choose one</span><em>Any size — you position it next</em></div>
       <input type="file" id="fi" accept="image/*" hidden>
-      <div class="sub">It keeps the same 1200 × 630 shape, so nothing on your page shifts.</div>
     </div>`);
   } else {
     parts.push(`<div class="stage">
@@ -509,7 +558,7 @@ function flow(){
     parts.push(`<div class="stage">
       <div class="ask">What is in this picture?</div>
       <input class="fld" id="dsc" value="${esc(c.alt || '')}" placeholder="A short, plain description">
-      <div class="sub">This is what Google and AI search read to know what the picture shows.</div>
+      <div class="sub">A picture is invisible to search without this. Plain words help — a <b>boost</b> writes and tags it properly.</div>
     </div>`);
   }
 
@@ -519,12 +568,15 @@ function flow(){
   /* ── the single next action ── */
   let cta = '', hint = '';
   if (img && !F.photo && F.desc === null){ cta = ''; hint = 'Drop a photo in to get started, or skip straight to the analysis.'; }
-  if (!F.analysed) cta = `<button class="g" id="go">See how AI reads this <span class="arw">→</span></button>`;
+  if (!F.analysed) cta = `<button class="g" id="go">See How AI Reads This <span class="arw">→</span></button>`;
   else if (canBoost(c) && !isBoosted(c.id)) cta = `<button class="g" id="go">Boost this ${esc(c.lbl.toLowerCase())}<span class="amt2">${M(c.price)}</span></button>`;
   else if (isBoosted(c.id)) cta = `<div class="sdone"><span class="tick">✓</span><span class="lbl2">Boosted — ${M(S.boosts.find(x=>x.id===c.id).price)} on this session</span></div>`;
 
-  const secondary = (img && !F.photo && F.desc === null) || (!img && F.words === null)
-    ? '' : `<button class="ghost" id="sv">Save and close</button>`;
+  const canBack = img && F.photo && F.desc === null;
+  const secondary = canBack
+    ? `<button class="ghost" id="bk">← Use my original photo instead</button>`
+    : ((img && !F.photo && F.desc === null) || (!img && F.words === null)
+        ? '' : `<button class="ghost" id="sv">Save and close</button>`);
 
   open({ ttl: hdr(c), flag: flagOf(c), body: parts.join('') + cta + secondary
         + (hint?`<div class="sub" style="text-align:center">${hint}</div>`:'')
@@ -539,7 +591,7 @@ function flow(){
     const take = file => {
       if (!file || !file.type.startsWith('image/')) return toast('That needs to be an image file.');
       const r = new FileReader();
-      r.onload = e => { F.photo = e.target.result; c.src = e.target.result; flow(); draw(); };
+      r.onload = e => { F.photo = e.target.result; c.src = e.target.result; c.fit = {x:50,y:50,z:100}; flow(); draw(); };
       r.readAsDataURL(file);
     };
     dz.onclick = () => fi.click();
@@ -548,6 +600,39 @@ function flow(){
     ['dragleave','dragend'].forEach(k => dz.addEventListener(k, () => dz.classList.remove('over')));
     dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('over'); take(e.dataTransfer.files[0]); });
   }
+
+  const crop = $('#crop');
+  if (crop){
+    const f = c.fit;
+    const paint = () => {
+      crop.style.backgroundSize = f.z + '%';
+      crop.style.backgroundPosition = f.x + '% ' + f.y + '%';
+      draw();
+    };
+    let drag = null;
+    crop.addEventListener('pointerdown', e => {
+      drag = {px:e.clientX, py:e.clientY, x:f.x, y:f.y};
+      crop.setPointerCapture(e.pointerId); crop.classList.add('moved');
+    });
+    crop.addEventListener('pointermove', e => {
+      if (!drag) return;
+      const r = crop.getBoundingClientRect();
+      /* how far the picture can travel depends on how far it is zoomed past the frame */
+      const room = Math.max(f.z - 100, 1);
+      f.x = Math.min(100, Math.max(0, drag.x - (e.clientX - drag.px) / r.width  * room * 2));
+      f.y = Math.min(100, Math.max(0, drag.y - (e.clientY - drag.py) / r.height * room * 2));
+      paint();
+    });
+    ['pointerup','pointercancel'].forEach(k => crop.addEventListener(k, () => { drag = null; }));
+    $('#zoom').oninput = e => { f.z = +e.target.value; paint(); };
+  }
+
+  const bkBtn = $('#bk');
+  if (bkBtn) bkBtn.onclick = () => {
+    c.src = F.wasSrc || null; c.fit = F.wasFit || null;
+    S.flow = {id:c.id, photo:null, desc:null, words:null, analysed:F.analysed, wasSrc:F.wasSrc, wasFit:F.wasFit};
+    flow(); draw(); toast('Back to your original photo.');
+  };
 
   const dsc = $('#dsc');
   if (dsc){
@@ -671,7 +756,7 @@ function noteP(id){
     <textarea class="ta" id="tx" placeholder="e.g. Can we mention the Saturday hours here?"></textarea>
     <div class="lab">Who is it for?</div>
     <div class="who-pick" id="wp">${PEOPLE.slice(0,S.seats).map((p,i)=>`<button data-w="${esc(p)}" class="${i?'':'on'}">${esc(p)}</button>`).join('')}
-      ${S.seats<2?'<button data-add="1" style="border-style:dashed">+ Add someone · $9/mo</button>':''}</div>
+      ${S.seats<2?'<button data-add="1" style="border-style:solid">+ Add someone · $9/mo</button>':''}</div>
     <button class="g" id="ad">Save this note</button>
     <div class="help">Notes gather in Review, so you can send them in one go.</div>
     <div class="p-ft"><u>Disclaimer</u> · © 2026 ReadTomato™</div>`});
@@ -834,6 +919,28 @@ function guide(){
 }
 
 /* ═══════════ wiring ═══════════ */
+/* drag the dashboard anywhere by its header; it recentres when closed */
+(function(){
+  const pan = $('#pan'), hd = document.querySelector('.p-hd');
+  let d = null;
+  hd.addEventListener('pointerdown', e => {
+    if (e.target.closest('button')) return;
+    const r = pan.getBoundingClientRect();
+    d = {px:e.clientX, py:e.clientY, l:r.left, t:r.top, w:r.width, h:r.height};
+    pan.classList.add('moved','dragging');
+    pan.style.left = r.left + 'px'; pan.style.top = r.top + 'px';
+    pan.style.transform = 'none';
+    hd.setPointerCapture(e.pointerId);
+  });
+  hd.addEventListener('pointermove', e => {
+    if (!d) return;
+    const nx = Math.min(innerWidth - d.w - 8, Math.max(8, d.l + e.clientX - d.px));
+    const ny = Math.min(innerHeight - 56, Math.max(8, d.t + e.clientY - d.py));
+    pan.style.left = nx + 'px'; pan.style.top = ny + 'px';
+  });
+  ['pointerup','pointercancel'].forEach(k => hd.addEventListener(k, () => { d = null; pan.classList.remove('dragging'); }));
+})();
+
 document.querySelectorAll('.bar [data-mode]').forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
 document.querySelector('[data-done]').onclick = done;
 $('#p-x').onclick = ()=> ['review','account','ident'].includes(S.mode) ? setMode(S.mode) : shut();
