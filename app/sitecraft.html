@@ -45,7 +45,7 @@ input,textarea,select{font-family:inherit}
   background:var(--bar);color:#C7D0DE;font-size:.76rem;font-weight:600;letter-spacing:.01em}
 .sc-name{color:#fff}
 .sc-lock{color:#C7D0DE}
-.sc-done{border:0;background:transparent;color:var(--green);font:inherit;font-weight:700;padding:0;text-decoration:underline}
+.sc-done{border:0;background:transparent;color:var(--green);font:inherit;font-weight:700;padding:0}
 .sc-done:hover{color:#fff}
 
 /* ═══════ the client's site ═══════ */
@@ -135,7 +135,7 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 /* the scrollbar is hidden, so a soft top edge is the only cue that more sits above */
 .p-bd.up{-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 1.4rem);mask-image:linear-gradient(180deg,transparent 0,#000 1.4rem)}
 .p-ft{font-size:.68rem;color:var(--faint);text-align:center;padding-top:.35rem}
-.p-ft u{cursor:pointer}
+.p-ft u{cursor:pointer;text-decoration:none;font-weight:700}
 
 /* buttons */
 .g{border:0;background:var(--green);color:#fff;padding:.8rem 1.3rem;border-radius:999px;font-size:.94rem;font-weight:700;letter-spacing:-.008em;text-align:center;width:100%;
@@ -153,7 +153,7 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .pill:hover{background:var(--rule)}
 .pill.warn{color:var(--red)}
 .pill.warn:hover{background:var(--red);color:#fff}
-.asdone{border:0;background:transparent;color:var(--green-d);font:inherit;font-weight:700;padding:0;text-decoration:underline}
+.asdone{border:0;background:transparent;color:var(--green-d);font:inherit;font-weight:700;padding:0}
 .asdone:hover{color:var(--green-x)}
 .pair{display:grid;grid-template-columns:auto 1fr;gap:.55rem;align-items:center}
 
@@ -162,7 +162,7 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .sdone{display:flex;align-items:center;gap:.55rem;padding:.55rem .7rem;background:var(--green-pale);border-radius:9px;font-size:.84rem;font-weight:600;color:var(--green-ink)}
 .sdone .tick{width:1.15rem;height:1.15rem;border-radius:50%;background:var(--green-d);color:#fff;display:grid;place-items:center;font-size:.7rem;font-weight:800;flex:none}
 .sdone .lbl2{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sdone button{margin-left:auto;border:0;background:transparent;color:var(--green-ink);font-size:.78rem;font-weight:700;text-decoration:underline;padding:0;flex:none}
+.sdone button{margin-left:auto;border:0;background:transparent;color:var(--green-ink);font-size:.78rem;font-weight:700;padding:0;flex:none}
 .sdone.sflat{background:var(--sunk);color:var(--ink-2)}
 .sdone .amt{margin-left:auto;font-variant-numeric:tabular-nums;font-family:var(--m);font-weight:700;flex:none}
 .sdone .sthumb{width:2.7rem;height:1.45rem;border-radius:5px;background-repeat:no-repeat;background-color:var(--rule);flex:none}
@@ -197,10 +197,14 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .crop:active{cursor:grabbing}
 .crop .hint{position:absolute;left:50%;bottom:.5rem;transform:translateX(-50%);background:rgba(10,14,20,.62);color:#fff;font-size:.68rem;font-weight:600;padding:.16rem .55rem;border-radius:999px;pointer-events:none;transition:opacity .2s}
 .crop.moved .hint{opacity:0}
-.zoomrow{display:flex;align-items:center;gap:.6rem;font-size:.72rem;color:var(--mut);font-weight:600}
+.zoomrow{display:flex;align-items:center;gap:.4rem;font-size:.72rem;color:var(--mut);font-weight:600}
+.ctarow{display:flex;gap:.5rem;align-items:stretch}
+.ctarow .g{flex:1;min-width:0}
+.ctarow .g.save{flex:none;width:auto;padding-left:1.15rem;padding-right:1.15rem}
 .zoomrow input[type=range]{flex:1;min-width:0;accent-color:var(--green);height:1.1rem}
-.reset{border:0;background:var(--green);color:#fff;font-size:.72rem;font-weight:700;padding:.26rem .7rem;border-radius:999px;flex:none}
+.reset{border:0;background:var(--green);color:#fff;font-size:.72rem;font-weight:700;padding:.28rem .62rem;border-radius:999px;flex:none;transition:background .14s,color .14s}
 .reset:hover{background:var(--green-d)}
+.reset[disabled]{background:var(--sunk);color:var(--faint);cursor:not-allowed}
 .fld{width:100%;font-family:var(--f);font-size:.9rem;line-height:1.45;padding:.7rem .8rem;border:0;border-radius:10px;background:var(--sunk);color:var(--ink);outline:none}
 .fld.grow{resize:none;overflow:hidden;display:block}
 /* clicking into a field must not take its background away, here or anywhere */
@@ -271,7 +275,7 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .tagmore{border:0;background:var(--sunk);color:var(--green-d);font-size:.7rem;font-weight:700;padding:.14rem .5rem;border-radius:999px;white-space:nowrap;flex:none}
 .tagmore:hover{background:var(--green);color:#fff}
 .tagctl{display:flex;align-items:center;gap:.45rem;margin-top:.1rem}
-.taghelp{margin-left:auto;border:0;background:transparent;color:var(--green-d);font-size:.7rem;font-weight:700;padding:.14rem 0;text-decoration:underline;white-space:nowrap}
+.taghelp{margin-left:auto;border:0;background:transparent;color:var(--green-d);font-size:.7rem;font-weight:700;padding:.14rem 0;white-space:nowrap}
 .taghelp:hover{color:var(--green-x)}
 .tagrow2.open{flex-wrap:wrap;overflow:visible}
 .labnote{font-weight:600;letter-spacing:0;text-transform:none;color:var(--mut);font-size:.6rem}
@@ -352,7 +356,7 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
   display:grid;place-items:center;font-size:1.9rem;margin-bottom:.15rem}
 .locknote .lt{font-size:1.02rem;font-weight:800;color:var(--navy);letter-spacing:-.015em;line-height:1.3}
 .locknote .ls{font-size:.83rem;line-height:1.5;color:var(--ink-2);text-wrap:balance}
-.locknote .ls b{color:var(--green-x);font-weight:700}
+.locknote .ls b{color:var(--navy);font-weight:700}
 /* the way out, small and under the last button, where a change of mind belongs */
 .optout{font-size:.71rem;line-height:1.5;color:var(--faint);text-align:center;text-wrap:balance;margin-top:-.2rem}
 .optout b{color:var(--mut);font-weight:700}
@@ -407,7 +411,7 @@ textarea.ta{width:100%;font-family:var(--f);font-size:.87rem;padding:.6rem .7rem
 
 .toast{position:fixed;left:50%;bottom:5rem;transform:translateX(-50%);background:var(--bar);color:#fff;padding:.6rem 1rem;border-radius:9px;font-size:.83rem;box-shadow:var(--sh);z-index:110;text-align:center;max-width:calc(100vw - 2rem);line-height:1.4}
 .toast[hidden]{display:none}
-.toast button{border:0;background:transparent;color:#9BD35F;text-decoration:underline;font-size:.8rem;font-weight:700;margin-left:.6rem}
+.toast button{border:0;background:transparent;color:#9BD35F;font-size:.8rem;font-weight:700;margin-left:.6rem}
 body.editing </style>
 
 
@@ -602,19 +606,14 @@ function liveScores(c){
 }
 /* red as found, amber once the client has improved it, green is a boost outcome:
    the self-help ceiling of .55 sits below the .60 the green band starts at */
+/* the numbers read as a share of a perfect page, not as a mark out of ten */
+const pct = v => Math.round(v * 10) + '%';
 function bandOf(v, i, c){
   if (!c.u) return '';
   const span = c.u[i] - c.s[i];
   if (span <= 0) return '';
   const r = (v - c.s[i]) / span;
   return r >= .60 ? 'hi' : r >= .20 ? 'mid' : '';
-}
-/* the line has to describe the picture as it stands, not as it arrived */
-function recOf(c){
-  if (c.t !== 'img' || !(c.alt || '').trim()) return c.rec;
-  return (c.userTags || []).length
-    ? "Your tags are plain words. A boost makes them readable markup."
-    : "Search engines can't find this picture, nothing tags your description.";
 }
 const uniq = a => [...new Set(a)];
 
@@ -830,23 +829,22 @@ function scores(c, proj){
   if (!Array.isArray(c.s)) return '';        /* nothing to show, and nothing to crash on */
   const cur = liveScores(c), up = Array.isArray(c.u) ? c.u : null;
   const shown = proj && up ? up : cur;
-  const badge = avg(proj && up ? up : cur).toFixed(1);
+  const badge = pct(avg(proj && up ? up : cur));
   const tiles = shown.map((v,i)=>`<div class="tile ${proj?'up':bandOf(v,i,c)}">
       <span class="tl">${SCORE_TL[i]}<button class="qmark" data-tip="${i}" aria-label="What is ${SCORE_NM[i]}?"></button></span>
-      <span class="tv">${v.toFixed(1)}</span><span class="tu">/10</span>
+      <span class="tv">${pct(v)}</span>
     </div>`).join('');
 
   /* what it says now, and only after a preview, what it would say */
   const isImg = c.t === 'img';
   const done = isBoosted(c.id) && !!DONE_BY_TYPE[c.t];
   const nowText = isImg ? (c.alt || 'No Description Yet') : c.text;
-  const recNow = recOf(c);
   const mine = c.userTags || (c.userTags = []);
   const F = S.flow || {};
   /* whatever already stands above, folded or still being typed, is not repeated */
   const bodyFolded = F.id === c.id && (isImg ? (F.desc !== null || F.analysed) : F.words !== null);
   const chips = mine.map(t=>`<span class="tag1 tagmine">${esc(t)}<button class="tagx" data-deltag="${esc(t)}" aria-label="Remove ${esc(t)}">&times;</button></span>`).join('');
-  const tagsNow = (mine.length ? '' : '<span class="tag0">None Yet</span>') + chips;
+  const tagsNow = chips;
   /* settled work takes no more tags */
   const slot = isBoosted(c.id) ? '' : (F.addingTag
     ? `<input class="taginput" id="taginput" maxlength="18" placeholder="Tag" autocomplete="off"${F.addWide?` style="width:${F.addWide}px"`:''}>`
@@ -867,14 +865,12 @@ function scores(c, proj){
     <div class="ca-bd">
       <div class="tilewrap"><div class="tiles">${tiles}</div>
         <div class="tipline" id="tip"></div></div>
-      ${done ? `<div class="rec done"><span>Now in place:</span> ${esc(DONE_BY_TYPE[c.t] || '')}</div>`
-             : (recNow ? `<div class="rec ${proj?'quiet':''}">${esc(recNow)}</div>` : '')}
 
       ${proj ? '' : `<div class="ba">
         ${bodyFolded ? '' : `<div class="lab">Current ${isImg?'Description':'Words'}</div>
         <div class="box">${esc(nowText)}</div>`}
         <div class="lab">Current Tags</div>
-        <div class="tagrow2">${tagsNow}</div>
+        ${tagsNow ? `<div class="tagrow2">${tagsNow}</div>` : ''}
         ${tagCtl}
       </div>`}
 
@@ -922,7 +918,7 @@ function rollScores(c){
   const badge = document.querySelector('.ca-sc');
   if (!tv.length) return;
   const from = liveScores(c), to = c.u, a = avg(from), b = avg(to);
-  const clamp = v => Math.max(0, Math.min(10, v)).toFixed(1);
+  const clamp = v => pct(Math.max(0, Math.min(10, v)));
   const DUR = 780, t0 = performance.now();
   const tick = now => {
     const p = Math.min(1, (now - t0) / DUR);
@@ -1017,16 +1013,17 @@ function flow(){
   if (img && photoSet){
     const f = c.fit || (c.fit = {x:50, y:50, z:100});
     const onOriginal = F.wasSrc && c.src === F.wasSrc;
-    parts.push(fold('photo', onOriginal ? 'Original Photo in Place' : 'New Photo Added',
-      descSet || F.analysed,
-      /* while the step is open the picture itself is right below, so no thumbnail */
-      photoOpen ? '' : `<span class="sthumb" style="background-image:url(${c.src});background-size:${f.z}%;background-position:${f.x}% ${f.y}%"></span>`));
+    /* the picture is right there while the step is open, so it needs no receipt */
+    if (descSet || F.analysed)
+      parts.push(fold('photo', onOriginal ? 'Original Photo in Place' : 'New Photo Added', true,
+        photoOpen ? '' : `<span class="sthumb" style="background-image:url(${c.src});background-size:${f.z}%;background-position:${f.x}% ${f.y}%"></span>`));
     if (photoOpen) parts.push(`<div class="stage">
       <div class="crop" id="crop" style="background-image:url(${c.src});background-size:${f.z}%;background-position:${f.x}% ${f.y}%">
         <span class="hint">Drag to reposition</span></div>
-      <div class="zoomrow"><span>Zoom</span><input type="range" id="zoom" min="100" max="260" value="${f.z}"><button class="reset" id="rs">Reset</button></div>
-      <div class="slinks"><button class="slink" id="rep">Replace This Photo</button>${
-        F.wasSrc && c.src !== F.wasSrc ? `<button class="slink" id="orig">Use my Original Photo Instead</button>` : ''}</div>
+      <div class="zoomrow"><input type="range" id="zoom" min="100" max="260" value="${f.z}">
+        <button class="reset" id="rep">Replace</button>
+        <button class="reset" id="orig"${onOriginal || !F.wasSrc ? ' disabled' : ''}>Revert</button>
+        <button class="reset" id="rs">Reset</button></div>
       <input type="file" id="fi2" accept="image/*" hidden>
     </div>`);
   } else if (img){
@@ -1065,13 +1062,15 @@ function flow(){
   const started = F.analysed || (img ? (photoSet || descSet) : wordsSet);
   let cta = '';
   /* one press arms it, the next one buys it: nothing else on the panel moves */
-  if (!F.analysed) cta = `<button class="g" id="go">See How AI Reads This <span class="arw">→</span></button>`;
+  if (!F.analysed) cta = `<div class="ctarow">
+    <button class="g" id="go">${img ? 'Boost This Image' : 'See How AI Reads This'} <span class="arw">→</span></button>
+    <button class="g save" id="sv2">Save</button></div>`;
   else if (canBoost(c) && !isBoosted(c.id) && !F.previewed)
     cta = `<button class="g" id="go">Preview Your Boost <span class="arw">→</span></button>`;
   else if (canBoost(c) && !isBoosted(c.id)) cta = `<button class="g" id="go">Boost This ${esc(tc(c.lbl))}<span class="amt2">${M(c.price)}</span></button>`;
   else if (isBoosted(c.id)) cta = `<div class="sdone"><span class="tick">✓</span><span class="lbl2">Boosted, ${M(S.boosts.find(x=>x.id===c.id).price)} on This Session</span></div>`;
 
-  const secondary = started ? `<button class="ghost" id="sv">Boost This ${esc(shortOf(c))} Later</button>` : '';
+  const secondary = (started && F.analysed) ? `<button class="ghost" id="sv">Boost This ${esc(shortOf(c))} Later</button>` : '';
 
   open({ ttl: hdr(c), flag: flagOf(c), back: canStepBack(), key: 'flow:' + c.id,
          body: parts.join('') + cta + secondary });
@@ -1157,14 +1156,14 @@ function flow(){
     const zoom = $('#zoom');
     if (zoom) zoom.oninput = e => { f.z = +e.target.value; paint(); };
     const rs = $('#rs');
-    if (rs) rs.onclick = () => {
+    if (rs) rs.onclick = () => {                    /* the framing, not the photo */
       f.x = 50; f.y = 50; f.z = 100;
       if (zoom) zoom.value = 100;
       crop.classList.remove('moved'); paint();
     };
   }
 
-  const bkBtn = $('#orig');
+  const bkBtn = $('#orig');                       /* Revert: the photo they arrived with */
   if (bkBtn) bkBtn.onclick = () => {
     c.src = F.wasSrc || null;
     c.fit = F.wasFit ? {...F.wasFit} : {x:50, y:50, z:100};
@@ -1226,6 +1225,13 @@ function flow(){
     if (!F.analysed){ F.analysed = true; return flow(); }
     if (!F.previewed && canBoost(c)){ F.previewed = true; return flow(); }
     return askBoost([c]);                           /* the last step gets its own surface */
+  };
+  const sv2 = $('#sv2');
+  if (sv2) sv2.onclick = () => {
+    if (ed && !commitWords()) return;
+    if (dsc) commitDesc();
+    shut(); draw(); flash(c.id);
+    toast('Saved. Nothing is charged for a change you make yourself.');
   };
   const sv = $('#sv');
   if (sv) sv.onclick = () => {
@@ -1321,14 +1327,12 @@ function paintScores(c){
   const cur = liveScores(c);
   document.querySelectorAll('.ca .tile').forEach((t,i)=>{
     if (cur[i] === undefined) return;
-    t.querySelector('.tv').textContent = cur[i].toFixed(1);
+    t.querySelector('.tv').textContent = pct(cur[i]);
     t.classList.remove('mid','hi');
     const b = bandOf(cur[i], i, c); if (b) t.classList.add(b);
   });
   const sc = document.querySelector('.ca-sc');
-  if (sc) sc.textContent = avg(cur).toFixed(1);
-  const rec = document.querySelector('.rec:not(.done):not(.quiet)');
-  if (rec && recOf(c)) rec.textContent = recOf(c);
+  if (sc) sc.textContent = pct(avg(cur));
 }
 
 /* what a boosted part looks like: itself, dimmed, with the reason over it */
@@ -1442,7 +1446,7 @@ function celebrate(list, before, after, tot){
   const val = VALUE[pg.value];
   const gauge = (label, from, to) => `<div class="gauge">
       <div class="ghd"><span class="glbl">${label}</span>
-        <span class="gnum">${to.toFixed(1)}<em>/10</em>${to > from ? `<b>+${(to-from).toFixed(1)}</b>` : ''}</span></div>
+        <span class="gnum">${pct(to)}${to > from ? `<b>+${Math.round((to-from)*10)}%</b>` : ''}</span></div>
       <div class="gbar"><i class="gfill" data-w="${from*10}"></i><i class="ggain" data-l="${from*10}" data-w="${to > from ? Math.max(1.8, (to-from)*10) : 0}"></i><i class="gticks"></i></div>
     </div>`;
   const left = pg.comps.filter(k => canBoost(k) && !isBoosted(k.id)).length;
@@ -1552,7 +1556,7 @@ function review(){
     ${aside.map(k=>`<div class="itm">
       <span class="who">${esc(k.lbl)}</span>
       <span class="bdy"><span class="new">${esc((k.t==='img' ? (k.alt||'No Description Yet') : k.text).slice(0,60))}</span>
-        <span class="stamp">now ${avg(liveScores(k)).toFixed(1)}/10 &rarr; could be ${avg(k.u).toFixed(1)}/10</span></span>
+        <span class="stamp">now ${pct(avg(liveScores(k)))} &rarr; could be ${pct(avg(k.u))}</span></span>
       <span class="acts"><button class="mini-g" data-boostnow="${k.id}">Boost ${M(k.price)}</button></span>
     </div>`).join('')}
     ${aside.length>1 ? `<button class="g" id="boostaside">Boost Them All<span class="amt2">${M(asideTotal)}</span></button>` : ''}
@@ -1682,7 +1686,7 @@ function guide(){
       const b = isBoosted(c.id);
       return `<div class="itm"><span class="who">${esc(c.lbl)}</span>
         <span class="bdy"><span class="new">${esc(c.text.slice(0,40))}${c.text.length>40?'…':''}</span>
-          <span class="stamp">now ${avg(liveScores(c)).toFixed(1)}/10${c.u?` → could be ${avg(c.u).toFixed(1)}/10`:''}</span></span>
+          <span class="stamp">now ${pct(avg(liveScores(c)))}${c.u?` → could be ${pct(avg(c.u))}`:''}</span></span>
         <span class="acts"><span class="amt" style="color:${b?'var(--green-d)':canBoost(c)?'var(--navy)':'var(--amber-ink)'}">${b?'✓ done':canBoost(c)?M(c.price):'needs you'}</span>
         <button class="pill" data-show="${c.id}">Show Me</button></span></div>`;
     }).join('')}</div>
