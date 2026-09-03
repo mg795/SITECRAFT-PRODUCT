@@ -69,9 +69,10 @@ p.c{margin:0 0 1rem;color:var(--ink-2);font-size:.98rem;line-height:1.7}
 
 .c{position:relative;border-radius:3px;transition:box-shadow .15s;scroll-margin:7rem}
 body.pick .c{cursor:pointer}
-body.pick .c:hover{box-shadow:0 0 0 2px var(--blue)}
-.c.sel{box-shadow:0 0 0 2px var(--blue)}
 body.ident .c[data-boost]{box-shadow:0 0 0 1px color-mix(in srgb,var(--red) 45%,transparent)}
+/* whichever tool is up, the thing under the pointer is ringed in the boosted green */
+body.pick .c:hover{box-shadow:0 0 0 2px var(--green-d)}
+.c.sel{box-shadow:0 0 0 2px var(--blue)}
 @keyframes fl{0%{box-shadow:0 0 0 3px var(--green)}100%{box-shadow:0 0 0 3px transparent}}
 .c.fl{animation:fl 1.6s ease-out}
 
@@ -147,6 +148,10 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .ghost:active{background:var(--green-d);color:#fff}
 .pill{border:0;background:var(--sunk);color:var(--ink-2);padding:.34rem .8rem;border-radius:999px;font-size:.78rem;font-weight:600;white-space:nowrap;transition:border-color .14s,background .14s}
 .pill:hover{background:var(--rule)}
+.pill.warn{color:var(--red)}
+.pill.warn:hover{background:var(--red);color:#fff}
+.asdone{border:0;background:transparent;color:var(--green-d);font:inherit;font-weight:700;padding:0;text-decoration:underline}
+.asdone:hover{color:var(--green-x)}
 .pair{display:grid;grid-template-columns:auto 1fr;gap:.55rem;align-items:center}
 
 /* ── staged flow ── */
@@ -286,12 +291,9 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .tagrow2.mini .tagadd{display:none}
 .tile,.tile .tv,.tile .tl,.tile .tu{transition:background .55s,color .55s}
 /* under the tiles, centred, at the weight of the labels beside it */
-/* the mark leads the sentence rather than hanging off the side of it */
+/* centred under the numbers, at the weight of the labels beside it, no mark */
 .rec{display:block;font-size:.6rem;letter-spacing:.04em;font-weight:700;color:var(--navy);
   text-align:center;line-height:1.6;text-wrap:balance}
-.rec span{width:.95rem;height:.95rem;border-radius:50%;background:var(--red);color:#fff;
-  font-size:.68rem;font-weight:900;line-height:1;display:inline-flex;align-items:center;justify-content:center;
-  letter-spacing:0;font-family:var(--f);vertical-align:-.2em;margin-right:.32rem}
 
 /* collapsibles */
 .coll{border-top:1px solid var(--rule-2)}
@@ -341,18 +343,18 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .sh-ttl{font-size:1.06rem;font-weight:800;color:var(--navy);letter-spacing:-.018em;line-height:1.25;text-align:center}
 .sh-sub{font-size:.83rem;line-height:1.5;color:var(--ink-2);text-align:center;text-wrap:balance}
 .sh-sub b{color:var(--navy);font-weight:700}
-/* a boosted part is settled: shown, dimmed, and out of reach */
-.lockwrap{position:relative;display:grid;gap:.55rem}
-.lockback{display:grid;gap:.55rem;opacity:.3;filter:saturate(.35);pointer-events:none;user-select:none}
-.lockshot{width:100%;aspect-ratio:1200/630;border-radius:12px;background-repeat:no-repeat;background-color:var(--sunk)}
-.locknote{position:absolute;left:.4rem;right:.4rem;top:50%;transform:translateY(-50%);
-  background:var(--card);border-radius:12px;padding:.9rem .85rem;display:grid;gap:.3rem;
-  justify-items:center;text-align:center}
-.locknote .lm{width:2rem;height:2rem;border-radius:50%;background:var(--green-pale);
-  display:grid;place-items:center;font-size:.95rem}
-.locknote .lt{font-size:.95rem;font-weight:800;color:var(--navy);letter-spacing:-.015em;line-height:1.3}
-.locknote .ls{font-size:.79rem;line-height:1.45;color:var(--mut)}
+/* a boosted part is settled: a plain panel that says so */
+.locknote{display:grid;gap:.4rem;justify-items:center;text-align:center;padding:.5rem 0 .2rem}
+.locknote .lm{width:4rem;height:4rem;border-radius:50%;background:var(--green-pale);
+  display:grid;place-items:center;font-size:1.9rem;margin-bottom:.15rem}
+.locknote .lt{font-size:1.02rem;font-weight:800;color:var(--navy);letter-spacing:-.015em;line-height:1.3}
+.locknote .ls{font-size:.83rem;line-height:1.5;color:var(--ink-2);text-wrap:balance}
 .locknote .ls b{color:var(--green-x);font-weight:700}
+/* the way out, small and under the last button, where a change of mind belongs */
+.optout{font-size:.71rem;line-height:1.5;color:var(--faint);text-align:center;text-wrap:balance;margin-top:-.2rem}
+.optout button{border:0;background:transparent;color:var(--green-d);font:inherit;font-weight:700;
+  padding:0;text-decoration:underline}
+.optout button:hover{color:var(--green-x)}
 .sh-term{margin-top:-.35rem;text-align:center;font-size:.71rem;line-height:1.45;color:var(--faint)}
 .sh-term b{color:var(--mut);font-weight:700}
 .sh-line{display:flex;align-items:center;gap:.5rem;font-size:.84rem;font-weight:600;color:var(--ink-2)}
@@ -459,7 +461,7 @@ const SITE = {
       up:'Real Estate Excellence: The Jacksonville Podcast For Working Agents',
       s:[2.5,2.0,3.5], u:[9.0,9.0,8.5],
       rec:'Searches for a Jacksonville real estate podcast return other shows.'},
-    {id:'h-p1',lbl:'Body copy', t:'p', hero:1, price:3.99,
+    {id:'h-p1',lbl:'Body Copy', t:'p', hero:1, price:3.99,
       text:'Tracy Hayes sits down each week with the agents, lenders and builders who actually close deals in Northeast Florida. No fluff, no theory, just the work.',
       up:'Each week Tracy Hayes sits down with an agent, lender or builder closing deals in Northeast Florida. Every episode covers one topic in full. There is no theory and no filler.',
       s:[4.5,4.0,5.0], u:[9.0,8.5,8.5],
@@ -473,7 +475,7 @@ const SITE = {
       up:'Seven Beats Cover The Work: Lending, Market Data, Marketing And More',
       s:[1.0,1.0,3.0], u:[9.0,9.0,8.5],
       rec:'This heading is a label and contains no quotable statement.'},
-    {id:'h-p2',lbl:'Body copy', t:'p', price:3.99,
+    {id:'h-p2',lbl:'Body Copy', t:'p', price:3.99,
       text:'Every episode is filed under a beat so you can go straight to the subject you are working on right now, whether that is lending and title, market data and pricing, marketing and lead generation, military relocation, mindset, new construction, or teams and leadership.',
       up:'Every episode is filed under a beat. Go straight to what you are working on today. The beats are lending and title, market data, marketing and lead generation, military relocation, mindset, new construction, and teams and leadership.',
       s:[3.5,3.0,5.0], u:[8.5,9.0,8.0],
@@ -492,7 +494,7 @@ const SITE = {
       up:'Jacksonville and twelve more Northeast Florida markets covered on the podcast',
       s:[1.0,0.5,1.0], u:[8.0,8.5,8.0],
       rec:'Search engines receive no readable description for this image.'},
-    {id:'h-band',lbl:'List item', t:'band', price:0,
+    {id:'h-band',lbl:'List Item', t:'band', price:0,
       text:'Rated 5 stars by 300+ listeners · The number one real estate podcast in Florida',
       s:[3.0,2.0,3.0],
       blocked:'To show star ratings in search results the reviews have to be visible on this page. Sitecraft never invents a rating or a listener count, so this one needs you: publish the reviews and the next scan will pick them up.'},
@@ -502,7 +504,7 @@ const SITE = {
       up:'Every Real Estate Excellence Episode, Filed By Beat And Market',
       s:[2.0,2.0,4.0], u:[9.0,8.5,9.0],
       rec:'Searches for these episodes return other shows in this area.'},
-    {id:'e-p1',lbl:'Body copy', t:'p', hero:1, price:2.99,
+    {id:'e-p1',lbl:'Body Copy', t:'p', hero:1, price:2.99,
       text:'The full archive, going back to the first episode. Filter by beat or by market.',
       up:'The full archive from the first episode onward. Filter by beat or by Northeast Florida market.',
       s:[5.0,4.5,6.0], u:[8.5,9.0,8.0],
@@ -522,7 +524,7 @@ const SITE = {
       up:'Be A Guest On The Real Estate Excellence Podcast',
       s:[2.0,2.0,4.0], u:[8.5,8.5,8.5],
       rec:'Searches for a local dentist return other practices nearby.'},
-    {id:'g-p1',lbl:'Body copy', t:'p', hero:1, price:2.99,
+    {id:'g-p1',lbl:'Body Copy', t:'p', hero:1, price:2.99,
       text:'We record in Jacksonville. If you close deals here and you have something worth saying, put your name in.',
       up:'We record in Jacksonville. If you close deals in Northeast Florida and have something worth saying, put your name in.',
       s:[6.0,5.0,5.5], u:[9.0,8.5,8.0],
@@ -633,7 +635,7 @@ function draw(){
   const one = c => {
     const b = isBoosted(c.id), nn = S.notes.filter(n=>n.id===c.id && !n.done).length;
     const tag = `<span class="etag">${b?'<span class="dn">✓ Boosted</span>'
-      :(canBoost(c)?`<span class="pr">Boost ${M(c.price)}</span>`:'<span>Needs you</span>')}<span>${esc(c.lbl)}</span></span>`;
+      :(canBoost(c)?`<span class="pr">Boost ${M(c.price)}</span>`:'<span>Needs You</span>')}<span>${esc(c.lbl)}</span></span>`;
     const pin = nn?`<span class="npin">${nn}</span>`:'';
     const at = canBoost(c)?' data-boost="1"':'';
     if (c.t==='img') return c.src
@@ -768,7 +770,7 @@ const VALUE_HELP = {
   1: "People rarely reach this page through search, so you can fix it whenever it suits you.",
 };
 const tc = s => String(s).replace(/\b\w/g, m => m.toUpperCase());
-const SHORT = {'Feature Photo':'Photo','Body copy':'Text','List item':'Text','Eyebrow':'Label','Heading':'Heading'};
+const SHORT = {'Feature Photo':'Photo','Body Copy':'Text','List Item':'Text','Eyebrow':'Label','Heading':'Heading'};
 const shortOf = c => SHORT[c.lbl] || tc(c.lbl);
 const pageOf = id => SITE[pgOf(id)] || {name:'this page', value:2, comps:[]};
 const hdr = c => `${esc(c.lbl)} <span class="dot">·</span> <i>On ${esc(pageOf(c.id).name)}</i>`;
@@ -865,7 +867,7 @@ function scores(c, proj){
       <div class="tilewrap"><div class="tiles">${tiles}</div>
         <div class="tipline" id="tip"></div></div>
       ${done ? `<div class="rec done"><span>Now in place:</span> ${esc(DONE_BY_TYPE[c.t] || '')}</div>`
-             : (recNow ? `<div class="rec ${proj?'quiet':''}"><span>!</span>${esc(recNow)}</div>` : '')}
+             : (recNow ? `<div class="rec ${proj?'quiet':''}">${esc(recNow)}</div>` : '')}
 
       ${proj ? '' : `<div class="ba">
         ${bodyFolded ? '' : `<div class="lab">Current ${isImg?'Description':'Words'}</div>
@@ -1325,7 +1327,7 @@ function paintScores(c){
   const sc = document.querySelector('.ca-sc');
   if (sc) sc.textContent = avg(cur).toFixed(1);
   const rec = document.querySelector('.rec:not(.done):not(.quiet)');
-  if (rec && recOf(c)) rec.innerHTML = `<span>!</span>${esc(recOf(c))}`;
+  if (rec && recOf(c)) rec.textContent = recOf(c);
 }
 
 /* what a boosted part looks like: itself, dimmed, with the reason over it */
@@ -1333,28 +1335,22 @@ function lockedP(c){
   const page = pgOf(c.id), nxt = nextUp(page, c.id);
   const img = c.t === 'img' && c.src;
   const f = c.fit || {x:50, y:50, z:100};
-  const back = img
-    ? `<div class="lockshot" style="background-image:url(${c.src});background-size:${f.z}%;background-position:${f.x}% ${f.y}%"></div>
-       <div class="box">${esc(c.alt || '')}</div>`
-    : `<div class="box">${esc(c.text)}</div>`;
   open({ ttl: hdr(c), flag: flagOf(c), key: 'lock:' + c.id, body: `
-    <div class="lockwrap">
-      <div class="lockback">${back}${scores(c, false)}</div>
-      <div class="locknote">
-        <span class="lm">&#128274;</span>
-        <div class="lt">This ${esc(tc(c.lbl))} is Already Boosted</div>
-        <div class="ls">Locked in for <b>90 days</b> while the results build.</div>
-      </div>
+    <div class="locknote">
+      <span class="lm">&#128274;</span>
+      <div class="lt">This ${esc(tc(c.lbl))} is Already Boosted</div>
+      <div class="ls">Locked in for <b>90 days</b> while the results build.</div>
     </div>
-    ${nxt ? `<button class="g" id="lk-next">Next Piece of Content<span class="arw">&rarr;</span></button>`
-          : `<button class="g" id="lk-rev">See The Whole Site<span class="arw">&rarr;</span></button>`}
-    <button class="ghost" id="lk-close">Back to my Page</button>`});
+    ${nxt ? `<button class="g" id="lk-next">Next Piece of Content<span class="arw">&rarr;</span></button>
+      <button class="ghost" id="lk-close">Back to my Page</button>`
+          : `<button class="g" id="lk-close">Back to my Page</button>`}
+    <div class="optout">Changed your mind? Nothing is charged until you press Done, so you can
+      <button id="lk-undo">remove this boost</button> in the review until then.</div>`});
 
   const nb = $('#lk-next');
   if (nb) nb.onclick = () => { shut(); setTimeout(() => pick(nxt.id), 160); };
-  const rb = $('#lk-rev');
-  if (rb) rb.onclick = () => setMode('review');
   $('#lk-close').onclick = () => { shut(); draw(); };
+  $('#lk-undo').onclick = () => { S.openSec = 'r3'; setMode('review'); };
 }
 
 function blockedP(id){
@@ -1416,6 +1412,7 @@ function applyAll(list){
   const tot = list.reduce((t,k)=>t+k.price, 0);
   list.forEach(k => {
     S.boosts.push({id:k.id, page:pgOf(k.id), lbl:k.lbl, price:k.price,
+                   was: k.t === 'img' ? (k.alt || '') : k.text,
                    gain:k.u.map((v,i)=>+(v - liveScores(k)[i]).toFixed(1))});
     if (k.t === 'img') k.alt = k.up; else k.text = k.up;
     S.later.delete(k.id);
@@ -1423,6 +1420,19 @@ function applyAll(list){
   S.session += tot; S.boostCount += list.length;
   draw(); bdg();
   celebrate(list, before, pageScore(page), tot);
+}
+
+/* nothing is charged until the session settles, so until then a boost can be lifted */
+function unboost(i){
+  const b = S.boosts[i]; if (!b) return;
+  const k = comp(b.id);
+  if (k && b.was !== undefined){ if (k.t === 'img') k.alt = b.was; else k.text = b.was; }
+  S.boosts.splice(i, 1);
+  S.session = Math.max(0, +(S.session - b.price).toFixed(2));
+  S.boostCount = Math.max(0, S.boostCount - 1);
+  if (S.flows[b.id]) delete S.flows[b.id];      /* it starts fresh if they go back to it */
+  draw(); bdg(); review();
+  toast(`Boost removed. <b>${M(b.price)}</b> is off this session.`);
 }
 
 /* a boost is a win, so it is told as one, with the page's own numbers behind it */
@@ -1562,11 +1572,13 @@ function review(){
         <button class="pill" data-sort="${i}">${n.done?'Reopen':'Sorted'}</button></span>
     </div>`).join('') : '<div class="empty">No notes yet. Use Comment, then click part of your page.</div>';
 
-  const bst = S.boosts.length ? S.boosts.map(b=>`<div class="itm">
+  const bst = S.boosts.length ? S.boosts.map((b,i)=>`<div class="itm">
       <span class="who">${esc(b.lbl)}</span>
       <span class="bdy"><span class="new">On ${esc(pageOf(b.id).name)}</span>
         <span class="stamp">AI +${b.gain[0]} · AEO +${b.gain[1]} · SEO +${b.gain[2]}</span></span>
-      <span class="acts"><span class="amt">${M(b.price)}</span><button class="pill" data-show="${b.id}">Show Me</button></span>
+      <span class="acts"><span class="amt">${M(b.price)}</span>
+        <button class="pill" data-show="${b.id}">Show Me</button>
+        <button class="pill warn" data-unboost="${i}">Remove This Boost</button></span>
     </div>`).join('') : '<div class="empty">No boosts yet.</div>';
 
   open({ ttl:'<b>Review The Whole Site</b>', body:`
@@ -1586,7 +1598,8 @@ function review(){
     <div class="sec"><button class="sec-hd" data-t="r3" aria-expanded="true">Boosts on This Page (${S.boosts.filter(b=>b.page===S.page).length})<span class="tw">✕</span></button>
       <div class="sec-bd" id="r3">${bst}
         <div class="spent"><span>Spent on This Page</span><span class="amt">${M(pageSpend(S.page))}</span></div>
-        <div class="mini">Across the whole site so far: ${M(S.boosts.reduce((t,b)=>t+b.price,0))} · settles when you press Done.</div></div></div>
+        <div class="mini">Across the whole site so far: ${M(S.boosts.reduce((t,b)=>t+b.price,0))} &middot; settles when you press <button class="asdone" data-done="1">Done</button>.</div>
+        ${S.boosts.length?'<div class="mini">A boost can be removed here at any time before the session settles.</div>':''}</div></div>
     <div class="p-ft">Approved by <b>Marshall</b>, just now.</div>`});
 
   document.querySelectorAll('[data-boostnow]').forEach(b=>b.onclick=()=>{
@@ -1597,6 +1610,8 @@ function review(){
   if (bas) bas.onclick = () => askBoost(aside);
   const ba = $('#boostall');
   if (ba) ba.onclick = () => askBoost(openBoosts);
+  document.querySelectorAll('[data-done]').forEach(b=>b.onclick=done);
+  document.querySelectorAll('[data-unboost]').forEach(b=>b.onclick=()=>unboost(+b.dataset.unboost));
   document.querySelectorAll('[data-show]').forEach(b=>b.onclick=()=>showMe(b.dataset.show));
   document.querySelectorAll('[data-undo]').forEach(b=>b.onclick=()=>{
     const c = S.changes[+b.dataset.undo], k = comp(c.id);
