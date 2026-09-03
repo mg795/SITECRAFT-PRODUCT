@@ -90,26 +90,48 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .scrim.open{display:block}
 .pan{position:fixed;left:50%;top:50%;transform:translate(-50%,-48%) scale(.98);width:min(27rem,calc(100vw - 1.5rem));max-height:min(82vh,46rem);background:var(--card);border-radius:14px;box-shadow:var(--sh);z-index:80;display:grid;grid-template-rows:auto 1fr;opacity:0;pointer-events:none;transition:opacity .16s,transform .16s;overflow:hidden}
 .pan.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
-.p-hd{padding:.85rem 1.05rem .7rem;display:grid;grid-template-columns:1fr auto;gap:.25rem .6rem;border-bottom:1px solid var(--rule-2)}
-.p-hd .ttl{font-size:.84rem;font-weight:700;color:var(--red);line-height:1.35;min-width:0}
-.p-hd .meta{grid-column:1/-1;display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
-.p-hd .ttl b{color:var(--navy)}
+.p-hd{padding:.9rem 1.1rem .75rem;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid var(--rule-2)}
+.p-hd .ttl{font-size:.9rem;font-weight:700;color:var(--navy);line-height:1.3;min-width:0;display:flex;align-items:center;gap:.42rem;flex-wrap:wrap}
 .p-hd .ttl i{font-style:normal;color:var(--mut);font-weight:500}
-.p-hd .step,.p-hd .flag{font-family:var(--m);font-size:.62rem;font-weight:600;color:var(--mut);background:var(--sunk);padding:.1rem .34rem;border-radius:3px;white-space:nowrap}
-.p-hd .flag{color:var(--amber-ink);background:var(--amber-bg)}
+.flagchip{display:inline-flex;align-items:center;gap:.2rem;font-size:.63rem;font-weight:700;color:var(--amber-ink);background:var(--amber-bg);padding:.13rem .4rem;border-radius:999px;white-space:nowrap;letter-spacing:.01em}
 .p-x{margin-left:auto;border:0;background:transparent;color:var(--green);font-size:1.05rem;line-height:1;font-weight:800;padding:0 .1rem;flex:none}
 .p-bd{overflow-y:auto;padding:.9rem 1.05rem 1.05rem;display:flex;flex-direction:column;gap:.7rem}
 .p-ft{font-size:.68rem;color:var(--faint);text-align:center;padding-top:.2rem;border-top:1px solid var(--rule-2);margin-top:.15rem}
 .p-ft u{cursor:pointer}
 
 /* buttons */
-.g{border:0;background:var(--green);color:#fff;padding:.6rem 1rem;border-radius:7px;font-size:.88rem;font-weight:700;text-align:center}
-.g:hover{background:var(--green-d)}
-.g[disabled]{background:color-mix(in srgb,var(--green) 42%,var(--card));cursor:not-allowed}
-.g.wide{width:100%;padding:.72rem 1rem;font-size:.92rem}
-.pill{border:1px solid var(--rule);background:var(--sunk);color:var(--ink-2);padding:.32rem .68rem;border-radius:6px;font-size:.78rem;font-weight:600;white-space:nowrap}
-.pill:hover{border-color:var(--mut)}
-.pair{display:grid;grid-template-columns:1fr 1fr;gap:.55rem}
+.g{border:0;background:var(--green);color:#fff;padding:.82rem 1.1rem;border-radius:11px;font-size:.94rem;font-weight:700;letter-spacing:-.008em;text-align:center;width:100%;
+  box-shadow:0 1px 0 rgba(0,0,0,.07),0 6px 16px -6px color-mix(in srgb,var(--green) 60%,transparent);transition:background .14s,transform .08s,box-shadow .14s;
+  display:flex;align-items:center;justify-content:center;gap:.5rem}
+.g:hover{background:var(--green-d);box-shadow:0 1px 0 rgba(0,0,0,.07),0 10px 22px -8px color-mix(in srgb,var(--green) 70%,transparent)}
+.g:active{transform:translateY(1px);box-shadow:none}
+.g[disabled]{background:var(--sunk);color:var(--faint);box-shadow:none;cursor:not-allowed}
+.g .amt2{margin-left:auto;font-family:var(--m);font-weight:700;opacity:.95}
+.g .arw{font-weight:800;opacity:.8}
+.ghost{border:0;background:transparent;color:var(--mut);font-size:.83rem;font-weight:600;padding:.5rem;width:100%;text-align:center;border-radius:9px}
+.ghost:hover{background:var(--sunk);color:var(--ink-2)}
+.pill{border:1px solid var(--rule);background:var(--card);color:var(--ink-2);padding:.34rem .7rem;border-radius:8px;font-size:.78rem;font-weight:600;white-space:nowrap;transition:border-color .14s,background .14s}
+.pill:hover{border-color:var(--mut);background:var(--sunk)}
+.pair{display:grid;grid-template-columns:auto 1fr;gap:.55rem;align-items:center}
+
+/* ── staged flow ── */
+.stage{display:grid;gap:.5rem}
+.sdone{display:flex;align-items:center;gap:.55rem;padding:.55rem .7rem;background:var(--green-pale);border-radius:9px;font-size:.84rem;font-weight:600;color:var(--green-ink)}
+.sdone .tick{width:1.15rem;height:1.15rem;border-radius:50%;background:var(--green-d);color:#fff;display:grid;place-items:center;font-size:.7rem;font-weight:800;flex:none}
+.sdone .lbl2{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sdone button{margin-left:auto;border:0;background:transparent;color:var(--green-ink);font-size:.78rem;font-weight:700;text-decoration:underline;padding:0;flex:none}
+.ask{font-size:1.02rem;font-weight:700;color:var(--navy);letter-spacing:-.015em;line-height:1.3}
+.sub{font-size:.82rem;color:var(--mut);line-height:1.45;margin-top:-.25rem}
+
+.drop{border:2px dashed var(--rule);border-radius:12px;background:var(--sunk);min-height:9.5rem;display:grid;place-items:center;text-align:center;padding:1.2rem;gap:.2rem;cursor:pointer;transition:border-color .14s,background .14s}
+.drop:hover{border-color:var(--green)}
+.drop.over{border-color:var(--green);background:var(--green-pale)}
+.drop b{display:block;font-size:.92rem;color:var(--navy);font-weight:700}
+.drop span{font-size:.79rem;color:var(--mut)}
+.drop.has{padding:0;border-style:solid;border-color:var(--green);overflow:hidden;min-height:0;background:var(--card)}
+.drop.has img{width:100%;display:block;aspect-ratio:1200/630;object-fit:cover}
+.fld{width:100%;font-family:var(--f);font-size:.9rem;padding:.7rem .8rem;border:1px solid var(--rule);border-radius:10px;background:var(--card);color:var(--ink);outline:none}
+.fld:focus{border-color:var(--green);box-shadow:0 0 0 3px var(--green-pale)}
 
 /* copy boxes */
 .box{background:var(--sunk);border:1px solid var(--rule-2);border-radius:7px;padding:.65rem .75rem;font-size:.9rem;line-height:1.6;color:var(--ink-2)}
@@ -226,7 +248,7 @@ body.editing nav.site{margin-top:1.6rem}
 
 <div class="scrim" id="scrim"></div>
 <div class="pan" id="pan" role="dialog" aria-modal="true">
-  <div class="p-hd"><div class="ttl" id="p-ttl"></div><button class="p-x" id="p-x" aria-label="Close">✕</button><div class="meta" id="p-meta"></div></div>
+  <div class="p-hd"><div class="ttl" id="p-ttl"></div><button class="p-x" id="p-x" aria-label="Close">✕</button></div>
   <div class="p-bd" id="p-bd"></div>
 </div>
 
@@ -236,7 +258,9 @@ body.editing nav.site{margin-top:1.6rem}
 /* ═══════════ content ═══════════ */
 const SITE = {
   home:{ name:'Home', critical:true, comps:[
-    {id:'h-k', lbl:'Eyebrow', t:'kick', hero:1, price:0.99, text:'Northgate · Seattle', s:[2.0,1.5,2.5]},
+    {id:'h-k', lbl:'Eyebrow', t:'kick', hero:1, price:0.99, text:'Northgate · Seattle',
+      up:'Family Dentistry · Northgate, Seattle', s:[2.0,1.5,2.5], u:[6.5,7.0,7.5],
+      rec:'Your label names the service as well as the place, so it reads as a subject and not a postcode.'},
     {id:'h-h1',lbl:'Heading', t:'h1', hero:1, price:5.99, text:'Gentle Family Dentistry in Northgate, Seattle',
       up:'Same-Day Crowns and Gentle Family Dentistry in Northgate, Seattle', s:[3.0,2.5,4.5], u:[8.5,9.0,8.5],
       rec:'Your heading names the service people actually search for, and gets tagged so engines know it is the page subject.'},
@@ -302,6 +326,7 @@ const W = s => s.trim() ? s.trim().split(/\s+/).length : 0;
 const comp = id => { for (const k in SITE){ const c = SITE[k].comps.find(x=>x.id===id); if (c) return c; } };
 const pgOf = id => Object.keys(SITE).find(k => SITE[k].comps.some(c=>c.id===id));
 const isBoosted = id => S.boosts.some(b=>b.id===id);
+const canBoost = c => !!(c.up && c.price);
 const paidTotal = () => S.receipts.reduce((t,r)=>t+r.amt,0);
 const pageSpend = p => S.boosts.filter(b=>b.page===p).reduce((t,b)=>t+b.price,0);
 const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -324,10 +349,12 @@ function draw(){
   const one = c => {
     const b = isBoosted(c.id), nn = S.notes.filter(n=>n.id===c.id && !n.done).length;
     const tag = `<span class="etag">${b?'<span class="dn">✓ Boosted</span>'
-      :(c.price?`<span class="pr">Boost ${M(c.price)}</span>`:'<span>Needs you</span>')}<span>${esc(c.lbl)}</span></span>`;
+      :(canBoost(c)?`<span class="pr">Boost ${M(c.price)}</span>`:'<span>Needs you</span>')}<span>${esc(c.lbl)}</span></span>`;
     const pin = nn?`<span class="npin">${nn}</span>`:'';
-    const at = c.price?' data-boost="1"':'';
-    if (c.t==='img') return `<div class="img c" data-id="${c.id}"${at}>${pin}${tag}${esc(c.text)}</div>`;
+    const at = canBoost(c)?' data-boost="1"':'';
+    if (c.t==='img') return c.src
+      ? `<div class="c" data-id="${c.id}"${at} style="position:relative;margin:0 0 1.2rem">${pin}${tag}<img src="${c.src}" alt="${esc(c.alt||'')}" style="width:100%;display:block;border-radius:4px;aspect-ratio:1200/630;object-fit:cover"></div>`
+      : `<div class="img c" data-id="${c.id}"${at}>${pin}${tag}${esc(c.text)}</div>`;
     if (c.t==='kick') return `<p class="kick c" data-id="${c.id}"${at}>${pin}${tag}${esc(c.text)}</p>`;
     if (c.t==='band') return `<div class="band c" data-id="${c.id}"${at}>${pin}${tag}${esc(c.text)}</div>`;
     return `<${c.t} class="c" data-id="${c.id}"${at}>${pin}${tag}${esc(c.text)}</${c.t}>`;
@@ -350,10 +377,8 @@ function bdg(){
 }
 
 /* ═══════════ panel ═══════════ */
-function open({ttl, step, flag, body}){
-  $('#p-ttl').innerHTML = ttl || '';
-  $('#p-meta').innerHTML = (flag?`<span class="flag">${flag}</span>`:'') + (step?`<span class="step">${step}</span>`:'');
-  $('#p-meta').hidden = !flag && !step;
+function open({ttl, flag, body}){
+  $('#p-ttl').innerHTML = (ttl||'') + (flag?`<span class="flagchip">⚡ ${flag}</span>`:'');
   $('#p-bd').innerHTML = body || '';
   $('#toast').hidden = true; clearTimeout(toast._t);
   $('#pan').classList.add('open'); $('#scrim').classList.add('open');
@@ -373,8 +398,8 @@ function toast(m, undo){
   const u = $('#t-undo'); u.style.display = undo?'':'none'; u.onclick = () => { undo&&undo(); $('#toast').hidden = true; };
   $('#toast').hidden = false; clearTimeout(toast._t); toast._t = setTimeout(()=>$('#toast').hidden=true, 5000);
 }
-const hdr = c => `<b>${esc(c.lbl)}</b> / On <b>${SITE[pgOf(c.id)].name}</b>`;
-const flagOf = c => SITE[pgOf(c.id)].critical ? 'SEO/AEO Critical Page' : '';
+const hdr = c => `${esc(c.lbl)} <i>On ${SITE[pgOf(c.id)].name}</i>`;
+const flagOf = c => SITE[pgOf(c.id)].critical ? 'SEO/AEO' : '';
 
 /* ═══════════ modes ═══════════ */
 function setMode(m){
@@ -426,11 +451,13 @@ function scores(c, proj){
       <span class="tl">${SCORE_TL[i]}</span>
       <span class="tv">${v.toFixed(1)}</span><span class="tu">/10</span>${proj?`<span class="tp">was ${cur[i].toFixed(1)}</span><span class="tw">projected</span>`:''}
     </div>`).join('');
-  const colls = SCORE_NM.map((n,i)=>`<div class="coll">
-      <button class="coll-hd" data-t="w${i}" aria-expanded="false">${n} — what it means<span class="tw">+</span></button>
-      <div class="coll-bd" id="w${i}" hidden>${WHY[i]}</div></div>`).join('')
-    + `<div class="coll"><button class="coll-hd" data-t="wt" aria-expanded="false">What does tagging mean?<span class="tw">+</span></button>
-       <div class="coll-bd" id="wt" hidden>${TAGGING}</div></div>`;
+  /* one door, not four — the three meanings plus tagging live behind it */
+  const colls = `<div class="coll">
+      <button class="coll-hd" data-t="wall" aria-expanded="false">What these numbers mean<span class="tw">+</span></button>
+      <div class="coll-bd" id="wall" hidden>
+        ${SCORE_NM.map((n,i)=>`<div><b>${n}.</b> ${WHY[i].replace('<b>Why this matters.</b> ','')}</div>`).join('')}
+        <div>${TAGGING}</div>
+      </div></div>`;
   return `<div class="ca">
     <button class="ca-hd ${proj?'up':''}" data-t="cab" aria-expanded="true">
       <span class="ca-sc">${badge}</span>
@@ -444,24 +471,131 @@ function scores(c, proj){
     </div></div>`;
 }
 
-/* ═══════════ edit panel — step 1 ═══════════ */
-function editP(id){
-  const c = comp(id), b = isBoosted(id);
-  if (c.blocked) return blockedP(id);
-  open({ ttl: hdr(c), flag: flagOf(c), step:'Step 1 of 2', body:`
-    <div class="lab">What it says now<span class="n">${c.t==='img'?'photo':W(c.text)+' words'}</span></div>
-    <div class="box">${esc(c.text)}</div>
-    <button class="pill" style="text-align:left;padding:.6rem .75rem" data-a="rw">
-      <b style="color:var(--navy);font-size:.86rem">${c.t==='img'?'Swap the picture':'Change the wording'}</b><br>
-      <span style="font-weight:400;color:var(--mut);font-size:.78rem">Free. Stays ${c.t==='img'?'the same size':'at '+W(c.text)+' words'} so nothing shifts.</span>
-    </button>
-    ${c.up && !b ? `<button class="pill" style="text-align:left;padding:.6rem .75rem;border-color:var(--green)" data-a="bo">
-      <b style="color:var(--green-ink);font-size:.86rem">Visibility Boost ${M(c.price)}</b><br>
-      <span style="font-weight:400;color:var(--mut);font-size:.78rem">See where it would take your scores. Nothing is charged yet.</span>
-    </button>` : b ? `<div class="note-amber"><b>Already boosted.</b> ${M(S.boosts.find(x=>x.id===id).price)} is on this session.</div>`:''}
-    ${scores(c, false)}
-    <div class="p-ft"><u>Disclaimer</u> · © 2026 ReadTomato™</div>`});
-  document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=> b.dataset.a==='bo'?boostP(id):rwP(id));
+/* ═══════════ edit: one action at a time ═══════════ */
+/* No step labels. Each stage completes, collapses to a ticked line, and the
+   next action appears as the single primary button naming what it does. */
+
+function editP(id){ S.flow = {id, photo:null, desc:null, words:null, analysed:false}; flow(); }
+
+function flow(){
+  const c = comp(S.flow.id), F = S.flow, img = c.t === 'img';
+  if (c.blocked) return blockedP(c.id);
+
+  const editDone = img ? (F.photo || F.desc !== null) : (F.words !== null);
+  const parts = [];
+
+  /* ── stage 1: the change ── */
+  if (editDone){
+    parts.push(`<div class="sdone"><span class="tick">✓</span>
+      <span class="lbl2">${img ? (F.photo ? 'New photo added' : 'Description updated') : 'Your words saved'}</span>
+      <button data-re="1">Change</button></div>`);
+  } else if (img){
+    parts.push(`<div class="stage">
+      <div class="ask">Add your new photo</div>
+      <div class="drop" id="dz"><b>Drag a photo here</b><span>or click to choose one</span></div>
+      <input type="file" id="fi" accept="image/*" hidden>
+      <div class="sub">It keeps the same 1200 × 630 shape, so nothing on your page shifts.</div>
+    </div>`);
+  } else {
+    parts.push(`<div class="stage">
+      <div class="ask">Change the wording</div>
+      <div class="box ed" contenteditable="true" id="ed">${esc(c.text)}</div>
+      <div class="wc" id="wc"></div>
+    </div>`);
+  }
+
+  /* ── stage 2 (photos only): what is in it ── */
+  if (img && F.photo && F.desc === null){
+    parts.push(`<div class="stage">
+      <div class="ask">What is in this picture?</div>
+      <input class="fld" id="dsc" value="${esc(c.alt || '')}" placeholder="A short, plain description">
+      <div class="sub">This is what Google and AI search read to know what the picture shows.</div>
+    </div>`);
+  }
+
+  /* ── stage 3: the analysis ── */
+  if (F.analysed) parts.push(scores(c, false));
+
+  /* ── the single next action ── */
+  let cta = '', hint = '';
+  if (img && !F.photo && F.desc === null){ cta = ''; hint = 'Drop a photo in to get started, or skip straight to the analysis.'; }
+  if (!F.analysed) cta = `<button class="g" id="go">See how AI reads this <span class="arw">→</span></button>`;
+  else if (canBoost(c) && !isBoosted(c.id)) cta = `<button class="g" id="go">Boost this ${esc(c.lbl.toLowerCase())}<span class="amt2">${M(c.price)}</span></button>`;
+  else if (isBoosted(c.id)) cta = `<div class="sdone"><span class="tick">✓</span><span class="lbl2">Boosted — ${M(S.boosts.find(x=>x.id===c.id).price)} on this session</span></div>`;
+
+  const secondary = (img && !F.photo && F.desc === null) || (!img && F.words === null)
+    ? '' : `<button class="ghost" id="sv">Save and close</button>`;
+
+  open({ ttl: hdr(c), flag: flagOf(c), body: parts.join('') + cta + secondary
+        + (hint?`<div class="sub" style="text-align:center">${hint}</div>`:'')
+        + `<div class="p-ft"><u>Disclaimer</u> · © 2026 ReadTomato™</div>` });
+
+  /* ── wiring ── */
+  const re = document.querySelector('[data-re]');
+  if (re) re.onclick = () => { S.flow = {id:c.id, photo:null, desc:null, words:null, analysed:F.analysed}; flow(); };
+
+  const dz = $('#dz'), fi = $('#fi');
+  if (dz){
+    const take = file => {
+      if (!file || !file.type.startsWith('image/')) return toast('That needs to be an image file.');
+      const r = new FileReader();
+      r.onload = e => { F.photo = e.target.result; c.src = e.target.result; flow(); draw(); };
+      r.readAsDataURL(file);
+    };
+    dz.onclick = () => fi.click();
+    fi.onchange = e => take(e.target.files[0]);
+    ['dragenter','dragover'].forEach(k => dz.addEventListener(k, e => { e.preventDefault(); dz.classList.add('over'); }));
+    ['dragleave','dragend'].forEach(k => dz.addEventListener(k, () => dz.classList.remove('over')));
+    dz.addEventListener('drop', e => { e.preventDefault(); dz.classList.remove('over'); take(e.dataTransfer.files[0]); });
+  }
+
+  const dsc = $('#dsc');
+  if (dsc){
+    dsc.focus();
+    dsc.onkeydown = e => { if (e.key === 'Enter'){ e.preventDefault(); commitDesc(); } };
+  }
+
+  const ed = $('#ed'), wc = $('#wc');
+  if (ed){
+    const target = W(c.text);
+    const tick = () => {
+      const n = W(ed.innerText), ok = n === target;
+      wc.className = 'wc ' + (ok ? 'ok' : 'bad');
+      wc.textContent = ok ? `${n} of ${target} words` : `${n} of ${target} words — ${n>target?(n-target)+' too many':(target-n)+' to go'}`;
+      return ok;
+    };
+    ed.addEventListener('input', tick); tick();
+  }
+
+  const go = $('#go');
+  if (go) go.onclick = () => {
+    if (dsc) commitDesc();
+    if (ed && !commitWords()) return;
+    if (!F.analysed){ F.analysed = true; return flow(); }
+    return S.skipConfirm ? apply(c.id) : boostP(c.id);
+  };
+  const sv = $('#sv');
+  if (sv) sv.onclick = () => { if (ed && !commitWords()) return; if (dsc) commitDesc(); shut(); draw(); flash(c.id); };
+}
+
+function commitDesc(){
+  const c = comp(S.flow.id), v = $('#dsc') ? $('#dsc').value.trim() : null;
+  if (v === null) return;
+  const was = c.alt;
+  c.alt = v; S.flow.desc = v;
+  if (v !== was) S.changes.push({id:c.id, page:pgOf(c.id), lbl:c.lbl, old:was||'(no description)', now:v, when:'just now', kind:'alt'});
+  bdg();
+}
+function commitWords(){
+  const c = comp(S.flow.id), ed = $('#ed');
+  if (!ed) return true;
+  const now = ed.innerText.trim(), target = W(c.text);
+  if (W(now) !== target){ toast(`Keep it to ${target} words and this will save.`); return false; }
+  if (now !== c.text){
+    S.changes.push({id:c.id, page:pgOf(c.id), lbl:c.lbl, old:c.text, now, when:'just now', kind:'copy'});
+    c.text = now; draw();
+  }
+  S.flow.words = now; bdg(); return true;
 }
 
 function blockedP(id){
@@ -473,108 +607,55 @@ function blockedP(id){
     <div class="p-ft"><u>Disclaimer</u> · © 2026 ReadTomato™</div>`});
 }
 
-/* ═══════════ free rewrite, word count locked ═══════════ */
-function rwP(id){
-  const c = comp(id);
-  if (c.t==='img'){
-    open({ ttl: hdr(c), flag: flagOf(c), step:'Step 2 of 2', body:`
-      <div class="box" style="text-align:center;padding:1.6rem 1rem">
-        <b style="color:var(--navy);display:block;font-size:.92rem">Drop a picture here</b>
-        <span style="font-size:.8rem;color:var(--mut)">or click to choose one from your computer</span></div>
-      <div class="lab">What is in this picture?</div>
-      <div class="box ed" contenteditable="true" id="ed">${esc(c.alt||'')}</div>
-      <div class="help">This tells Google and AI search what the picture is.</div>
-      <div class="note-amber">🔒 <b>1200 × 630 only.</b> Sitecraft only takes a picture the same size as the one there now — that is what stops your layout breaking.</div>
-      <div class="pair"><button class="pill" id="bk">Back</button><button class="g" id="sv">Save</button></div>
-      <div class="p-ft"><u>Disclaimer</u> · © 2026 ReadTomato™</div>`});
-    $('#bk').onclick = ()=>editP(id);
-    $('#sv').onclick = ()=>{
-      const was = c.alt; c.alt = $('#ed').innerText.trim();
-      S.changes.push({id, page:pgOf(id), lbl:c.lbl, old:was||'(nothing)', now:c.alt, when:'just now', kind:'alt'});
-      shut(); draw(); flash(id);
-      toast('Saved', ()=>{ c.alt=was; S.changes.pop(); draw(); bdg(); });
-    };
-    return;
-  }
-  const target = W(c.text);
-  open({ ttl: hdr(c), flag: flagOf(c), step:'Step 2 of 2', body:`
-    <div class="lab">Your words<span class="n" id="wcn"></span></div>
-    <div class="box ed" contenteditable="true" id="ed">${esc(c.text)}</div>
-    <div class="wc" id="wc"></div>
-    <div class="note-amber">🔒 <b>Locked to ${target} words.</b> This is the one rule Sitecraft enforces, and it is what stops an edit from breaking your design.</div>
-    <div class="pair"><button class="pill" id="rv">Revert</button><button class="g" id="sv">Save</button></div>
-    <div class="p-ft"><u>Disclaimer</u> · © 2026 ReadTomato™</div>`});
-  const ed = $('#ed'), wc = $('#wc'), sv = $('#sv');
-  const tick = () => {
-    const n = W(ed.innerText), ok = n===target;
-    wc.className = 'wc ' + (ok?'ok':'bad');
-    wc.textContent = ok ? `${n} / ${target} words — good to save`
-      : `${n} / ${target} words — ${n>target?(n-target)+' too many':(target-n)+' more needed'}`;
-    sv.disabled = !ok;
-  };
-  ed.addEventListener('input', tick); tick(); ed.focus();
-  $('#rv').onclick = ()=>{ ed.innerText = c.text; tick(); };
-  sv.onclick = ()=>{
-    const was = c.text, now = ed.innerText.trim();
-    if (W(now)!==target) return;
-    c.text = now;
-    S.changes.push({id, page:pgOf(id), lbl:c.lbl, old:was, now, when:'just now', kind:'copy'});
-    shut(); draw(); flash(id);
-    toast('Saved', ()=>{ c.text=was; S.changes.pop(); draw(); bdg(); });
-  };
-}
-
-/* ═══════════ THE BOOST ═══════════ */
+/* ═══════════ boost: projection, then one confirm ═══════════ */
 function boostP(id, proj = true){
-  const c = comp(id), d = c.t!=='img' ? dif(c.text, c.up) : null;
-  open({ ttl: hdr(c), flag: flagOf(c), step:'Step 1 of 2', body:`
-    ${d ? `<div class="lab">${proj?'What it could say':'What it says now'}<span class="n">${W(proj?c.up:c.text)} words</span></div>
-      <div class="box">${rend(d, proj?'+':'-')}</div>`
-        : `<div class="lab">${proj?'The description it would get':'The description now'}</div>
-      <div class="box">${esc(proj?c.up:(c.alt||'(no description)'))}</div>`}
+  const c = comp(id), d = c.t !== 'img' ? dif(c.text, c.up) : null;
+  open({ ttl: hdr(c), flag: flagOf(c), body:`
+    <div class="ask">${proj ? 'Where a boost would take you' : 'What you have right now'}</div>
+    ${d ? `<div class="box">${rend(d, proj?'+':'-')}</div>`
+        : `<div class="box">${esc(proj ? c.up : (c.alt || '(no description)'))}</div>`}
     ${scores(c, proj)}
-    <button class="pill" id="flip" style="width:100%">${proj?'Show my scores again':'Show me the boost again'}</button>
-    <div class="help">${proj?'That is where a boost would take you. <b>Nothing on your page has changed.</b>':'This is what you have right now.'}</div>
-    <div class="pair"><button class="pill" id="bk">Back</button><button class="g" id="nx">Visibility Boost ${M(c.price)}</button></div>
+    <div class="sub" style="text-align:center">${proj?'<b>Nothing on your page has changed.</b>':'This is live on your page now.'}</div>
+    <button class="g" id="go">Boost this ${esc(c.lbl.toLowerCase())}<span class="amt2">${M(c.price)}</span></button>
+    <button class="ghost" id="flip">${proj?'Show my scores again':'Show me the boost again'}</button>
     <div class="p-ft"><u>Disclaimer</u> · © 2026 ReadTomato™</div>`});
-  $('#flip').onclick = ()=>boostP(id, !proj);
-  $('#bk').onclick = ()=>editP(id);
-  $('#nx').onclick = ()=> S.skipConfirm ? apply(id) : confirmP(id);
+  $('#flip').onclick = () => boostP(id, !proj);
+  $('#go').onclick = () => S.skipConfirm ? apply(id) : confirmP(id);
 }
 function confirmP(id){
   const c = comp(id);
-  open({ ttl: hdr(c), flag: flagOf(c), step:'Step 2 of 2', body:`
-    <div class="ca-t">Boost this ${esc(c.lbl.toLowerCase())} for ${M(c.price)}?</div>
-    <div class="lab">Going live on your page</div>
-    <div class="box" style="border-color:var(--green);background:var(--card);color:var(--ink)">${esc(c.t==='img'?c.up:c.up)}</div>
-    <div class="itm" style="border:0"><span></span><span class="bdy"><span class="new">This boost</span></span><span class="amt">${M(c.price)}</span></div>
-    <div class="itm" style="border:0;padding-top:0"><span></span><span class="bdy"><span class="stamp">On this session so far</span></span><span class="amt">${M(S.session)}</span></div>
-    <div class="note-amber">Boosts are agreed as you choose them and settle as <b>one amount</b> when you press Done.</div>
-    <div class="pair"><button class="pill" id="bk">Back</button><button class="g" id="go">Boost for ${M(c.price)}</button></div>
+  open({ ttl: hdr(c), flag: flagOf(c), body:`
+    <div class="ask">Boost this ${esc(c.lbl.toLowerCase())} for ${M(c.price)}?</div>
+    <div class="box" style="border-color:var(--green);background:var(--card);color:var(--ink)">${esc(c.up)}</div>
+    <div class="sdone" style="background:var(--sunk);color:var(--ink-2)"><span class="lbl2">On this session so far</span>
+      <span class="amt" style="margin-left:auto">${M(S.session)}</span></div>
+    <div class="sub">Boosts are agreed as you pick them and settle as <b>one amount</b> when you press Done.</div>
+    <button class="g" id="go">Yes, boost it<span class="amt2">${M(c.price)}</span></button>
+    <button class="ghost" id="bk">Back</button>
     <div class="p-ft"><u>Disclaimer</u> · © 2026 ReadTomato™</div>`});
-  $('#bk').onclick = ()=>boostP(id);
-  $('#go').onclick = ()=>apply(id);
+  $('#bk').onclick = () => boostP(id);
+  $('#go').onclick = () => apply(id);
 }
 function apply(id){
-  const c = comp(id), was = c.t==='img' ? c.alt : c.text;
-  if (c.t==='img') c.alt = c.up; else c.text = c.up;
+  const c = comp(id), was = c.t === 'img' ? c.alt : c.text;
+  if (c.t === 'img') c.alt = c.up; else c.text = c.up;
   S.boosts.push({id, page:pgOf(id), lbl:c.lbl, price:c.price, gain:c.u.map((v,i)=>+(v-c.s[i]).toFixed(1))});
   S.session += c.price; S.boostCount++;
   shut(); draw(); flash(id); bdg();
-  toast(`Boosted. <b>${M(c.price)}</b> added to this session — nothing charged until Done.`, ()=>{
-    if (c.t==='img') c.alt = was; else c.text = was;
+  toast(`Boosted. <b>${M(c.price)}</b> added to this session — nothing charged until Done.`, () => {
+    if (c.t === 'img') c.alt = was; else c.text = was;
     S.boosts.pop(); S.session -= c.price; S.boostCount--; draw(); bdg();
   });
-  if (S.boostCount===3 && !S.skipConfirm && !S.offered){ S.offered = true; setTimeout(offer, 1400); }
+  if (S.boostCount === 3 && !S.skipConfirm && !S.offered){ S.offered = true; setTimeout(offer, 1400); }
 }
 function offer(){
-  open({ ttl:'<b>Sitecraft noticed a habit</b>', body:`
-    <div class="note-amber" style="background:var(--green-pale);color:var(--green-ink)">
-      You have boosted three times and said yes every time. Sitecraft can skip that confirm step from now on — you will still see the comparison first, and Undo still works straight after.</div>
-    <div class="help">You can switch this back whenever you like, from My Account.</div>
-    <div class="pair"><button class="pill" id="no">Keep asking me</button><button class="g" id="yes">Skip it from now on</button></div>`});
-  $('#no').onclick = ()=>{ shut(); toast('No problem — Sitecraft will keep asking.'); };
-  $('#yes').onclick = ()=>{ S.skipConfirm = true; shut(); toast('Done. Boosts now take one step.'); };
+  open({ ttl:'Sitecraft noticed a habit', body:`
+    <div class="sdone" style="align-items:flex-start"><span class="tick">⚡</span>
+      <span style="font-weight:500;line-height:1.45">You have boosted three times and said yes every time. Sitecraft can skip the confirm from now on — you will still see the comparison first, and Undo still works.</span></div>
+    <button class="g" id="yes">Skip it from now on</button>
+    <button class="ghost" id="no">Keep asking me</button>`});
+  $('#no').onclick = () => { shut(); toast('No problem — Sitecraft will keep asking.'); };
+  $('#yes').onclick = () => { S.skipConfirm = true; shut(); toast('Done. Boosts now take one step.'); };
 }
 
 /* ═══════════ comments ═══════════ */
@@ -591,7 +672,7 @@ function noteP(id){
     <div class="lab">Who is it for?</div>
     <div class="who-pick" id="wp">${PEOPLE.slice(0,S.seats).map((p,i)=>`<button data-w="${esc(p)}" class="${i?'':'on'}">${esc(p)}</button>`).join('')}
       ${S.seats<2?'<button data-add="1" style="border-style:dashed">+ Add someone · $9/mo</button>':''}</div>
-    <button class="g wide" id="ad">Save this note</button>
+    <button class="g" id="ad">Save this note</button>
     <div class="help">Notes gather in Review, so you can send them in one go.</div>
     <div class="p-ft"><u>Disclaimer</u> · © 2026 ReadTomato™</div>`});
   S.noteTo = PEOPLE[0];
@@ -650,7 +731,7 @@ function review(){
     <div class="sec"><button class="sec-hd" data-t="r2" aria-expanded="${openN?'true':'false'}">Notes (${openN} open of ${S.notes.length})<span class="tw">${openN?'✕':'+'}</span></button>
       <div class="sec-bd" id="r2" ${openN?'':'hidden'}>${nts}
         ${S.notes.length?`<div class="help" style="padding-top:.5rem">Tick the notes you want to send</div>
-        <button class="g wide" id="send" ${S.picked.size?'':'disabled'}>Send the ticked notes</button>
+        <button class="g" id="send" ${S.picked.size?'':'disabled'}>Send the ticked notes</button>
         <div class="mini" style="padding-top:.3rem">Each note goes to the person it was already meant for — one message each, holding only their notes.</div>`:''}</div></div>
     <div class="sec"><button class="sec-hd" data-t="r3" aria-expanded="true">Boosts on this page (${S.boosts.filter(b=>b.page===S.page).length})<span class="tw">✕</span></button>
       <div class="sec-bd" id="r3">${bst}
@@ -719,7 +800,7 @@ function account(){
 
 /* ═══════════ the ? guide ═══════════ */
 function guide(){
-  const pg = SITE[S.page], list = pg.comps.filter(c=>c.price);
+  const pg = SITE[S.page], list = pg.comps.filter(canBoost);
   const left = list.filter(c=>!isBoosted(c.id));
   const tot = left.reduce((t,c)=>t+c.price,0);
   open({ ttl:`<b>What is on ${pg.name}</b>`, flag: pg.critical?'SEO/AEO Critical Page':'', body:`
@@ -729,11 +810,11 @@ function guide(){
       return `<div class="itm"><span class="who">${esc(c.lbl)}</span>
         <span class="bdy"><span class="new">${esc(c.text.slice(0,40))}${c.text.length>40?'…':''}</span>
           <span class="stamp">now ${avg(c.s).toFixed(1)}/10${c.u?` → could be ${avg(c.u).toFixed(1)}/10`:''}</span></span>
-        <span class="acts"><span class="amt" style="color:${b?'var(--green-d)':c.price?'var(--navy)':'var(--amber-ink)'}">${b?'✓ done':c.price?M(c.price):'needs you'}</span>
+        <span class="acts"><span class="amt" style="color:${b?'var(--green-d)':canBoost(c)?'var(--navy)':'var(--amber-ink)'}">${b?'✓ done':canBoost(c)?M(c.price):'needs you'}</span>
         <button class="pill" data-show="${c.id}">Show me</button></span></div>`;
     }).join('')}</div>
     ${tot?`<div class="spent"><span>Boost all ${left.length} left on this page</span><span class="amt">${M(tot)}</span></div>
-      <button class="g wide" id="all">Boost the whole page · ${M(tot)}</button>
+      <button class="g" id="all">Boost the whole page · ${M(tot)}</button>
       <div class="mini">Adds to this session. Nothing charged until you press Done.</div>`:'<div class="help">Everything boostable on this page is done.</div>'}
     <div class="p-ft"><u>Disclaimer</u> · © 2026 ReadTomato™</div>`});
   document.querySelectorAll('[data-show]').forEach(b=>b.onclick=()=>showMe(b.dataset.show));
