@@ -129,12 +129,12 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .ask{font-size:1.02rem;font-weight:700;color:var(--navy);letter-spacing:-.015em;line-height:1.3}
 .sub{font-size:.82rem;color:var(--mut);line-height:1.45;margin-top:-.25rem}
 
-.drop{border:1px solid var(--rule);border-radius:14px;background:var(--sunk);min-height:8.5rem;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:1rem;gap:.1rem;cursor:pointer;transition:border-color .14s,background .14s}
+.drop{position:relative;border:1px solid var(--rule);border-radius:14px;background:var(--sunk);min-height:9rem;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:1.1rem 1rem;gap:.1rem;cursor:pointer;transition:border-color .14s,background .14s}
 .drop:hover{border-color:var(--green);background:var(--green-pale)}
 .drop.over{border-color:var(--green);background:var(--green-pale)}
 .drop b{font-size:.88rem;color:var(--navy);font-weight:600;line-height:1.3}
 .drop span{font-size:.76rem;color:var(--mut);line-height:1.35}
-.drop em{font-style:normal;font-size:.71rem;color:var(--faint);margin-top:.4rem}
+.drop em{position:absolute;left:0;right:0;bottom:.7rem;font-style:normal;font-size:.71rem;color:var(--faint);text-align:center}
 .drop.has{padding:0;border-color:var(--green);overflow:hidden;min-height:0;background:var(--card)}
 .drop.has img{width:100%;display:block;aspect-ratio:1200/630;object-fit:cover}
 .crop{width:100%;aspect-ratio:1200/630;border-radius:12px;background-repeat:no-repeat;background-color:var(--sunk);cursor:grab;position:relative;overflow:hidden;border:1px solid var(--rule)}
@@ -296,7 +296,7 @@ const SITE = {
     {id:'h-p1',lbl:'Body copy', t:'p', hero:1, price:3.99, text:'We have been caring for families across North Seattle since 2004. Same-day crowns, clear aligners, and emergency appointments — with a team that remembers your name.',
       up:'We have cared for families across North Seattle since 2004. You can get a same-day crown, clear aligners, or an emergency appointment from a team that remembers your name.', s:[4.0,3.5,5.0], u:[8.5,8.0,8.0],
       rec:'Assistants skip paragraphs they cannot lift as one whole thought.'},
-    {id:'h-img',lbl:'Feature Photo', t:'img', price:1.99, text:'Waiting room · 1200 × 630', alt:'Waiting room',
+    {id:'h-img',lbl:'Feature Photo', t:'img', price:1.99, text:'Waiting room · 1200 × 630', alt:'Waiting room', dim:{w:1200,h:630},
       up:'The Northgate Family Dental waiting room in Seattle, where families wait for same-day crown appointments', s:[0.0,0.0,0.0], u:[3.5,3.5,3.5],
       rec:'Search engines cannot see photos, so yours is simply ignored.'},
     {id:'h-h2',lbl:'Heading', t:'h2', price:2.99, text:'Our Services',
@@ -351,7 +351,7 @@ const PEOPLE = ['Jo Castellane','Priya Raman'];
 
 /* ═══════════ state ═══════════ */
 const S = { page:'home', mode:null, editing:false, sel:null, open:null,
-  changes:[], notes:[], boosts:[], receipts:[{when:'2026-09-02 16:06', site:'Northgate', n:1, amt:0.99}],
+  flows:{}, changes:[], notes:[], boosts:[], receipts:[{when:'2026-09-02 16:06', site:'Northgate', n:1, amt:0.99}],
   seats:1, session:0, boostCount:0, skipConfirm:false, offered:false, picked:new Set(), noteTo:PEOPLE[0], projecting:null };
 
 const $ = s => document.querySelector(s);
@@ -426,7 +426,14 @@ function open({ttl, flag, body}){
     const w = b.querySelector('.tw'); if (w) w.textContent = o?'+':'✕';
   });
 }
+/* a dismissal must never lose what was typed but not yet committed */
+function stash(){
+  const F = S.flow; if (!F) return;
+  const d = $('#dsc'); if (d) F.draftDesc = d.value;
+  const e = $('#ed');  if (e) F.draftWords = e.innerText;
+}
 function shut(){
+  stash();
   const pan = $('#pan');
   pan.classList.remove('open','moved');
   pan.style.left = ''; pan.style.top = '';   /* always back to centre */
@@ -467,7 +474,7 @@ function done(){
   if (!S.editing){ toast('You are already unlocked — pick a page.'); return; }
   const amt = S.session;
   if (amt){ S.receipts.push({when:'now', site:'Northgate', n:S.boosts.length, amt}); S.session = 0; }
-  S.editing = false; S.mode = null;
+  S.editing = false; S.mode = null; S.flows = {};
   document.body.classList.remove('editing','pick','ident');
   document.querySelectorAll('.bar [data-mode]').forEach(b=>b.classList.remove('on'));
   document.querySelector('.done').classList.remove('armed');
@@ -526,9 +533,14 @@ function wireTips(){
 /* No step labels. Each stage completes, collapses to a ticked line, and the
    next action appears as the single primary button naming what it does. */
 
-function editP(id){ const c = comp(id);
-  S.flow = {id, photo:null, desc:null, words:null, analysed:false, wasSrc:c.src||null, wasFit:c.fit?{...c.fit}:null};
-  flow(); }
+const setFlow = f => { S.flow = f; S.flows[f.id] = f; return f; };
+function editP(id){
+  const c = comp(id);
+  /* resume where they left off — clicking away is a dismissal, not a discard */
+  S.flow = S.flows[id] || setFlow({id, photo:null, desc:null, words:null, analysed:false,
+                                   wasSrc:c.src||null, wasFit:c.fit?{...c.fit}:null});
+  flow();
+}
 
 function flow(){
   const c = comp(S.flow.id), F = S.flow, img = c.t === 'img';
@@ -552,13 +564,13 @@ function flow(){
     }
   } else if (img){
     parts.push(`<div class="stage">
-      <div class="drop" id="dz"><b>Drag a photo here</b><span>or click to choose one</span><em>Any size — you position it next</em></div>
+      <div class="drop" id="dz"><b>Drag a photo here</b><span>or click to choose one</span><em>Any size — you position it next (now ${c.dim ? c.dim.w + ' × ' + c.dim.h : '1200 × 630'})</em></div>
       <input type="file" id="fi" accept="image/*" hidden>
     </div>`);
   } else {
     parts.push(`<div class="stage">
       <div class="ask">Change the wording</div>
-      <div class="box ed" contenteditable="true" id="ed">${esc(c.text)}</div>
+      <div class="box ed" contenteditable="true" id="ed">${esc(F.draftWords ?? c.text)}</div>
       <div class="wc" id="wc"></div>
     </div>`);
   }
@@ -567,7 +579,7 @@ function flow(){
   if (img && F.photo && F.desc === null){
     parts.push(`<div class="stage">
       <div class="ask">What is in this picture?</div>
-      <input class="fld" id="dsc" value="${esc(c.alt || '')}" placeholder="A short, plain description">
+      <input class="fld" id="dsc" value="${esc(F.draftDesc ?? c.alt ?? '')}" placeholder="A short, plain description">
       <div class="sub">A picture is invisible to search without this. Plain words help — a <b>boost</b> writes and tags it properly.</div>
     </div>`);
   }
@@ -576,8 +588,7 @@ function flow(){
   if (F.analysed) parts.push(scores(c, false));
 
   /* ── the single next action ── */
-  let cta = '', hint = '';
-  if (img && !F.photo && F.desc === null){ cta = ''; hint = 'Drop a photo in to get started, or skip straight to the analysis.'; }
+  let cta = '';
   if (!F.analysed) cta = `<button class="g" id="go">See How AI Reads This <span class="arw">→</span></button>`;
   else if (canBoost(c) && !isBoosted(c.id)) cta = `<button class="g" id="go">Boost this ${esc(c.lbl.toLowerCase())}<span class="amt2">${M(c.price)}</span></button>`;
   else if (isBoosted(c.id)) cta = `<div class="sdone"><span class="tick">✓</span><span class="lbl2">Boosted — ${M(S.boosts.find(x=>x.id===c.id).price)} on this session</span></div>`;
@@ -589,19 +600,24 @@ function flow(){
         ? '' : `<button class="ghost" id="sv">Boost This ${esc(shortOf(c))} Later</button>`);
 
   open({ ttl: hdr(c), flag: flagOf(c), body: parts.join('') + cta + secondary
-        + (hint?`<div class="sub" style="text-align:center">${hint}</div>`:'')
         + `<div class="p-ft"><u>Disclaimer</u> · © 2026 ReadTomato™</div>` });
 
   /* ── wiring ── */
   const re = document.querySelector('[data-re]');
-  if (re) re.onclick = () => { S.flow = {id:c.id, photo:null, desc:null, words:null, analysed:F.analysed}; flow(); };
+  if (re) re.onclick = () => { setFlow({id:c.id, photo:null, desc:null, words:null, analysed:F.analysed, wasSrc:F.wasSrc, wasFit:F.wasFit}); flow(); };
 
   const dz = $('#dz'), fi = $('#fi');
   if (dz){
     const take = file => {
       if (!file || !file.type.startsWith('image/')) return toast('That needs to be an image file.');
       const r = new FileReader();
-      r.onload = e => { F.photo = e.target.result; c.src = e.target.result; c.fit = {x:50,y:50,z:100}; flow(); draw(); };
+      r.onload = e => {
+        F.photo = e.target.result; c.src = e.target.result; c.fit = {x:50, y:50, z:100};
+        const probe = new Image();
+        probe.onload = () => { c.dim = {w:probe.naturalWidth, h:probe.naturalHeight}; };
+        probe.src = e.target.result;
+        flow(); draw();
+      };
       r.readAsDataURL(file);
     };
     dz.onclick = () => fi.click();
@@ -640,7 +656,7 @@ function flow(){
   const bkBtn = $('#bk');
   if (bkBtn) bkBtn.onclick = () => {
     c.src = F.wasSrc || null; c.fit = F.wasFit || null;
-    S.flow = {id:c.id, photo:null, desc:null, words:null, analysed:F.analysed, wasSrc:F.wasSrc, wasFit:F.wasFit};
+    setFlow({id:c.id, photo:null, desc:null, words:null, analysed:F.analysed, wasSrc:F.wasSrc, wasFit:F.wasFit});
     flow(); draw(); toast('Back to your original photo.');
   };
 
@@ -849,7 +865,7 @@ function review(){
 
   document.querySelectorAll('[data-boostnow]').forEach(b=>b.onclick=()=>{
     const id = b.dataset.boostnow; shut(); S.page = pgOf(id); draw();
-    setTimeout(()=>{ S.flow = {id, photo:null, desc:null, words:null, analysed:true}; boostP(id); }, 140);
+    setTimeout(()=>{ setFlow({id, photo:null, desc:null, words:null, analysed:true}); boostP(id); }, 140);
   });
   const ba = $('#boostall');
   if (ba) ba.onclick = () => {
