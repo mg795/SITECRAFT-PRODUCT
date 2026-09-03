@@ -352,9 +352,7 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .locknote .ls b{color:var(--green-x);font-weight:700}
 /* the way out, small and under the last button, where a change of mind belongs */
 .optout{font-size:.71rem;line-height:1.5;color:var(--faint);text-align:center;text-wrap:balance;margin-top:-.2rem}
-.optout button{border:0;background:transparent;color:var(--green-d);font:inherit;font-weight:700;
-  padding:0;text-decoration:underline}
-.optout button:hover{color:var(--green-x)}
+.optout b{color:var(--mut);font-weight:700}
 .sh-term{margin-top:-.35rem;text-align:center;font-size:.71rem;line-height:1.45;color:var(--faint)}
 .sh-term b{color:var(--mut);font-weight:700}
 .sh-line{display:flex;align-items:center;gap:.5rem;font-size:.84rem;font-weight:600;color:var(--ink-2)}
@@ -1335,22 +1333,22 @@ function lockedP(c){
   const page = pgOf(c.id), nxt = nextUp(page, c.id);
   const img = c.t === 'img' && c.src;
   const f = c.fit || {x:50, y:50, z:100};
-  open({ ttl: hdr(c), flag: flagOf(c), key: 'lock:' + c.id, body: `
+  /* no breadcrumb: the panel says what this is, and the X is the way back */
+  open({ ttl:'', key: 'lock:' + c.id, body: `
     <div class="locknote">
       <span class="lm">&#128274;</span>
       <div class="lt">This ${esc(tc(c.lbl))} is Already Boosted</div>
       <div class="ls">Locked in for <b>90 days</b> while the results build.</div>
     </div>
-    ${nxt ? `<button class="g" id="lk-next">Next Piece of Content<span class="arw">&rarr;</span></button>
-      <button class="ghost" id="lk-close">Back to my Page</button>`
+    ${nxt ? `<button class="g" id="lk-next">Boost Your Next Piece of Content<span class="arw">&rarr;</span></button>`
           : `<button class="g" id="lk-close">Back to my Page</button>`}
     <div class="optout">Changed your mind? Nothing is charged until you press Done, so you can
-      <button id="lk-undo">remove this boost</button> in the review until then.</div>`});
+      <b>remove this boost</b> in the review until then.</div>`});
 
   const nb = $('#lk-next');
   if (nb) nb.onclick = () => { shut(); setTimeout(() => pick(nxt.id), 160); };
-  $('#lk-close').onclick = () => { shut(); draw(); };
-  $('#lk-undo').onclick = () => { S.openSec = 'r3'; setMode('review'); };
+  const cb = $('#lk-close');
+  if (cb) cb.onclick = () => { shut(); draw(); };
 }
 
 function blockedP(id){
@@ -1644,12 +1642,12 @@ function account(){
     <div class="itm" style="border:0;grid-template-columns:auto 1fr">
       <span style="width:2.4rem;height:2.4rem;border-radius:50%;background:var(--bar);color:#fff;display:grid;place-items:center;font-weight:800">M</span>
       <span class="bdy"><span class="new" style="font-weight:700">Marshall</span><span class="stamp">mg@readtomato.com</span></span></div>
-    <div class="chips"><span class="chip gr">Account active</span><span class="chip ${S.session?'am':'gr'}">${S.session?M(S.session)+' on this session':'Nothing outstanding'}</span></div>
-    <div class="sec"><button class="sec-hd" data-t="a1" aria-expanded="true">Your sites (1)<span class="tw">✕</span></button>
+    <div class="chips"><span class="chip gr">Account Active</span><span class="chip ${S.session?'am':'gr'}">${S.session?M(S.session)+' on This Session':'Nothing Outstanding'}</span></div>
+    <div class="sec"><button class="sec-hd" data-t="a1" aria-expanded="true">Your Sites (1)<span class="tw">✕</span></button>
       <div class="sec-bd" id="a1"><div class="itm">
         <span class="who" style="color:var(--green-ink)">Real Estate Excellence</span>
         <span class="bdy"><span class="stamp">L2 Constrained Copy Edit · you are owner</span>
-          <span class="chips" style="margin-top:.25rem"><span class="chip">${S.changes.length} of 3 change rounds used</span><span class="chip ${S.seats>1?'am':''}">${S.seats} of 2 reviewer seats</span></span></span>
+          <span class="chips" style="margin-top:.25rem"><span class="chip">${S.changes.length} of 3 Change Rounds Used</span><span class="chip ${S.seats>1?'am':''}">${S.seats} of 2 Reviewer Seats</span></span></span>
         <span class="amt">${M(S.boosts.reduce((t,b)=>t+b.price,0))}</span></div></div></div>
     <div class="sec"><button class="sec-hd" data-t="a2" aria-expanded="false">Receipts (${S.receipts.length})<span class="tw">+</span></button>
       <div class="sec-bd" id="a2" hidden>${S.receipts.map(r=>`<div class="itm">
@@ -1685,8 +1683,8 @@ function guide(){
         <span class="acts"><span class="amt" style="color:${b?'var(--green-d)':canBoost(c)?'var(--navy)':'var(--amber-ink)'}">${b?'✓ done':canBoost(c)?M(c.price):'needs you'}</span>
         <button class="pill" data-show="${c.id}">Show Me</button></span></div>`;
     }).join('')}</div>
-    ${tot?`<div class="spent"><span>Boost all ${left.length} left on this page</span><span class="amt">${M(tot)}</span></div>
-      <button class="g" id="all">Boost the whole page · ${M(tot)}</button>
+    ${tot?`<div class="spent"><span>Boost All ${left.length} Left on This Page</span><span class="amt">${M(tot)}</span></div>
+      <button class="g" id="all">Boost The Whole Page · ${M(tot)}</button>
       <div class="mini">Adds to this session. Nothing charged until you press Done.</div>`:'<div class="help">Everything boostable on this page is done.</div>'}`});
   document.querySelectorAll('[data-show]').forEach(b=>b.onclick=()=>showMe(b.dataset.show));
   const a = $('#all');
