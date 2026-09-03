@@ -328,8 +328,8 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
   transform:translateY(14px);transition:transform .18s}
 .sheetcard::-webkit-scrollbar{display:none}
 .sheet.on .sheetcard{transform:none}
-.sh-ttl{font-size:1.06rem;font-weight:800;color:var(--navy);letter-spacing:-.018em;line-height:1.25}
-.sh-sub{font-size:.83rem;line-height:1.5;color:var(--ink-2)}
+.sh-ttl{font-size:1.06rem;font-weight:800;color:var(--navy);letter-spacing:-.018em;line-height:1.25;text-align:center}
+.sh-sub{font-size:.83rem;line-height:1.5;color:var(--ink-2);text-align:center;text-wrap:balance}
 .sh-sub b{color:var(--navy);font-weight:700}
 /* a boosted part is settled: shown, dimmed, and out of reach */
 .lockwrap{position:relative;display:grid;gap:.55rem}
@@ -1327,7 +1327,7 @@ function askBoost(list){
   sheet(`
     <div class="sh-ttl">${many ? `Boost ${list.length} parts of ${esc(pg)}?` : `Boost this ${esc(one.lbl.toLowerCase())}?`}</div>
     <div class="sh-sub">${many ? 'Each one is' : 'This is'} rewritten and tagged on your live page so answer engines can read ${many ? 'them' : 'it'}.</div>
-    ${list.map(k=>`<div class="sh-line">${esc(k.lbl)} <span style="color:var(--faint);font-weight:500">on ${esc(pageOf(k.id).name)}</span><span class="amt">${M(k.price)}</span></div>`).join('')}
+    ${many ? list.map(k=>`<div class="sh-line">${esc(k.lbl)} <span style="color:var(--faint);font-weight:500">on ${esc(pageOf(k.id).name)}</span><span class="amt">${M(k.price)}</span></div>`).join('') : ''}
     <button class="g" id="sh-go">${many ? `Boost all ${list.length}` : `Boost this ${esc(shortOf(one).toLowerCase())}`}<span class="amt2">${M(tot)}</span></button>
     <div class="sh-term">Runs for <b>90 days</b>, the time it takes to show trackable results.</div>
     <button class="ghost" id="sh-no">Not yet</button>`);
