@@ -199,13 +199,17 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 
 /* copy boxes */
 .box{background:var(--sunk);border:0;border-radius:7px;padding:.65rem .75rem;font-size:.9rem;line-height:1.6;color:var(--ink-2)}
-.box.ed{background:var(--card);color:var(--ink);outline:2px solid var(--blue);outline-offset:-2px}
+.box.ed{background:var(--sunk);color:var(--ink);outline:none;min-height:2.6rem}
 .box ins{background:var(--green-pale);color:var(--green-ink);text-decoration:none;border-radius:2px;padding:0 .08rem}
 .box del{background:color-mix(in srgb,var(--red) 13%,transparent);color:var(--red);border-radius:2px;padding:0 .08rem}
 .lab{font-size:.6rem;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-2);font-weight:700;display:flex;align-items:center;gap:.4rem}
 .lab .n{margin-left:auto;font-family:var(--m);letter-spacing:0;text-transform:none;font-weight:500}
-.wc{font-variant-numeric:tabular-nums;font-family:var(--m);font-size:.72rem;font-weight:500;color:var(--mut)}
-.wc.bad{color:var(--red)}.wc.ok{color:var(--green-ink)}
+/* the note that appears only when they run out of room */
+.edwrap{position:relative}
+.full{position:absolute;left:0;right:0;top:calc(100% + .3rem);z-index:6;font-size:.78rem;line-height:1.4;
+  color:#fff;background:var(--bar);border-radius:9px;padding:.5rem .65rem;text-align:center;
+  opacity:0;pointer-events:none;transition:opacity .14s}
+.full.on{opacity:1}
 .help{font-size:.76rem;color:var(--mut);text-align:center;line-height:1.45}
 .note-amber{background:var(--amber-bg);color:var(--amber-ink);border-radius:6px;padding:.55rem .7rem;font-size:.78rem;line-height:1.45}
 .note-amber b{font-weight:700}
@@ -249,8 +253,8 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .tile .tl .qmark{margin-left:.2rem}
 .tagrow2{display:flex;gap:.3rem;flex-wrap:nowrap;overflow:hidden;align-items:center;min-height:1.35rem}
 .tag0,.tag1,.tagadd,.taginput{font-size:.7rem;font-weight:600;line-height:1.45;padding:.14rem .5rem;border-radius:999px;white-space:nowrap;flex:none}
-.tagadd{border:1.5px solid var(--green);background:var(--card);color:var(--green-d)}
-.tagadd:hover{background:var(--green);color:#fff}
+.tagadd{border:1.5px solid var(--green);background:var(--green);color:#fff;transition:background .14s,color .14s}
+.tagadd:hover,.tagadd:focus-visible{background:var(--card);color:var(--green-d)}
 .tagmine{background:var(--sunk);color:var(--ink-2);display:inline-flex;align-items:center;gap:.24rem}
 .tagkept{background:var(--sunk);color:var(--green-ink)}
 .tagx{border:0;background:transparent;color:var(--faint);font-size:.82rem;line-height:1;padding:0;font-weight:700}
@@ -271,7 +275,7 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .lab.up{color:var(--green-ink)}
 .box.upbox{background:var(--green-pale);color:var(--green-x);font-weight:500}
 .rec.done span{color:var(--green-x)}
-.rec.quiet{font-weight:600;color:var(--mut)}
+.rec.quiet{font-weight:700}
 /* the previous stage stays on screen, compressed, so the new one reads as growth */
 .ba.squash{display:grid;gap:.25rem;padding:.45rem .55rem;background:var(--sunk);border-radius:9px}
 .ba.squash .cline{display:flex;align-items:center;gap:.5rem;min-width:0}
@@ -281,9 +285,13 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .tagrow2.mini .tag0,.tagrow2.mini .tag1{padding:.08rem .42rem}
 .tagrow2.mini .tagadd{display:none}
 .tile,.tile .tv,.tile .tl,.tile .tu{transition:background .55s,color .55s}
-/* one line, the weight of the labels around it, in the dark blue rather than green */
-.rec{display:flex;align-items:center;gap:.3rem;font-size:.56rem;letter-spacing:0;font-weight:700;color:var(--navy);text-align:left;line-height:1.5}
-.rec span{flex:none;font-size:.68rem;line-height:1}
+/* under the tiles, centred, at the weight of the labels beside it */
+/* the mark leads the sentence rather than hanging off the side of it */
+.rec{display:block;font-size:.6rem;letter-spacing:.04em;font-weight:700;color:var(--navy);
+  text-align:center;line-height:1.6;text-wrap:balance}
+.rec span{width:.95rem;height:.95rem;border-radius:50%;background:var(--red);color:#fff;
+  font-size:.68rem;font-weight:900;line-height:1;display:inline-flex;align-items:center;justify-content:center;
+  letter-spacing:0;font-family:var(--f);vertical-align:-.2em;margin-right:.32rem}
 
 /* collapsibles */
 .coll{border-top:1px solid var(--rule-2)}
@@ -529,10 +537,10 @@ const SITE = {
 const PIC_HELP = "Search can't see this picture yet. Boost it and we'll describe and tag it so it counts.";
 const SCORE_NM = ['AI retrieval','AEO optimized','SEO optimized'];
 const TAGS_AFTER = {
-  img:  ['ImageObject', 'Caption', 'Alt text', 'Subject', 'Location'],
-  h1:   ['Page subject', 'Heading level', 'Service', 'Location'],
-  h2:   ['Section subject', 'Heading level', 'Service'],
-  p:    ['Answer block', 'Article body', 'Topic'],
+  img:  ['ImageObject', 'Caption', 'Alt Text', 'Subject', 'Location'],
+  h1:   ['Page Subject', 'Heading Level', 'Service', 'Location'],
+  h2:   ['Section Subject', 'Heading Level', 'Service'],
+  p:    ['Answer Block', 'Article Body', 'Topic'],
   kick: ['Place', 'Category', 'Region'],
   band: [],
 };
@@ -822,26 +830,26 @@ function scores(c, proj){
   const badge = avg(proj && up ? up : cur).toFixed(1);
   const tiles = shown.map((v,i)=>`<div class="tile ${proj?'up':bandOf(v,i,c)}">
       <span class="tl">${SCORE_TL[i]}<button class="qmark" data-tip="${i}" aria-label="What is ${SCORE_NM[i]}?"></button></span>
-      <span class="tv">${v.toFixed(1)}</span><span class="tu">/10</span>${proj?`<span class="tp">was ${cur[i].toFixed(1)}</span><span class="tw">Projected</span>`:''}
+      <span class="tv">${v.toFixed(1)}</span><span class="tu">/10</span>
     </div>`).join('');
 
   /* what it says now, and only after a preview, what it would say */
   const isImg = c.t === 'img';
   const done = isBoosted(c.id) && !!DONE_BY_TYPE[c.t];
-  const nowText = isImg ? (c.alt || 'No description yet') : c.text;
+  const nowText = isImg ? (c.alt || 'No Description Yet') : c.text;
   const recNow = recOf(c);
   const mine = c.userTags || (c.userTags = []);
   const F = S.flow || {};
   /* whatever already stands above, folded or still being typed, is not repeated */
   const bodyFolded = F.id === c.id && (isImg ? (F.desc !== null || F.analysed) : F.words !== null);
   const chips = mine.map(t=>`<span class="tag1 tagmine">${esc(t)}<button class="tagx" data-deltag="${esc(t)}" aria-label="Remove ${esc(t)}">&times;</button></span>`).join('');
-  const tagsNow = (mine.length ? '' : '<span class="tag0">None yet</span>') + chips;
+  const tagsNow = (mine.length ? '' : '<span class="tag0">None Yet</span>') + chips;
   /* settled work takes no more tags */
   const slot = isBoosted(c.id) ? '' : (F.addingTag
     ? `<input class="taginput" id="taginput" maxlength="18" placeholder="Tag" autocomplete="off"${F.addWide?` style="width:${F.addWide}px"`:''}>`
-    : (mine.length < MAX_OWN_TAGS ? `<button class="tagadd" data-newtag="1">+ Add tag</button>` : ''));
+    : (mine.length < MAX_OWN_TAGS ? `<button class="tagadd" data-newtag="1">+ Add Tag</button>` : ''));
   const helpLink = (canBoost(c) && !isBoosted(c.id))
-    ? `<button class="taghelp" data-taghelp="1">Want help adding tags?</button>` : '';
+    ? `<button class="taghelp" data-taghelp="1">Want Help Adding Tags?</button>` : '';
   const tagCtl = (slot || helpLink) ? `<div class="tagctl">${slot}${helpLink}</div>` : '';
   const recs = (TAGS_AFTER[c.t] || []).filter(t => !mine.includes(t));
   const tagsUp = recs.map(t=>`<span class="tag1">${esc(t)}</span>`).join('')
@@ -857,12 +865,9 @@ function scores(c, proj){
       <div class="tilewrap"><div class="tiles">${tiles}</div>
         <div class="tipline" id="tip"></div></div>
       ${done ? `<div class="rec done"><span>Now in place:</span> ${esc(DONE_BY_TYPE[c.t] || '')}</div>`
-             : (recNow ? `<div class="rec ${proj?'quiet':''}"><span>&#10071;</span>${esc(recNow)}</div>` : '')}
+             : (recNow ? `<div class="rec ${proj?'quiet':''}"><span>!</span>${esc(recNow)}</div>` : '')}
 
-      ${proj ? `<div class="ba squash">
-        <div class="cline"><span class="lab">Current ${isImg?'Description':'Words'}</span><span class="ctext">${esc(nowText)}</span></div>
-        <div class="cline"><span class="lab">Current Tags</span><span class="tagrow2 mini">${tagsNow}</span></div>
-      </div>` : `<div class="ba">
+      ${proj ? '' : `<div class="ba">
         ${bodyFolded ? '' : `<div class="lab">Current ${isImg?'Description':'Words'}</div>
         <div class="box">${esc(nowText)}</div>`}
         <div class="lab">Current Tags</div>
@@ -873,8 +878,8 @@ function scores(c, proj){
       ${proj ? `<div class="ba up">
         <div class="lab up">After the Boost</div>
         <div class="box upbox">${esc(c.up)}</div>
-        <div class="lab up">Tags It Would Get${mine.length?` <span class="labnote">yours kept</span>`:''}</div>
-        <div class="tagrow2">${tagsUp || '<span class="tag1">Structured markup</span>'}</div>
+        <div class="lab up">Tags It Would Get${mine.length?` <span class="labnote">Yours Kept</span>`:''}</div>
+        <div class="tagrow2">${tagsUp || '<span class="tag1">Structured Markup</span>'}</div>
       </div>` : ''}
     </div></div>`;
 }
@@ -901,7 +906,7 @@ function fitTags(row){
     m.onclick = () => {
       const open = row.classList.toggle('open');
       m.setAttribute('aria-expanded', String(open));
-      if (open){ [...row.children].forEach(c => { c.hidden = false; }); m.textContent = 'Show less'; }
+      if (open){ [...row.children].forEach(c => { c.hidden = false; }); m.textContent = 'Show Less'; }
       else fitTags(row);
     };
     row.appendChild(m);
@@ -1009,7 +1014,7 @@ function flow(){
   if (img && photoSet){
     const f = c.fit || (c.fit = {x:50, y:50, z:100});
     const onOriginal = F.wasSrc && c.src === F.wasSrc;
-    parts.push(fold('photo', onOriginal ? 'Original photo in place' : 'New photo added',
+    parts.push(fold('photo', onOriginal ? 'Original Photo in Place' : 'New Photo Added',
       descSet || F.analysed,
       /* while the step is open the picture itself is right below, so no thumbnail */
       photoOpen ? '' : `<span class="sthumb" style="background-image:url(${c.src});background-size:${f.z}%;background-position:${f.x}% ${f.y}%"></span>`));
@@ -1017,8 +1022,8 @@ function flow(){
       <div class="crop" id="crop" style="background-image:url(${c.src});background-size:${f.z}%;background-position:${f.x}% ${f.y}%">
         <span class="hint">Drag to reposition</span></div>
       <div class="zoomrow"><span>Zoom</span><input type="range" id="zoom" min="100" max="260" value="${f.z}"><button class="reset" id="rs">Reset</button></div>
-      <div class="slinks"><button class="slink" id="rep">Replace this photo</button>${
-        F.wasSrc && c.src !== F.wasSrc ? `<button class="slink" id="orig">Use my original photo instead</button>` : ''}</div>
+      <div class="slinks"><button class="slink" id="rep">Replace This Photo</button>${
+        F.wasSrc && c.src !== F.wasSrc ? `<button class="slink" id="orig">Use my Original Photo Instead</button>` : ''}</div>
       <input type="file" id="fi2" accept="image/*" hidden>
     </div>`);
   } else if (img){
@@ -1030,7 +1035,7 @@ function flow(){
 
   /* ── what is in it ── */
   if (img && (photoSet || F.analysed)){
-    if (descSet) parts.push(fold('desc', c.alt || 'No description yet', F.analysed));
+    if (descSet) parts.push(fold('desc', c.alt || 'No Description Yet', F.analysed));
     if (descOpen) parts.push(`<div class="stage">
       <div class="tipwrap">
         <div class="ask">What is in this picture?<button class="qmark" data-tiptext="${esc(PIC_HELP)}" aria-label="Why this matters"></button></div>
@@ -1045,8 +1050,8 @@ function flow(){
     if (wordsSet) parts.push(fold('words', c.text, F.analysed));
     if (wordsOpen) parts.push(`<div class="stage">
       <div class="ask">Change the wording</div>
-      <div class="box ed" contenteditable="true" id="ed">${esc(F.draftWords ?? c.text)}</div>
-      <div class="wc" id="wc"></div>
+      <div class="edwrap"><div class="box ed" contenteditable="true" id="ed">${esc(F.draftWords ?? c.text)}</div>
+        <div class="full" id="full"></div></div>
     </div>`);
   }
 
@@ -1060,8 +1065,8 @@ function flow(){
   if (!F.analysed) cta = `<button class="g" id="go">See How AI Reads This <span class="arw">→</span></button>`;
   else if (canBoost(c) && !isBoosted(c.id) && !F.previewed)
     cta = `<button class="g" id="go">Preview Your Boost <span class="arw">→</span></button>`;
-  else if (canBoost(c) && !isBoosted(c.id)) cta = `<button class="g" id="go">Boost this ${esc(c.lbl.toLowerCase())}<span class="amt2">${M(c.price)}</span></button>`;
-  else if (isBoosted(c.id)) cta = `<div class="sdone"><span class="tick">✓</span><span class="lbl2">Boosted, ${M(S.boosts.find(x=>x.id===c.id).price)} on this session</span></div>`;
+  else if (canBoost(c) && !isBoosted(c.id)) cta = `<button class="g" id="go">Boost This ${esc(tc(c.lbl))}<span class="amt2">${M(c.price)}</span></button>`;
+  else if (isBoosted(c.id)) cta = `<div class="sdone"><span class="tick">✓</span><span class="lbl2">Boosted, ${M(S.boosts.find(x=>x.id===c.id).price)} on This Session</span></div>`;
 
   const secondary = started ? `<button class="ghost" id="sv">Boost This ${esc(shortOf(c))} Later</button>` : '';
 
@@ -1177,20 +1182,36 @@ function flow(){
     dsc.onkeydown = e => { if (e.key === 'Enter'){ e.preventDefault(); const g=$('#go'); if (g) g.click(); } };
   }
 
-  const ed = $('#ed'), wc = $('#wc');
+  const ed = $('#ed'), full = $('#full');
   if (ed){
     const was = F.textWas ?? c.text;
-    const ln = n => n + (n === 1 ? ' line' : ' lines');
-    const tick = () => {
-      const fit = fitsBox(c, was, ed.innerText.trim());
-      wc.className = 'wc ' + (fit.ok ? 'ok' : 'bad');
-      wc.textContent = fit.ok ? `Fits the space, ${ln(fit.lines)}`
-        : fit.why === 'thin' ? 'Too little copy for the space'
-        : fit.d > 0 ? `${ln(fit.d)} too long for the space`
-                    : `${ln(-fit.d)} short of the space`;
-      return fit.ok;
+    let hold;
+    const say = m => {
+      full.textContent = m; full.classList.add('on');
+      clearTimeout(hold); hold = setTimeout(() => full.classList.remove('on'), 2200);
     };
-    ed.addEventListener('input', tick); tick();
+    /* where a point in the tree falls in the plain text, so the check can be made
+       on what the edit would produce rather than on what it already produced */
+    const offsetOf = (node, off) => {
+      const r = document.createRange();
+      r.selectNodeContents(ed); r.setEnd(node, off);
+      return r.toString().length;
+    };
+    ed.addEventListener('beforeinput', e => {
+      const add = e.data ?? (e.dataTransfer ? e.dataTransfer.getData('text/plain') : '');
+      if (!add) return;                             /* deleting always has room */
+      const sel = getSelection();
+      if (!sel.rangeCount) return;
+      const r = sel.getRangeAt(0), cur = ed.innerText;
+      const a = offsetOf(r.startContainer, r.startOffset);
+      const b = offsetOf(r.endContainer, r.endOffset);
+      const next = (cur.slice(0, a) + add + cur.slice(b)).trim();
+      const fit = fitsBox(c, was, next);
+      if (!fit.ok && fit.why === 'long'){
+        e.preventDefault();                         /* the keystroke never lands */
+        say("You have reached your maximum amount of words.");
+      }
+    });
   }
 
   const go = $('#go');
@@ -1304,7 +1325,7 @@ function paintScores(c){
   const sc = document.querySelector('.ca-sc');
   if (sc) sc.textContent = avg(cur).toFixed(1);
   const rec = document.querySelector('.rec:not(.done):not(.quiet)');
-  if (rec && recOf(c)) rec.innerHTML = `<span>&#10071;</span>${esc(recOf(c))}`;
+  if (rec && recOf(c)) rec.innerHTML = `<span>!</span>${esc(recOf(c))}`;
 }
 
 /* what a boosted part looks like: itself, dimmed, with the reason over it */
@@ -1321,13 +1342,13 @@ function lockedP(c){
       <div class="lockback">${back}${scores(c, false)}</div>
       <div class="locknote">
         <span class="lm">&#128274;</span>
-        <div class="lt">This ${esc(c.lbl.toLowerCase())} is already boosted</div>
+        <div class="lt">This ${esc(tc(c.lbl))} is Already Boosted</div>
         <div class="ls">Locked in for <b>90 days</b> while the results build.</div>
       </div>
     </div>
-    ${nxt ? `<button class="g" id="lk-next">Next piece of content<span class="arw">&rarr;</span></button>`
-          : `<button class="g" id="lk-rev">See the whole site<span class="arw">&rarr;</span></button>`}
-    <button class="ghost" id="lk-close">Back to my page</button>`});
+    ${nxt ? `<button class="g" id="lk-next">Next Piece of Content<span class="arw">&rarr;</span></button>`
+          : `<button class="g" id="lk-rev">See The Whole Site<span class="arw">&rarr;</span></button>`}
+    <button class="ghost" id="lk-close">Back to my Page</button>`});
 
   const nb = $('#lk-next');
   if (nb) nb.onclick = () => { shut(); setTimeout(() => pick(nxt.id), 160); };
@@ -1380,12 +1401,12 @@ function askBoost(list){
   const many = list.length > 1, tot = list.reduce((t,k)=>t+k.price, 0);
   const one = list[0], pg = pageOf(one.id).name;
   sheet(`
-    <div class="sh-ttl">${many ? `Boost ${list.length} parts of ${esc(pg)}?` : `Boost this ${esc(one.lbl.toLowerCase())}?`}</div>
+    <div class="sh-ttl">${many ? `Boost ${list.length} Parts of ${esc(pg)}?` : `Boost This ${esc(tc(one.lbl))}?`}</div>
     <div class="sh-sub">${many ? 'Each one is' : 'This is'} rewritten and tagged on your live page so answer engines can read ${many ? 'them' : 'it'}.</div>
-    ${many ? list.map(k=>`<div class="sh-line">${esc(k.lbl)} <span style="color:var(--faint);font-weight:500">on ${esc(pageOf(k.id).name)}</span><span class="amt">${M(k.price)}</span></div>`).join('') : ''}
-    <button class="g" id="sh-go">${many ? `Boost all ${list.length}` : `Boost this ${esc(shortOf(one).toLowerCase())}`}<span class="amt2">${M(tot)}</span></button>
+    ${many ? list.map(k=>`<div class="sh-line">${esc(k.lbl)} <span style="color:var(--faint);font-weight:500">On ${esc(pageOf(k.id).name)}</span><span class="amt">${M(k.price)}</span></div>`).join('') : ''}
+    <button class="g" id="sh-go">${many ? `Boost All ${list.length}` : `Boost This ${esc(shortOf(one))}`}<span class="amt2">${M(tot)}</span></button>
     <div class="sh-term">Runs for <b>90 days</b>, the time it takes to show trackable results.</div>
-    <button class="ghost" id="sh-no">Not yet</button>`);
+    <button class="ghost" id="sh-no">Not Yet</button>`);
   $('#sh-no').onclick = sheetShut;
   $('#sh-go').onclick = () => applyAll(list);
 }
@@ -1425,12 +1446,12 @@ function celebrate(list, before, after, tot){
       ${gauge(esc(pg.name) + ' &middot; AI visibility',  before.ai,  after.ai)}
       ${gauge(esc(pg.name) + ' &middot; SEO visibility', before.seo, after.seo)}
     </div>
-    <div class="sh-line">Added to this session<span class="amt">${M(tot)}</span></div>
+    <div class="sh-line">Added to This Session<span class="amt">${M(tot)}</span></div>
     <div class="sub">Nothing is charged until you press <b>Done</b>.</div>
-    ${nxt ? `<button class="g" id="sh-next">Boost the next one<span class="amt2">${M(nxt.price)}</span></button>
+    ${nxt ? `<button class="g" id="sh-next">Boost The Next One<span class="amt2">${M(nxt.price)}</span></button>
       <div class="mini">${left} more ${left===1?'part':'parts'} of ${esc(pg.name)} ${left===1?'is':'are'} still untagged.</div>
-      <button class="ghost" id="sh-done">Back to my page</button>`
-          : `<button class="g" id="sh-done">Back to my page</button>`}`);
+      <button class="ghost" id="sh-done">Back to my Page</button>`
+          : `<button class="g" id="sh-done">Back to my Page</button>`}`);
 
   /* the bars fill once the sheet is up, so the gain is something you watch happen */
   requestAnimationFrame(() => {
@@ -1500,13 +1521,13 @@ function review(){
   const chg = S.changes.length ? S.changes.map((c,i)=>{
     const k = comp(c.id), up = canBoost(k) && !isBoosted(c.id);
     return `<div class="itm stack">
-      <span class="bdy"><span class="who">${esc(c.lbl)} <i>on ${esc(pageOf(c.id).name)}</i></span>
+      <span class="bdy"><span class="who">${esc(c.lbl)} <i>On ${esc(pageOf(c.id).name)}</i></span>
         ${c.kind==='copy' && c.old ? `<span class="old">${esc(c.old.slice(0,64))}${c.old.length>64?'…':''}</span>` : ''}
         <span class="new">${esc(c.now.slice(0,72))}${c.now.length>72?'…':''}</span>
         <span class="stamp">Marshall · ${esc(c.when)}</span>
         ${up?`<span class="upsell">You changed the words. A boost adds the tagging engines read.</span>`:''}</span>
       <span class="acts">${up?`<button class="mini-g" data-boostnow="${c.id}">Boost ${M(k.price)}</button>`:''}
-        <button class="pill" data-show="${c.id}">Show me</button><button class="pill" data-undo="${i}">Undo</button></span>
+        <button class="pill" data-show="${c.id}">Show Me</button><button class="pill" data-undo="${i}">Undo</button></span>
     </div>`;}).join('') : '<div class="empty">Nothing changed yet.</div>';
 
   /* what they set aside gets asked for once more, at the top, before anything else */
@@ -1519,11 +1540,11 @@ function review(){
       Search engines read the tagging, not the words. ${aside.length===1 ? 'It stays unreadable until it is boosted.' : 'They stay unreadable until they are boosted.'}</div>
     ${aside.map(k=>`<div class="itm">
       <span class="who">${esc(k.lbl)}</span>
-      <span class="bdy"><span class="new">${esc((k.t==='img' ? (k.alt||'No description yet') : k.text).slice(0,60))}</span>
+      <span class="bdy"><span class="new">${esc((k.t==='img' ? (k.alt||'No Description Yet') : k.text).slice(0,60))}</span>
         <span class="stamp">now ${avg(liveScores(k)).toFixed(1)}/10 &rarr; could be ${avg(k.u).toFixed(1)}/10</span></span>
       <span class="acts"><button class="mini-g" data-boostnow="${k.id}">Boost ${M(k.price)}</button></span>
     </div>`).join('')}
-    ${aside.length>1 ? `<button class="g" id="boostaside">Boost them all<span class="amt2">${M(asideTotal)}</span></button>` : ''}
+    ${aside.length>1 ? `<button class="g" id="boostaside">Boost Them All<span class="amt2">${M(asideTotal)}</span></button>` : ''}
   </div>` : '';
 
   /* one last offer before they close the session */
@@ -1537,7 +1558,7 @@ function review(){
         <span class="new">${esc(n.text)}</span>
         <span class="stamp">Marshall · ${esc(n.when)}${n.sent?' · sent':''}</span>
         ${n.reply?`<span class="msg them" style="margin-top:.2rem"><b>${esc(n.to)}</b>${esc(n.reply)}</span>`:''}</span>
-      <span class="acts"><button class="pill" data-show="${n.id}">Show me</button>
+      <span class="acts"><button class="pill" data-show="${n.id}">Show Me</button>
         <button class="pill" data-sort="${i}">${n.done?'Reopen':'Sorted'}</button></span>
     </div>`).join('') : '<div class="empty">No notes yet. Use Comment, then click part of your page.</div>';
 
@@ -1545,26 +1566,26 @@ function review(){
       <span class="who">${esc(b.lbl)}</span>
       <span class="bdy"><span class="new">On ${esc(pageOf(b.id).name)}</span>
         <span class="stamp">AI +${b.gain[0]} · AEO +${b.gain[1]} · SEO +${b.gain[2]}</span></span>
-      <span class="acts"><span class="amt">${M(b.price)}</span><button class="pill" data-show="${b.id}">Show me</button></span>
+      <span class="acts"><span class="amt">${M(b.price)}</span><button class="pill" data-show="${b.id}">Show Me</button></span>
     </div>`).join('') : '<div class="empty">No boosts yet.</div>';
 
-  open({ ttl:'<b>Review the whole site</b>', body:`
+  open({ ttl:'<b>Review The Whole Site</b>', body:`
     ${asideBlock}
-    <div class="sec"><button class="sec-hd" data-t="r1" aria-expanded="true">What changed (${S.changes.length})<span class="tw">✕</span></button>
+    <div class="sec"><button class="sec-hd" data-t="r1" aria-expanded="true">What Changed (${S.changes.length})<span class="tw">✕</span></button>
       <div class="sec-bd" id="r1">${chg}
         ${openTotal?`<div class="lastcall">
           <div><b>${openBoosts.length} of your edits ${openBoosts.length===1?'is':'are'} still untagged.</b>
           Search engines read the tagging, not just the words.</div>
-          <button class="g" id="boostall">Boost ${openBoosts.length===1?'it':'them all'}<span class="amt2">${M(openTotal)}</span></button>
+          <button class="g" id="boostall">Boost ${openBoosts.length===1?'It':'Them All'}<span class="amt2">${M(openTotal)}</span></button>
         </div>`:''}</div></div>
-    <div class="sec"><button class="sec-hd" data-t="r2" aria-expanded="${openN?'true':'false'}">Notes (${openN} open of ${S.notes.length})<span class="tw">${openN?'✕':'+'}</span></button>
+    <div class="sec"><button class="sec-hd" data-t="r2" aria-expanded="${openN?'true':'false'}">Notes (${openN} Open of ${S.notes.length})<span class="tw">${openN?'✕':'+'}</span></button>
       <div class="sec-bd" id="r2" ${openN?'':'hidden'}>${nts}
-        ${S.notes.length?`<div class="help" style="padding-top:.5rem">Tick the notes you want to send</div>
-        <button class="g" id="send" ${S.picked.size?'':'disabled'}>Send the ticked notes</button>
+        ${S.notes.length?`<div class="help" style="padding-top:.5rem">Tick The Notes You Want to Send</div>
+        <button class="g" id="send" ${S.picked.size?'':'disabled'}>Send The Ticked Notes</button>
         <div class="mini" style="padding-top:.3rem">Each note goes to the person it was already meant for. One message each, holding only their notes.</div>`:''}</div></div>
-    <div class="sec"><button class="sec-hd" data-t="r3" aria-expanded="true">Boosts on this page (${S.boosts.filter(b=>b.page===S.page).length})<span class="tw">✕</span></button>
+    <div class="sec"><button class="sec-hd" data-t="r3" aria-expanded="true">Boosts on This Page (${S.boosts.filter(b=>b.page===S.page).length})<span class="tw">✕</span></button>
       <div class="sec-bd" id="r3">${bst}
-        <div class="spent"><span>Spent on this page</span><span class="amt">${M(pageSpend(S.page))}</span></div>
+        <div class="spent"><span>Spent on This Page</span><span class="amt">${M(pageSpend(S.page))}</span></div>
         <div class="mini">Across the whole site so far: ${M(S.boosts.reduce((t,b)=>t+b.price,0))} · settles when you press Done.</div></div></div>
     <div class="p-ft">Approved by <b>Marshall</b>, just now.</div>`});
 
@@ -1604,7 +1625,7 @@ function review(){
 
 /* ═══════════ account ═══════════ */
 function account(){
-  open({ ttl:'<b>Your account</b>', body:`
+  open({ ttl:'<b>Your Account</b>', body:`
     <div class="itm" style="border:0;grid-template-columns:auto 1fr">
       <span style="width:2.4rem;height:2.4rem;border-radius:50%;background:var(--bar);color:#fff;display:grid;place-items:center;font-weight:800">M</span>
       <span class="bdy"><span class="new" style="font-weight:700">Marshall</span><span class="stamp">mg@readtomato.com</span></span></div>
@@ -1618,16 +1639,16 @@ function account(){
     <div class="sec"><button class="sec-hd" data-t="a2" aria-expanded="false">Receipts (${S.receipts.length})<span class="tw">+</span></button>
       <div class="sec-bd" id="a2" hidden>${S.receipts.map(r=>`<div class="itm">
           <span class="stamp">${esc(r.when)}</span><span class="bdy"><span class="new">${r.n} item${r.n>1?'s':''}</span></span><span class="amt">${M(r.amt)}</span></div>`).join('')}
-        <div class="spent"><span>Paid to date</span><span class="amt">${M(paidTotal())}</span></div>
+        <div class="spent"><span>Paid to Date</span><span class="amt">${M(paidTotal())}</span></div>
         <div class="mini">Each line is one settled session, not one boost.</div></div></div>
-    <div class="sec"><button class="sec-hd" data-t="a3" aria-expanded="false">People on your account<span class="tw">+</span></button>
+    <div class="sec"><button class="sec-hd" data-t="a3" aria-expanded="false">People on Your Account<span class="tw">+</span></button>
       <div class="sec-bd" id="a3" hidden>
-        <div class="itm"><span class="who">Owner</span><span class="bdy"><span class="new">You, edit and boost</span></span><span></span></div>
+        <div class="itm"><span class="who">Owner</span><span class="bdy"><span class="new">You, Edit and Boost</span></span><span></span></div>
         ${PEOPLE.slice(0,S.seats).map(p=>`<div class="itm"><span class="who"><i>Reviewer</i></span><span class="bdy"><span class="new">${esc(p)}, notes only</span></span><span></span></div>`).join('')}
         ${S.seats<2?'<div class="itm"><span></span><span class="bdy"><span class="stamp">One seat is included. A second is $9/mo.</span></span><span class="acts"><button class="pill" id="as">Add</button></span></div>':''}</div></div>
-    <div class="sec"><button class="sec-hd" data-t="a4" aria-expanded="false">How you like to work<span class="tw">+</span></button>
+    <div class="sec"><button class="sec-hd" data-t="a4" aria-expanded="false">How You Like to Work<span class="tw">+</span></button>
       <div class="sec-bd" id="a4" hidden><div class="itm">
-        <span></span><span class="bdy"><span class="new">Confirm before each boost</span><span class="stamp">Always on. Boosts run for 90 days, so Sitecraft asks every time.</span></span>
+        <span></span><span class="bdy"><span class="new">Confirm Before Each Boost</span><span class="stamp">Always on. Boosts run for 90 days, so Sitecraft asks every time.</span></span>
         <span></span></div></div></div>
     <div class="note-amber">Your plan is <b>$299/mo</b>. Boosts are agreed as you pick them and settle as one amount each time you press Done.</div>
     <div class="p-ft"><u>All my details</u> · © 2026 ReadTomato™</div>`});
@@ -1639,7 +1660,7 @@ function guide(){
   const pg = SITE[S.page], list = pg.comps.filter(canBoost);
   const left = list.filter(c=>!isBoosted(c.id));
   const tot = left.reduce((t,c)=>t+c.price,0);
-  open({ ttl:`<b>What is on ${pg.name}</b>`, flag: pg.critical?'SEO/AEO Critical Page':'', body:`
+  open({ ttl:`<b>What Is on ${esc(pg.name)}</b>`, flag: pg.critical?'SEO/AEO Critical Page':'', body:`
     <div class="help">Everything Sitecraft can see on this page, and what each part scores right now. Outlined on the page behind this.</div>
     <div class="sec-bd">${pg.comps.map(c=>{
       const b = isBoosted(c.id);
@@ -1647,7 +1668,7 @@ function guide(){
         <span class="bdy"><span class="new">${esc(c.text.slice(0,40))}${c.text.length>40?'…':''}</span>
           <span class="stamp">now ${avg(liveScores(c)).toFixed(1)}/10${c.u?` → could be ${avg(c.u).toFixed(1)}/10`:''}</span></span>
         <span class="acts"><span class="amt" style="color:${b?'var(--green-d)':canBoost(c)?'var(--navy)':'var(--amber-ink)'}">${b?'✓ done':canBoost(c)?M(c.price):'needs you'}</span>
-        <button class="pill" data-show="${c.id}">Show me</button></span></div>`;
+        <button class="pill" data-show="${c.id}">Show Me</button></span></div>`;
     }).join('')}</div>
     ${tot?`<div class="spent"><span>Boost all ${left.length} left on this page</span><span class="amt">${M(tot)}</span></div>
       <button class="g" id="all">Boost the whole page · ${M(tot)}</button>
