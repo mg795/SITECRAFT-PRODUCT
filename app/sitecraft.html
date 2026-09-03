@@ -532,12 +532,6 @@ const DONE_BY_TYPE = {
   band: '',
 };
 const SCORE_TL = ['AI RETRIEVAL','AEO OPTIMIZED','SEO OPTIMIZED'];
-const WHY = [
-  '<b>Why this matters.</b> AI tools pull out one paragraph at a time, not whole pages. If a paragraph only makes sense after reading the one above it, it gets left behind when an assistant is putting an answer together.',
-  '<b>Why this matters.</b> This is whether ChatGPT, Perplexity or Google\'s AI answers name <em>you</em>. A heading that makes a claim beats a heading that is just a label, and naming your actual neighbourhood beats advice that could apply anywhere.',
-  '<b>Why this matters.</b> Whether Google can rank this. It rewards the words people really search for appearing early, sensible lengths, and text that reads naturally rather than stuffed with keywords.',
-];
-const TAGGING = '<b>What does tagging mean?</b> Tagging means adding extra notes into your page\'s code. Visitors never see them. Google and AI search engines read them to work out what each part of your page actually is.<br><br>Writing it better lifts part of these scores on its own. The tagging only comes with a boost, which is why the numbers keep climbing after you have done your best with the words.';
 const HEAD_TIP = "These three numbers are how search engines and AI assistants read this part of your page today.";
 const TIP = [
   "Can an assistant quote this on its own? Short, self-contained lines win.",
@@ -549,7 +543,7 @@ const PEOPLE = ['Jo Castellane','Priya Raman'];
 /* ═══════════ state ═══════════ */
 const S = { page:'home', mode:null, editing:false, sel:null, open:null,
   flows:{}, changes:[], notes:[], boosts:[], receipts:[{when:'2026-09-02 16:06', site:'Real Estate Excellence', n:1, amt:0.99}],
-  seats:1, session:0, boostCount:0, picked:new Set(), noteTo:PEOPLE[0], projecting:null,
+  seats:1, session:0, boostCount:0, picked:new Set(), noteTo:PEOPLE[0],
   later:new Set() };
 
 const $ = s => document.querySelector(s);
@@ -595,18 +589,19 @@ function recOf(c){
 }
 const uniq = a => [...new Set(a)];
 
-function dif(a,b){
-  const A=a.split(/(\s+)/),B=b.split(/(\s+)/),n=A.length,m=B.length;
-  const L=Array.from({length:n+1},()=>new Uint16Array(m+1));
-  for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--)L[i][j]=A[i]===B[j]?L[i+1][j+1]+1:Math.max(L[i+1][j],L[i][j+1]);
-  const o=[];const p=(t,x)=>{const l=o[o.length-1];if(l&&l.t===t)l.x+=x;else o.push({t,x});};
-  let i=0,j=0;
-  while(i<n&&j<m){if(A[i]===B[j]){p('=',A[i]);i++;j++;}else if(L[i+1][j]>=L[i][j+1]){p('-',A[i]);i++;}else{p('+',B[j]);j++;}}
-  while(i<n)p('-',A[i++]);while(j<m)p('+',B[j++]);return o;
-}
-const rend = (d,k) => d.filter(x=>x.t==='='||x.t===k).map(x=>x.t==='='?esc(x.x):`<${k==='+'?'ins':'del'}>${esc(x.x)}</${k==='+'?'ins':'del'}>`).join('');
 
 /* ═══════════ draw site ═══════════ */
+/* draw() rebuilds the page, so it is for structural change only. Anything that
+   moves while a pointer is down repaints the single element it touches: a full
+   rebuild re-parses every inlined image and turns a drag into a slideshow. */
+function paintComp(c){
+  const el = document.querySelector(`[data-id="${c.id}"]`);
+  if (!el || c.t !== 'img' || !c.src) return;
+  const f = c.fit || {x:50, y:50, z:100};
+  el.style.backgroundSize = f.z + '%';
+  el.style.backgroundPosition = `${f.x}% ${f.y}%`;
+  el.setAttribute('aria-label', c.alt || '');
+}
 function draw(){
   const pg = SITE[S.page];
   const one = c => {
@@ -731,7 +726,7 @@ function shut(){
   open._key = null;
   const sh = $('#sheet'); sh.hidden = true; sh.classList.remove('on'); $('#sheetcard').innerHTML = '';
   $('#scrim').classList.remove('open');
-  S.sel = null; S.projecting = null;
+  S.sel = null;
   document.querySelectorAll('.c.sel').forEach(e=>e.classList.remove('sel'));
 }
 function toast(m, undo){
@@ -749,8 +744,9 @@ const VALUE_HELP = {
 const tc = s => String(s).replace(/\b\w/g, m => m.toUpperCase());
 const SHORT = {'Feature Photo':'Photo','Body copy':'Text','List item':'Text','Eyebrow':'Label','Heading':'Heading'};
 const shortOf = c => SHORT[c.lbl] || tc(c.lbl);
-const hdr = c => `${esc(c.lbl)} <span class="dot">·</span> <i>On ${SITE[pgOf(c.id)].name}</i>`;
-const flagOf = c => pageValue(SITE[pgOf(c.id)]);
+const pageOf = id => SITE[pgOf(id)] || {name:'this page', value:2, comps:[]};
+const hdr = c => `${esc(c.lbl)} <span class="dot">·</span> <i>On ${esc(pageOf(c.id).name)}</i>`;
+const flagOf = c => pageValue(pageOf(c.id));
 
 /* ═══════════ modes ═══════════ */
 function setMode(m){
@@ -802,9 +798,10 @@ function showMe(id){ shut(); S.page = pgOf(id); draw(); setTimeout(()=>flash(id)
 
 /* ═══════════ scores block ═══════════ */
 function scores(c, proj){
-  const cur = liveScores(c), up = c.u;
+  if (!Array.isArray(c.s)) return '';        /* nothing to show, and nothing to crash on */
+  const cur = liveScores(c), up = Array.isArray(c.u) ? c.u : null;
   const shown = proj && up ? up : cur;
-  const badge = (proj ? avg(up) : avg(cur)).toFixed(1);
+  const badge = avg(proj && up ? up : cur).toFixed(1);
   const tiles = shown.map((v,i)=>`<div class="tile ${proj?'up':bandOf(v,i,c)}">
       <span class="tl">${SCORE_TL[i]}<button class="qmark" data-tip="${i}" aria-label="What is ${SCORE_NM[i]}?"></button></span>
       <span class="tv">${v.toFixed(1)}</span><span class="tu">/10</span>${proj?`<span class="tp">was ${cur[i].toFixed(1)}</span><span class="tw">Projected</span>`:''}
@@ -935,6 +932,14 @@ function wireTips(){
 /* No step labels. Each stage completes, collapses to a ticked line, and the
    next action appears as the single primary button naming what it does. */
 
+const MAX_PHOTO = 8 * 1024 * 1024;
+/* every picture is inlined, so an oversized one has to be turned away in words */
+function readable(file){
+  if (!file || !file.type.startsWith('image/')){ toast('That needs to be an image file.'); return false; }
+  if (file.size > MAX_PHOTO){ toast(`That photo is ${(file.size/1048576).toFixed(1)}MB. Keep it under 8MB.`); return false; }
+  return true;
+}
+
 const setFlow = f => { S.flow = f; S.flows[f.id] = f; return f; };
 /* the stack grows past the panel, so the newest stage comes to meet the reader */
 function toBottom(){
@@ -957,7 +962,9 @@ function editP(id){
 }
 
 function flow(){
-  const c = comp(S.flow.id), F = S.flow, img = c.t === 'img';
+  const F = S.flow, c = F && comp(F.id);
+  if (!c) return shut();                     /* the component went away; do not render half a panel */
+  const img = c.t === 'img';
   if (c.blocked) return blockedP(c.id);
 
   /* Every step that settles folds into a line and stays there. The panel only
@@ -1063,7 +1070,7 @@ function flow(){
   if (rep) rep.onclick = () => fi2 && fi2.click();
   if (fi2) fi2.onchange = e => {
     const file = e.target.files[0];
-    if (!file || !file.type.startsWith('image/')) return toast('That needs to be an image file.');
+    if (!readable(file)) return;
     const r = new FileReader();
     r.onload = ev => {
       c.src = ev.target.result; c.fit = {x:50, y:50, z:100}; F.photo = c.src;
@@ -1078,7 +1085,7 @@ function flow(){
   const dz = $('#dz'), fi = $('#fi');
   if (dz){
     const take = file => {
-      if (!file || !file.type.startsWith('image/')) return toast('That needs to be an image file.');
+      if (!readable(file)) return;
       const r = new FileReader();
       r.onload = e => {
         c.src = e.target.result; F.photo = c.src; c.fit = {x:50, y:50, z:100};
@@ -1098,11 +1105,11 @@ function flow(){
 
   const crop = $('#crop');
   if (crop){
-    const f = c.fit;
+    const f = c.fit || (c.fit = {x:50, y:50, z:100});
     const paint = () => {
       crop.style.backgroundSize = f.z + '%';
       crop.style.backgroundPosition = f.x + '% ' + f.y + '%';
-      draw();
+      paintComp(c);
     };
     let drag = null;
     crop.addEventListener('pointerdown', e => {
@@ -1119,8 +1126,14 @@ function flow(){
       paint();
     });
     ['pointerup','pointercancel'].forEach(k => crop.addEventListener(k, () => { drag = null; }));
-    $('#zoom').oninput = e => { f.z = +e.target.value; paint(); };
-    $('#rs').onclick = () => { f.x = 50; f.y = 50; f.z = 100; $('#zoom').value = 100; crop.classList.remove('moved'); paint(); };
+    const zoom = $('#zoom');
+    if (zoom) zoom.oninput = e => { f.z = +e.target.value; paint(); };
+    const rs = $('#rs');
+    if (rs) rs.onclick = () => {
+      f.x = 50; f.y = 50; f.z = 100;
+      if (zoom) zoom.value = 100;
+      crop.classList.remove('moved'); paint();
+    };
   }
 
   const bkBtn = $('#orig');
@@ -1186,7 +1199,7 @@ function logChange(c, kind, was, now){
   if (was === now){ if (at > -1) S.changes.splice(at, 1); return; }
   if (at > -1){ S.changes[at].now = now; S.changes[at].when = 'just now'; }
   else S.changes.push({id:c.id, page:pgOf(c.id), lbl:c.lbl,
-                       old:was || '(no description)', now, when:'just now', kind});
+                       old:was, now, when:'just now', kind});
 }
 /* typing lands straight on the component, so the numbers can answer for it */
 function liveDesc(){
@@ -1195,7 +1208,7 @@ function liveDesc(){
   const v = d.value.trim();
   if (v === (c.alt || '')) return;
   logChange(c, 'alt', S.flow.altWas || '', v);
-  c.alt = v; bdg(); draw(); paintScores(c);
+  c.alt = v; bdg(); paintComp(c); paintScores(c);
 }
 function commitDesc(){
   const d = $('#dsc'); if (!d) return;
@@ -1238,14 +1251,14 @@ function blockedP(id){
 /* ═══════════ boost: ask, apply, celebrate ═══════════ */
 /* how the whole page reads, not just the part in front of them */
 function pageScore(page){
-  const cs = SITE[page].comps.filter(k => k.s && k.u);
+  const cs = (SITE[page] || {comps:[]}).comps.filter(k => Array.isArray(k.s) && Array.isArray(k.u));
   if (!cs.length) return {ai:0, seo:0};
   const now = k => isBoosted(k.id) ? k.u : liveScores(k);
   return { ai:  +avg(cs.map(k => (now(k)[0] + now(k)[1]) / 2)).toFixed(1),
            seo: +avg(cs.map(k => now(k)[2])).toFixed(1) };
 }
 const nextUp = (page, not) =>
-  SITE[page].comps.find(k => k.id !== not && canBoost(k) && !isBoosted(k.id));
+  (SITE[page] || {comps:[]}).comps.find(k => k.id !== not && canBoost(k) && !isBoosted(k.id));
 
 function sheet(html){
   const sh = $('#sheet');
@@ -1263,12 +1276,12 @@ const sheetOpen = () => !$('#sheet').hidden;
 /* the one step that cannot be walked back gets its own surface and its own words */
 function askBoost(list){
   const many = list.length > 1, tot = list.reduce((t,k)=>t+k.price, 0);
-  const one = list[0], pg = SITE[pgOf(one.id)].name;
+  const one = list[0], pg = pageOf(one.id).name;
   sheet(`
     <div class="sh-ttl">${many ? `Boost ${list.length} parts of ${esc(pg)}?` : `Boost this ${esc(one.lbl.toLowerCase())}?`}</div>
     <div class="sh-sub">${many ? 'Each one is' : 'This is'} rewritten and tagged on your live page so answer engines can read ${many ? 'them' : 'it'}.</div>
     <div class="sh-lock"><span>&#128274;</span><div>A boost holds for <b>90 days</b>. Once you say yes, it can't be cancelled before then.</div></div>
-    ${list.map(k=>`<div class="sh-line">${esc(k.lbl)} <span style="color:var(--faint);font-weight:500">on ${esc(SITE[pgOf(k.id)].name)}</span><span class="amt">${M(k.price)}</span></div>`).join('')}
+    ${list.map(k=>`<div class="sh-line">${esc(k.lbl)} <span style="color:var(--faint);font-weight:500">on ${esc(pageOf(k.id).name)}</span><span class="amt">${M(k.price)}</span></div>`).join('')}
     <button class="g" id="sh-go">${many ? `Boost all ${list.length}` : `Boost this ${esc(shortOf(one).toLowerCase())}`}<span class="amt2">${M(tot)}</span></button>
     <button class="ghost" id="sh-no">Not yet</button>`);
   $('#sh-no').onclick = sheetShut;
@@ -1291,14 +1304,14 @@ function applyAll(list){
 
 /* a boost is a win, so it is told as one, with the page's own numbers behind it */
 function celebrate(list, before, after, tot){
-  const one = list[0], page = pgOf(one.id), pg = SITE[page];
+  const one = list[0], page = pgOf(one.id), pg = pageOf(one.id);
   const val = VALUE[pg.value];
   const gauge = (label, from, to) => `<div class="gauge">
       <div class="ghd"><span class="glbl">${label}</span>
         <span class="gnum">${to.toFixed(1)}<em>/10</em>${to > from ? `<b>+${(to-from).toFixed(1)}</b>` : ''}</span></div>
       <div class="gbar"><i class="gfill" data-w="${from*10}"></i><i class="ggain" data-l="${from*10}" data-w="${to > from ? Math.max(1.8, (to-from)*10) : 0}"></i><i class="gticks"></i></div>
     </div>`;
-  const left = SITE[page].comps.filter(k => canBoost(k) && !isBoosted(k.id)).length;
+  const left = pg.comps.filter(k => canBoost(k) && !isBoosted(k.id)).length;
   const nxt = nextUp(page, null);
   sheet(`
     <div class="sh-win">
@@ -1343,7 +1356,7 @@ function celebrate(list, before, after, tot){
   if (rb) rb.onclick = () => { sheetShut(); setMode('review'); };
 }
 
-function apply(id){ askBoost([comp(id)]); }
+
 /* ═══════════ comments ═══════════ */
 function noteP(id){
   const c = comp(id), mine = S.notes.filter(n=>n.id===id);
@@ -1387,8 +1400,8 @@ function review(){
   const chg = S.changes.length ? S.changes.map((c,i)=>{
     const k = comp(c.id), up = canBoost(k) && !isBoosted(c.id);
     return `<div class="itm stack">
-      <span class="bdy"><span class="who">${esc(c.lbl)} <i>on ${SITE[c.page].name}</i></span>
-        ${c.kind==='copy'?`<span class="old">${esc(c.old.slice(0,64))}${c.old.length>64?'…':''}</span>`:''}
+      <span class="bdy"><span class="who">${esc(c.lbl)} <i>on ${esc(pageOf(c.id).name)}</i></span>
+        ${c.kind==='copy' && c.old ? `<span class="old">${esc(c.old.slice(0,64))}${c.old.length>64?'…':''}</span>` : ''}
         <span class="new">${esc(c.now.slice(0,72))}${c.now.length>72?'…':''}</span>
         <span class="stamp">Marshall · ${esc(c.when)}</span>
         ${up?`<span class="upsell">You changed the words. A boost adds the tagging engines read.</span>`:''}</span>
@@ -1401,7 +1414,7 @@ function review(){
   const asideTotal = aside.reduce((t,k)=>t+k.price, 0);
   const asideBlock = aside.length ? `<div class="lastcall">
     <div><b>${aside.length===1
-        ? `Your ${esc(aside[0].lbl.toLowerCase())} on ${esc(SITE[pgOf(aside[0].id)].name)} is set aside.`
+        ? `Your ${esc(aside[0].lbl.toLowerCase())} on ${esc(pageOf(aside[0].id).name)} is set aside.`
         : `${aside.length} parts are set aside.`}</b>
       Search engines read the tagging, not the words. ${aside.length===1 ? 'It stays unreadable until it is boosted.' : 'They stay unreadable until they are boosted.'}</div>
     ${aside.map(k=>`<div class="itm">
@@ -1430,7 +1443,7 @@ function review(){
 
   const bst = S.boosts.length ? S.boosts.map(b=>`<div class="itm">
       <span class="who">${esc(b.lbl)}</span>
-      <span class="bdy"><span class="new">On ${SITE[b.page].name}</span>
+      <span class="bdy"><span class="new">On ${esc(pageOf(b.id).name)}</span>
         <span class="stamp">AI +${b.gain[0]} · AEO +${b.gain[1]} · SEO +${b.gain[2]}</span></span>
       <span class="acts"><span class="amt">${M(b.price)}</span><button class="pill" data-show="${b.id}">Show me</button></span>
     </div>`).join('') : '<div class="empty">No boosts yet.</div>';
@@ -1466,7 +1479,7 @@ function review(){
   document.querySelectorAll('[data-show]').forEach(b=>b.onclick=()=>showMe(b.dataset.show));
   document.querySelectorAll('[data-undo]').forEach(b=>b.onclick=()=>{
     const c = S.changes[+b.dataset.undo], k = comp(c.id);
-    if (c.kind==='alt') k.alt = c.old==='(nothing)'?'':c.old; else k.text = c.old;
+    if (c.kind === 'alt') k.alt = c.old; else k.text = c.old;
     S.changes.splice(+b.dataset.undo,1); draw(); review(); bdg(); toast('Change undone.');
   });
   document.querySelectorAll('[data-sort]').forEach(b=>b.onclick=()=>{
@@ -1591,7 +1604,11 @@ function stepBack(){
   if (F.previewed){ F.previewed = false; F.rolled = false; }
   else if (F.analysed) F.analysed = false;
   else if (c.t === 'img' && F.desc !== null) F.desc = null;
-  else if (c.t === 'img' && F.photo) { c.src = F.wasSrc || null; c.fit = F.wasFit || null; F.photo = null; draw(); }
+  else if (c.t === 'img' && F.photo){
+    c.src = F.wasSrc || null;
+    c.fit = F.wasFit ? {...F.wasFit} : null;      /* a copy: the snapshot has to survive the next drag */
+    F.photo = null; draw();
+  }
   flow();
 }
 document.querySelectorAll('.bar [data-mode]').forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
