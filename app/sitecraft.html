@@ -40,13 +40,19 @@ input,textarea,select{font-family:inherit}
 :focus-visible{outline:2px solid var(--blue);outline-offset:2px}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
+/* ═══════ Sitecraft chrome ═══════ */
+.sc-bar{display:flex;align-items:center;justify-content:flex-end;gap:.55rem;padding:.42rem 1.4rem;
+  background:var(--bar);color:#C7D0DE;font-size:.76rem;font-weight:600;letter-spacing:.01em}
+.sc-name{color:#fff}
+.sc-lock{color:#C7D0DE}
+.sc-done{border:0;background:transparent;color:var(--green);font:inherit;font-weight:700;padding:0;text-decoration:underline}
+.sc-done:hover{color:#fff}
+
 /* ═══════ the client's site ═══════ */
 nav.site{display:flex;align-items:center;gap:1.5rem;padding:.9rem 2.2rem;border-bottom:1px solid var(--rule);position:relative;flex-wrap:wrap;background:var(--card)}
 nav.site .lg{font-weight:800;letter-spacing:-.02em;font-size:1rem;margin-right:auto;color:var(--navy)}
 nav.site a{font-size:.85rem;font-weight:500;color:var(--ink-2);text-decoration:none}
 nav.site a.on{color:var(--blue);font-weight:600}
-nav.site .navlock{position:absolute;inset:0;display:none;align-items:center;justify-content:center;background:color-mix(in srgb,var(--card) 88%,transparent);font-size:.78rem;font-weight:600;color:var(--amber-ink);gap:.4rem}
-body.editing nav.site .navlock{display:flex}
 
 .hero{background:var(--bar);padding:3.2rem 2.2rem;color:#fff}
 .hero .in{max-width:52rem;margin:0 auto}
@@ -314,19 +320,19 @@ textarea.ta{width:100%;font-family:var(--f);font-size:.87rem;padding:.6rem .7rem
 .toast{position:fixed;left:50%;bottom:5rem;transform:translateX(-50%);background:var(--bar);color:#fff;padding:.6rem 1rem;border-radius:9px;font-size:.83rem;box-shadow:var(--sh);z-index:110;text-align:center;max-width:calc(100vw - 2rem);line-height:1.4}
 .toast[hidden]{display:none}
 .toast button{border:0;background:transparent;color:#9BD35F;text-decoration:underline;font-size:.8rem;font-weight:700;margin-left:.6rem}
-.banner{position:fixed;top:0;left:0;right:0;background:var(--amber);color:#2A1F06;font-size:.76rem;font-weight:700;padding:.35rem 1rem;text-align:center;z-index:65;display:none}
-body.editing .banner{display:block}
-body.editing nav.site{margin-top:1.6rem}
-</style>
+body.editing </style>
 
-<div class="banner">You're editing. Press <b>Done</b> to settle up and unlock the other pages</div>
+
+<div class="sc-bar">
+  <span class="sc-lock" id="sc-lock" hidden>&#128274; This page is locked while editing. <button class="sc-done" id="sc-done">Press Done</button></span>
+  <span class="sc-name">Sitecraft Editor</span>
+</div>
 
 <nav class="site">
   <span class="lg"><img src="" id="thp-logo" alt="Real Estate Excellence" style="height:1.55rem;display:block"></span>
   <a href="#" data-go="home" class="on">Home</a>
   <a href="#" data-go="episodes">Episodes</a>
   <a href="#" data-go="guest">Be A Guest</a>
-  <div class="navlock">🔒 Locked while you're editing. Press Done</div>
 </nav>
 
 <div class="hero" id="hero"></div>
@@ -480,7 +486,7 @@ const PEOPLE = ['Jo Castellane','Priya Raman'];
 
 /* ═══════════ state ═══════════ */
 const S = { page:'home', mode:null, editing:false, sel:null, open:null,
-  flows:{}, changes:[], notes:[], boosts:[], receipts:[{when:'2026-09-02 16:06', site:'Northgate', n:1, amt:0.99}],
+  flows:{}, changes:[], notes:[], boosts:[], receipts:[{when:'2026-09-02 16:06', site:'Real Estate Excellence', n:1, amt:0.99}],
   seats:1, session:0, boostCount:0, skipConfirm:false, offered:false, picked:new Set(), noteTo:PEOPLE[0], projecting:null };
 
 const $ = s => document.querySelector(s);
@@ -641,13 +647,20 @@ function setMode(m){
   if (S.mode==='edit') toast('Click any part of your page to change it or boost it.');
   if (S.mode==='comment') toast('Click any part of your page to leave a note on it.');
 }
-function arm(){ if (S.editing) return; S.editing = true; document.body.classList.add('editing'); document.querySelector('.done').classList.add('armed'); }
+function arm(){
+  if (S.editing) return;
+  S.editing = true;
+  document.body.classList.add('editing');
+  $('#sc-lock').hidden = false;
+  document.querySelector('.done').classList.add('armed');
+}
 function done(){
   if (!S.editing){ toast("You're already unlocked. Pick a page."); return; }
   const amt = S.session;
-  if (amt){ S.receipts.push({when:'now', site:'Northgate', n:S.boosts.length, amt}); S.session = 0; }
+  if (amt){ S.receipts.push({when:'now', site:'Real Estate Excellence', n:S.boosts.length, amt}); S.session = 0; }
   S.editing = false; S.mode = null; S.flows = {};
   document.body.classList.remove('editing','pick','ident');
+  $('#sc-lock').hidden = true;
   document.querySelectorAll('.bar [data-mode]').forEach(b=>b.classList.remove('on'));
   document.querySelector('.done').classList.remove('armed');
   shut(); bdg();
@@ -1269,6 +1282,7 @@ function stepBack(){
 }
 document.querySelectorAll('.bar [data-mode]').forEach(b=>b.onclick=()=>setMode(b.dataset.mode));
 document.querySelector('[data-done]').onclick = done;
+$('#sc-done').onclick = done;
 $('#p-x').onclick = ()=> ['review','account','ident'].includes(S.mode) ? setMode(S.mode) : shut();
 $('#scrim').onclick = ()=>$('#p-x').click();
 document.addEventListener('keydown', e=>{ if (e.key==='Escape') $('#p-x').click(); });
