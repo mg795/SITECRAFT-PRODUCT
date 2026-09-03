@@ -103,10 +103,11 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .flagchip.v3{color:var(--red)}
 .flagchip.v2{color:var(--ink-2)}
 .flagchip.v1{color:var(--faint)}
-.qmark{border:1.5px solid var(--green);background:var(--card);color:var(--green-d);width:1.05rem;height:1.05rem;border-radius:50%;font-size:.64rem;font-weight:800;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;line-height:1;flex:none;transition:background .12s,color .12s}
-.qmark::before{content:'?';display:block;transform:translateY(0.5px)}
-.qmark:hover,.qmark:focus-visible{background:var(--green);color:#fff}
+.qmark{border:0;background:var(--green);color:#fff;width:1.05rem;height:1.05rem;border-radius:50%;font-size:.64rem;font-weight:800;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;line-height:1;flex:none;transition:background .12s,color .12s}
+.qmark::before{content:'?';display:block;line-height:1;text-align:center}
+.qmark:hover,.qmark:focus-visible{background:var(--green-x)}
 .flagchip .qmark{margin-left:.28rem}
+.tile.up .tl .qmark{background:var(--green-d)}
 /* the header tooltip, capped at two lines so it can never wreck the panel */
 .headtip{position:absolute;top:2.3rem;left:1.1rem;right:1.1rem;z-index:9;background:var(--bar);color:#fff;font-size:.75rem;line-height:1.4;border-radius:8px;padding:.42rem .6rem;opacity:0;pointer-events:none;transition:opacity .12s;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
@@ -221,7 +222,12 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .tagx:hover{color:var(--red)}
 .taginput{border:0;outline:2px solid var(--green);outline-offset:-2px;background:var(--card);color:var(--ink);
   font-family:var(--f);font-size:.7rem;font-weight:600;padding:.14rem .5rem;border-radius:999px;width:7rem;flex:none}
-.tag1.more{background:var(--sunk);color:var(--mut)}
+.tagmore{border:0;background:var(--sunk);color:var(--green-d);font-size:.7rem;font-weight:700;padding:.14rem .5rem;border-radius:999px;white-space:nowrap;flex:none}
+.tagmore:hover{background:var(--green);color:#fff}
+.tagctl{display:flex;align-items:center;gap:.45rem;margin-top:.1rem}
+.taghelp{margin-left:auto;border:0;background:transparent;color:var(--green-d);font-size:.7rem;font-weight:700;padding:.14rem 0;text-decoration:underline;white-space:nowrap}
+.taghelp:hover{color:var(--green-x)}
+.tagrow2.open{flex-wrap:wrap;overflow:visible}
 .labnote{font-weight:600;letter-spacing:0;text-transform:none;color:var(--mut);font-size:.6rem}
 .tag0{background:var(--sunk);color:var(--faint)}
 .tag1{background:var(--green-pale);color:var(--green-ink)}
@@ -230,6 +236,7 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .ba.up{padding-top:.55rem;border-top:1px solid var(--rule-2)}
 .lab.up{color:var(--green-ink)}
 .box.upbox{background:var(--green-pale);color:var(--green-x);font-weight:500}
+.rec.done span{color:var(--green-x)}
 .rec.quiet{font-size:.74rem;font-weight:500;color:var(--mut)}
 .rec.quiet span{color:var(--mut)}
 /* the previous stage stays on screen, compressed, so the new one reads as growth */
@@ -397,6 +404,15 @@ const TAGS_AFTER = {
 /* the boost recommends; the client's own tags are kept and carried through,
    so what they get is always their tags plus at least two more */
 const MAX_OWN_TAGS = 3;
+/* what the boost put in place, stated the same clinical way as the status it replaces */
+const DONE_BY_TYPE = {
+  img:  'A written description and structured tags now identify this image.',
+  h1:   'The page subject is now named and tagged for search engines.',
+  h2:   'This heading now states a claim that assistants can quote.',
+  p:    'Each sentence now stands alone and carries structured markup.',
+  kick: 'The label now carries a service term and a location tag.',
+  band: '',
+};
 const PIC_HELP = "Search can't see this picture yet. Boost it and we'll describe and tag it so it counts.";
 const SCORE_TL = ['AI RETRIEVAL','AEO OPTIMIZED','SEO OPTIMIZED'];
 const WHY = [
@@ -495,6 +511,8 @@ function open({ttl, flag, body, back}){
     c.userTags = (c.userTags||[]).filter(t => t !== b.dataset.deltag);
     flow();
   });
+  const th = document.querySelector('[data-taghelp]');
+  if (th) th.onclick = () => { S.flow.previewed = true; S.flow.rolled = false; flow(); };
   const ti = $('#taginput');
   if (ti){
     ti.focus();
@@ -612,14 +630,18 @@ function scores(c, proj){
 
   /* what it says now, and only after a preview, what it would say */
   const isImg = c.t === 'img';
+  const done = isBoosted(c.id) && !!DONE_BY_TYPE[c.t];
   const nowText = isImg ? (c.alt || 'No description yet') : c.text;
   const mine = c.userTags || (c.userTags = []);
   const F = S.flow || {};
   const chips = mine.map(t=>`<span class="tag1 tagmine">${esc(t)}<button class="tagx" data-deltag="${esc(t)}" aria-label="Remove ${esc(t)}">&times;</button></span>`).join('');
+  const tagsNow = (mine.length ? '' : '<span class="tag0">None yet</span>') + chips;
   const slot = F.addingTag
     ? `<input class="taginput" id="taginput" maxlength="18" placeholder="Type a tag" autocomplete="off">`
     : (mine.length < MAX_OWN_TAGS ? `<button class="tagadd" data-newtag="1">+ Add tag</button>` : '');
-  const tagsNow = (mine.length ? '' : '<span class="tag0">None yet</span>') + chips + slot;
+  const helpLink = (canBoost(c) && !isBoosted(c.id))
+    ? `<button class="taghelp" data-taghelp="1">Want help adding tags?</button>` : '';
+  const tagCtl = (slot || helpLink) ? `<div class="tagctl">${slot}${helpLink}</div>` : '';
   const recs = (TAGS_AFTER[c.t] || []).filter(t => !mine.includes(t));
   const tagsUp = recs.map(t=>`<span class="tag1">${esc(t)}</span>`).join('')
                + mine.map(t=>`<span class="tag1 tagkept">${esc(t)}</span>`).join('');
@@ -633,7 +655,8 @@ function scores(c, proj){
     <div class="ca-bd">
       <div class="tilewrap"><div class="tiles">${tiles}</div>
         <div class="tipline" id="tip"></div></div>
-      ${c.rec?`<div class="rec ${proj?'quiet':''}"><span>Right now:</span> ${esc(c.rec)}</div>`:''}
+      ${done ? `<div class="rec done"><span>Now in place:</span> ${esc(DONE_BY_TYPE[c.t] || '')}</div>`
+             : (c.rec ? `<div class="rec ${proj?'quiet':''}"><span>Right now:</span> ${esc(c.rec)}</div>` : '')}
 
       ${proj ? `<div class="ba squash">
         <div class="cline"><span class="lab">Current ${isImg?'Description':'Words'}</span><span class="ctext">${esc(nowText)}</span></div>
@@ -643,6 +666,7 @@ function scores(c, proj){
         <div class="box">${esc(nowText)}</div>
         <div class="lab">Current Tags</div>
         <div class="tagrow2">${tagsNow}</div>
+        ${tagCtl}
       </div>`}
 
       ${proj ? `<div class="ba up">
@@ -657,7 +681,8 @@ function scores(c, proj){
 /* one line, always: anything that will not fit is folded into a counter */
 function fitTags(row){
   if (!row || !row.clientWidth) return;
-  row.querySelectorAll('.more').forEach(m => m.remove());
+  row.querySelectorAll('.tagmore').forEach(m => m.remove());
+  if (row.classList.contains('open')) return;
   const chips = [...row.children];
   chips.forEach(c => { c.hidden = false; });
   const gap = parseFloat(getComputedStyle(row).gap) || 5;
@@ -669,8 +694,15 @@ function fitTags(row){
     else used += w;
   });
   if (over){
-    const m = document.createElement('span');
-    m.className = 'tag1 more'; m.textContent = '+' + over;
+    const m = document.createElement('button');
+    m.className = 'tagmore'; m.textContent = '+' + over;
+    m.setAttribute('aria-expanded', 'false');
+    m.onclick = () => {
+      const open = row.classList.toggle('open');
+      m.setAttribute('aria-expanded', String(open));
+      if (open){ [...row.children].forEach(c => { c.hidden = false; }); m.textContent = 'Show less'; }
+      else fitTags(row);
+    };
     row.appendChild(m);
   }
 }
