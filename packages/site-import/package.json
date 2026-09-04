@@ -6,7 +6,7 @@
   "main": "src/crawl.js",
   "bin": { "sitecraft-import": "bin/import.js" },
   "scripts": {
-    "test": "node test/extract.test.js && node test/migrate.test.js && node test/junior-import.test.js"
+    "test": "node test/extract.test.js && node test/migrate.test.js && node test/admin.test.js && node test/junior-import.test.js"
   },
   "peerDependencies": { "playwright": "*" },
   "peerDependenciesMeta": { "playwright": { "optional": true } }
