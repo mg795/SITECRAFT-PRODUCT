@@ -1063,7 +1063,7 @@ function flow(){
   let cta = '';
   /* one press arms it, the next one buys it: nothing else on the panel moves */
   if (!F.analysed) cta = `<div class="ctarow">
-    <button class="g" id="go">${img ? 'Boost This Image' : 'See How AI Reads This'} <span class="arw">→</span></button>
+    <button class="g" id="go">${img ? 'Boost This Image' : 'Boost This Content'} <span class="arw">→</span></button>
     <button class="g save" id="sv2">Save</button></div>`;
   else if (canBoost(c) && !isBoosted(c.id) && !F.previewed)
     cta = `<button class="g" id="go">Preview Your Boost <span class="arw">→</span></button>`;
