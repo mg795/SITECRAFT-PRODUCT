@@ -1862,14 +1862,20 @@ function readModel(raw){
       comps };
   }
   if (!Object.keys(site).length) throw new Error('There are no pages Sitecraft can read in that.');
-  return { site, report: raw && raw.report ? raw.report : null };
+  return {
+    site,
+    summary: raw && raw.summary ? raw.summary : null,
+    /* the exception report comes across as it stands: it is what an administrator
+       reads before deciding whether this site is fit to hand to a client */
+    report: raw && raw.report && Array.isArray(raw.report.entries) ? raw.report : null,
+  };
 }
 function readText(text){
   let raw;
   try { raw = JSON.parse(text); } catch { throw new Error("That isn't valid JSON."); }
   return readModel(raw);
 }
-/* What to tell the administrator, when the crawler did not say it itself. */
+/* What to tell the administrator, when the migration did not say it itself. */
 function tally(site){
   const all = Object.values(site).reduce((a, p) => a.concat(p.comps), []);
   return { pages: Object.keys(site).length, components: all.length,
@@ -1878,6 +1884,7 @@ function tally(site){
            words:    all.reduce((n, c) => n + (c.t === 'img' ? 0 : W(c.text)), 0),
            untitled: all.filter(c => c.t === 'img' && !c.alt).length };
 }
+const SEV = { critical:{ cls:'am', word:'Needs You' }, warning:{ cls:'', word:'Worth a Look' }, note:{ cls:'', word:'For the Record' } };
 function normUrl(v){
   const t = String(v || '').trim();
   if (!t) return '';
@@ -1960,18 +1967,48 @@ function importP(){
   </div>`);
 
   if (F.stage === 'ready'){
-    const r = F.report;
+    const r = F.summary, rep = F.report;
     const line = (k, v, note) => `<div class="itm"><span class="who"><i>${k}</i></span>
-      <span class="bdy"><span class="new">${v}</span>${note ? `<span class="stamp">${note}</span>` : ''}</span><span></span></div>`;
+      <span class="bdy"><span class="new">${v}</span>${note ? `<span class="stamp">${esc(note)}</span>` : ''}</span><span></span></div>`;
     parts.push(`<div class="stage">
-      <div class="ask">${esc(F.name)} is ready to load</div>
+      <div class="ask">${esc(F.name)} came across</div>
       <div class="sec-bd">
         ${line('Pages', r.pages, Object.values(F.site).map(p => p.name).join(', '))}
-        ${line('Things To Edit', r.components, r.headings + ' headings, ' + r.photos + ' photos')}
+        ${line('Things To Edit', r.components, (r.headings !== undefined ? r.headings + ' headings, ' : '') + r.photos + ' photos')}
         ${line('Words', r.words)}
       </div>
-      ${r.untitled ? `<div class="note-amber"><b>${r.untitled} of the ${r.photos} photos have no description.</b><br>Search engines and screen readers can't see a picture, so that is the first thing worth fixing.</div>` : ''}
     </div>`);
+
+    /*
+     * The exception report, which is the whole reason this screen exists. An
+     * employee should never have to click through every page to find the eight per
+     * cent that did not come across, so it is put in front of them here, worst
+     * first, each line naming its page and what to do about it.
+     */
+    if (rep && rep.entries.length){
+      const c = rep.counts;
+      parts.push(`<div class="stage">
+        <div class="ask">${c.total} thing${c.total === 1 ? '' : 's'} need${c.total === 1 ? 's' : ''} a look</div>
+        <div class="chips">
+          ${c.critical ? `<span class="chip am">${c.critical} Needs You</span>` : '<span class="chip gr">Nothing Critical</span>'}
+          ${c.warning ? `<span class="chip">${c.warning} Worth a Look</span>` : ''}
+          ${c.note ? `<span class="chip">${c.note} For the Record</span>` : ''}</div>
+        <div class="sec-bd">${rep.entries.slice(0, 40).map(e => `<div class="itm">
+          <span class="who">${e.severity === 'critical' ? esc(e.label) : `<em>${esc(e.label)}</em>`}</span>
+          <span class="bdy"><span class="new">${esc(e.message)}</span>
+            <span class="stamp">${esc(String(e.page))}${e.detail ? ' · ' + esc(String(e.detail).slice(0, 70)) : ''}</span>
+            <span class="stamp">${esc(e.fix || '')}</span></span><span></span></div>`).join('')}
+          ${rep.entries.length > 40 ? `<div class="itm"><span></span><span class="bdy"><span class="stamp">and ${rep.entries.length - 40} more</span></span><span></span></div>` : ''}
+        </div>
+      </div>`);
+    } else if (rep){
+      parts.push(`<div class="stage"><div class="sdone"><span class="tick">✓</span>
+        <span class="lbl2">Nothing needs attention</span></div></div>`);
+    }
+    if (rep && !rep.approvable)
+      parts.push(`<div class="note-amber"><b>This site isn't ready for a client yet.</b><br>
+        ${rep.counts.critical} thing${rep.counts.critical === 1 ? '' : 's'} still need${rep.counts.critical === 1 ? 's' : ''} you.
+        You can still open it to look at what came across.</div>`);
   }
 
   const cta = F.stage === 'ask'   ? `<button class="g" id="ig">Fetch This Site <span class="arw">→</span></button>`
@@ -1990,7 +2027,9 @@ function importP(){
     u.focus();
   }
   const settle = m => {
-    F.site = m.site; F.report = m.report || tally(m.site);
+    F.site = m.site;
+    F.summary = m.summary || tally(m.site);
+    F.report = m.report || null;
     F.name = Object.values(m.site)[0].name; F.stage = 'ready'; importP();
   };
   const g = $('#ig');

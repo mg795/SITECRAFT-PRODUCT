@@ -1,0 +1,30 @@
+:root{--ink:#1e3040;--mut:#5a7183;--brand:#0f7b8a;--sand:#f3f0e9;--line:#dfe5e9}
+*{box-sizing:border-box}
+body{margin:0;font:17px/1.65 Georgia,'Times New Roman',serif;color:var(--ink);background:#fff}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+#masthead{border-bottom:1px solid var(--line);padding:14px 0}
+#masthead nav a{margin-right:18px;color:var(--ink);text-decoration:none;font-size:15px}
+.page-banner{height:420px;background-size:cover;background-position:center}
+h1{font-size:42px;line-height:1.12;margin:0 0 14px;letter-spacing:-.02em}
+h2{font-size:27px;line-height:1.2;margin:44px 0 12px}
+h3{font-size:20px;margin:28px 0 8px}
+.eyebrow{font:600 13px/1.4 Helvetica,Arial,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--brand);margin:0 0 10px}
+p{margin:0 0 16px}
+img{max-width:100%;height:auto;display:block}
+.btn{display:inline-block;background:var(--brand);color:#fff;text-decoration:none;
+     padding:13px 26px;border-radius:4px;font:700 15px/1 Helvetica,Arial,sans-serif}
+.cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:26px;margin:22px 0 8px}
+.card{border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.card h3{margin:14px 16px 6px}
+.card p{margin:0 16px 16px;font-size:15px;color:var(--mut)}
+.band{background:var(--sand);padding:40px 0;margin:48px 0}
+.screen-reader-text{position:absolute;left:-9999px}
+#colophon{background:var(--ink);color:#c3d2dc;padding:30px 0;margin-top:56px;font-size:15px}
+#colophon a{color:#c3d2dc}
+.posts{list-style:none;padding:0;margin:20px 0}
+.posts li{border-bottom:1px solid var(--line);padding:18px 0}
+.posts h3{margin:0 0 4px}
+.posts time{font:600 13px/1.4 Helvetica,Arial,sans-serif;color:var(--mut)}
+form{border:1px solid var(--line);border-radius:6px;padding:22px;max-width:520px}
+label{display:block;font:600 14px/1.6 Helvetica,Arial,sans-serif}
+input,textarea{width:100%;padding:9px;border:1px solid var(--line);border-radius:4px;margin-bottom:14px;font:inherit}

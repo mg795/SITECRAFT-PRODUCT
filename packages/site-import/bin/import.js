@@ -52,15 +52,32 @@ function args(argv){
   const { chromium } = playwright();
   const browser = await chromium.launch(opt.browser ? { executablePath: opt.browser } : {});
   try {
-    const { site, report } = await crawl(browser, url, { maxPages: opt.pages, as: opt.as });
-    const json = JSON.stringify({ site, report }, null, 2);
-    if (opt.out){
-      fs.writeFileSync(path.resolve(opt.out), json);
-      console.error(`${report.pages} pages, ${report.components} things to edit, ${report.photos} photos ` +
-                    `(${report.untitled} with no description) written to ${opt.out}`);
-    } else {
-      process.stdout.write(json + '\n');
+    const out = await crawl(browser, url, { maxPages: opt.pages, as: opt.as });
+    const { site, design, report, summary, status, library, assets } = out;
+    const json = JSON.stringify({ site, design, report, summary, status, library, assets,
+                                  source: out.source }, null, 2);
+    if (opt.out) fs.writeFileSync(path.resolve(opt.out), json);
+    else process.stdout.write(json + '\n');
+
+    /* The report goes to stderr so it can be read while the model goes to a file
+       or down a pipe. It is the same list the review screen shows. */
+    const say = m => console.error(m);
+    say(`${summary.pages} pages, ${summary.components} components, ${summary.photos} pictures, ` +
+        `${summary.words} words. Status: ${status}.`);
+    say(library.map(l => `  ${String(l.count).padStart(3)} × ${l.label}`).join('\n'));
+    if (report.entries.length){
+      say(`\n${report.counts.total} exception${report.counts.total === 1 ? '' : 's'}: ` +
+          `${report.counts.critical} critical, ${report.counts.warning} warning, ${report.counts.note} note.`);
+      for (const e of report.entries)
+        say(`  [${e.severity}] ${e.label} — ${e.page}${e.detail ? ' — ' + String(e.detail).slice(0, 70) : ''}`);
     }
+    say('\nAcceptance:');
+    for (const c of report.acceptance)
+      say(`  ${c.pass ? 'pass' : 'FAIL'}  ${c.name}${c.detail ? '  (' + c.detail + ')' : ''}`);
+    say(report.approvable
+      ? '\nNo critical exceptions. An administrator can review and approve this site.'
+      : `\n${report.counts.critical} critical exception(s) must be resolved before this site can be approved.`);
+    if (opt.out) say(`\nWritten to ${opt.out}`);
   } finally {
     await browser.close();
   }

@@ -25,7 +25,7 @@ const ok = (name, cond, detail) => {
   /* the model, made the way production makes it */
   const model = await crawl(b, 'file://' + path.join(SITE_DIR, 'index.html'),
                             { settleMs: 80, as: 'https://harbourlight.test/' });
-  const json = JSON.stringify({ site: model.site, report: model.report });
+  const json = JSON.stringify({ site: model.site, report: model.report, summary: model.summary });
 
   console.log('\nthe admin door');
   /* each door is checked on its own machine: the flag is remembered per browser */
@@ -84,8 +84,12 @@ const ok = (name, cond, detail) => {
   await page.waitForSelector('#io', { timeout: 8000 });
   const summary = await page.locator('#p-bd').innerText();
   ok('the report names the site', summary.includes('Harbour Light Trust'), summary.slice(0, 200));
-  ok('it counts the pages', /\b3\b/.test(summary));
-  ok('it says which photos have no description', /no description/.test(summary), summary);
+  ok('it counts the pages', /Pages\s*\n?\s*3/.test(summary), summary.slice(0, 260));
+  ok('it puts the exception report in front of the administrator',
+     /needs? a look|Nothing needs attention/.test(summary), summary.slice(0, 400));
+  ok('every exception says what to do about it',
+     !/needs? a look/.test(summary) || /Set a redirect|Write a title|Upload the picture|Point the link|Give one of|Check the source|Fill the missing|Nothing to do|Decide whether|Add an Image|Write a plain|Open the source|Rebuild it/.test(summary),
+     summary.slice(0, 900));
 
   console.log('\nafter loading');
   await page.click('#io');
