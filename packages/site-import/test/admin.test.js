@@ -272,6 +272,32 @@ const ok = (name, cond, detail) => {
   ok('so is its activity log', a.log.length > 6, a.log.length);
   ok('nothing threw at any point', errs.length === 0, errs);
 
+  console.log('\nthe example account carries a real migration');
+  const ctx2 = await b.newContext({ viewport: { width: 1440, height: 1000 } });
+  const p2 = await ctx2.newPage();
+  const e2 = [];
+  p2.on('pageerror', e => e2.push(e.message));
+  await p2.goto(APP);
+  await p2.click('#seed');
+  await p2.waitForTimeout(150);
+  ok('it lands on authorisation, not on a loaded site',
+     await p2.locator('#auth').count() === 1 && await p2.locator('#ex').count() === 0);
+  await p2.check('#auth');
+  await p2.click('#doAuth');
+  await p2.waitForTimeout(120);
+  ok('the example migration is offered once authorisation is recorded',
+     await p2.locator('#ex').count() === 1);
+  await p2.click('#ex');
+  await p2.waitForTimeout(250);
+  const ex = await p2.evaluate(() => DB.accounts[0]);
+  ok('it is the real eight-page migration', ex.migration.summary.pages === 8, ex.migration.summary);
+  ok('with a real exception report', ex.migration.report.counts.critical === 5, ex.migration.report.counts);
+  ok('and its planted faults',
+     ex.migration.report.entries.some(x => x.kind === 'image_missing') &&
+     ex.migration.report.entries.some(x => x.kind === 'broken_link'));
+  ok('nothing threw loading it', e2.length === 0, e2);
+  await ctx2.close();
+
   await b.close();
   console.log('\n' + pass + ' passing, ' + fail + ' failing');
   process.exit(fail ? 1 : 0);

@@ -92,7 +92,7 @@ migration can reach, so that decision cannot be made accidentally.
 ## Running it
 
 ```sh
-npm test --prefix packages/site-import     # 249 assertions
+npm test --prefix packages/site-import     # 255 assertions
 node packages/site-import/bin/import.js <url> --out client.json
 ```
 
