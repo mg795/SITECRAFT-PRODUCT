@@ -165,11 +165,6 @@ body.pick .c:hover .etag,.c.sel .etag,body.ident .c .etag{display:flex}
 .sdone button{margin-left:auto;border:0;background:transparent;color:var(--green-ink);font-size:.78rem;font-weight:700;padding:0;flex:none}
 .sdone.sflat{background:var(--sunk);color:var(--ink-2)}
 .sdone .amt{margin-left:auto;font-variant-numeric:tabular-nums;font-family:var(--m);font-weight:700;flex:none}
-.sdone .sthumb{width:2.7rem;height:1.45rem;border-radius:5px;background-repeat:no-repeat;background-color:var(--rule);flex:none}
-/* a step that has been reopened is in progress again, so it drops the green */
-.sdone.on{background:var(--sunk);color:var(--ink-2)}
-.sdone.on .tick{background:var(--mut)}
-.sdone.on button{color:var(--green-ink)}
 .slinks{display:flex;gap:1.1rem;align-items:center;flex-wrap:wrap;margin-top:-.2rem}
 .slink{border:0;background:transparent;color:var(--mut);font-size:.74rem;font-weight:600;padding:.2rem .1rem}
 .slink:hover{color:var(--green-d)}
@@ -979,7 +974,7 @@ function editP(id){
                                    altWas:c.alt||'', textWas:c.text||''});
   /* one they set aside opens where they left off: on the boost */
   if (S.later.has(id) && canBoost(c) && !isBoosted(id)){
-    S.flow.analysed = true; S.flow.previewed = true; S.flow.rolled = true; S.flow.open = null;
+    S.flow.analysed = true; S.flow.previewed = true; S.flow.rolled = true;
   }
   flow();
 }
@@ -997,26 +992,16 @@ function flow(){
      left standing. */
   const photoSet  = img && !!F.photo, descSet = img && F.desc !== null;
   const wordsSet  = !img && F.words !== null;
-  const photoOpen = img && (!photoSet || !descSet || F.open === 'photo');
-  const descOpen  = img && (photoSet || F.analysed) && (!descSet || F.open === 'desc');
-  const wordsOpen = !img && (!wordsSet || F.open === 'words');
+  /* a step that is done leaves no receipt behind: the back arrow is the way to it */
+  const photoOpen = img && (!photoSet || !descSet);
+  const descOpen  = img && (photoSet || F.analysed) && !descSet;
+  const wordsOpen = !img && !wordsSet;
   const parts = [];
-  /* the fold only offers itself once the flow has moved past that step */
-  const fold = (key, label, foldable, extra = '') => {
-    const on = F.open === key;
-    return `<div class="sdone${on ? ' on' : ''}"><span class="tick">✓</span>${extra}
-      <span class="lbl2">${esc(label)}</span>
-      ${foldable ? `<button data-step="${key}">${on ? 'Done' : 'Change'}</button>` : ''}</div>`;
-  };
 
   /* ── the picture ── */
   if (img && photoSet){
     const f = c.fit || (c.fit = {x:50, y:50, z:100});
     const onOriginal = F.wasSrc && c.src === F.wasSrc;
-    /* the picture is right there while the step is open, so it needs no receipt */
-    if (descSet || F.analysed)
-      parts.push(fold('photo', onOriginal ? 'Original Photo in Place' : 'New Photo Added', true,
-        photoOpen ? '' : `<span class="sthumb" style="background-image:url(${c.src});background-size:${f.z}%;background-position:${f.x}% ${f.y}%"></span>`));
     if (photoOpen) parts.push(`<div class="stage">
       <div class="crop" id="crop" style="background-image:url(${c.src});background-size:${f.z}%;background-position:${f.x}% ${f.y}%">
         <span class="hint">Drag to reposition</span></div>
@@ -1035,7 +1020,6 @@ function flow(){
 
   /* ── what is in it ── */
   if (img && (photoSet || F.analysed)){
-    if (descSet) parts.push(fold('desc', c.alt || 'No Description Yet', F.analysed));
     if (descOpen) parts.push(`<div class="stage">
       <div class="tipwrap">
         <div class="ask">What is in this picture?<button class="qmark" data-tiptext="${esc(PIC_HELP)}" aria-label="Why this matters"></button></div>
@@ -1047,7 +1031,6 @@ function flow(){
 
   /* ── the wording, for everything that is not a picture ── */
   if (!img){
-    if (wordsSet) parts.push(fold('words', c.text, F.analysed));
     if (wordsOpen) parts.push(`<div class="stage">
       <div class="ask">Change the wording</div>
       <div class="edwrap"><div class="box ed" contenteditable="true" id="ed">${esc(F.draftWords ?? c.text)}</div>
@@ -1078,21 +1061,6 @@ function flow(){
   if (F.scroll){ F.scroll = false; toBottom(); }
 
   /* ── wiring ── */
-  document.querySelectorAll('[data-step]').forEach(b => b.onclick = () => {
-    const k = b.dataset.step;
-    if (F.open === k){                              /* Done: fold it back up */
-      if (k === 'desc') commitDesc();
-      if (k === 'words' && !commitWords()) return;
-      F.open = null;
-    } else {
-      if (k === 'desc')  F.draftDesc  = null;       /* reopen on what is in place */
-      if (k === 'words') F.draftWords = null;
-      F.open = k;
-    }
-    flow();
-    const row = document.querySelector(`[data-step="${k}"]`);
-    if (row) row.closest('.sdone').scrollIntoView({block:'nearest', behavior:'smooth'});
-  });
   const fi2 = $('#fi2'), rep = $('#rep');
   if (rep) rep.onclick = () => fi2 && fi2.click();
   if (fi2) fi2.onchange = e => {
@@ -1177,7 +1145,7 @@ function flow(){
     const grow = () => { dsc.style.height = 'auto'; dsc.style.height = dsc.scrollHeight + 'px'; };
     dsc.addEventListener('input', () => { grow(); liveDesc(); }); grow();
     /* it takes the caret when it is the step being asked, not when it is offered */
-    if (!F.analysed || F.open === 'desc'){
+    if (!F.analysed){
       dsc.focus();
       dsc.setSelectionRange(dsc.value.length, dsc.value.length);
     }
@@ -1220,7 +1188,6 @@ function flow(){
   if (go) go.onclick = () => {
     if (dsc) commitDesc();
     if (ed && !commitWords()) return;
-    F.open = null;                                  /* the CTA settles any reopened step */
     F.scroll = true;
     if (!F.analysed){ F.analysed = true; return flow(); }
     if (!F.previewed && canBoost(c)){ F.previewed = true; return flow(); }
@@ -1241,7 +1208,7 @@ function flow(){
        review panel asks for it again before the session settles */
     if (canBoost(c) && !isBoosted(c.id)){
       S.later.add(c.id);
-      F.analysed = true; F.previewed = true; F.rolled = true; F.open = null;
+      F.analysed = true; F.previewed = true; F.rolled = true;
     }
     /* keep them moving down the page; the review panel asks about it later */
     const nxt = nextUp(pgOf(c.id), c.id);
@@ -1741,10 +1708,14 @@ function canStepBack(){
 }
 function stepBack(){
   const F = S.flow, c = comp(F.id);
-  F.open = null;
   if (F.previewed){ F.previewed = false; F.rolled = false; }
-  else if (F.analysed) F.analysed = false;
-  else if (c.t === 'img' && F.desc !== null) F.desc = null;
+  else if (F.analysed){
+    /* with no Change button left, back is the way in, so it reopens the step */
+    F.analysed = false;
+    if (c.t === 'img'){ F.desc = null; F.draftDesc = null; }
+    else { F.words = null; F.draftWords = null; }
+  }
+  else if (c.t === 'img' && F.desc !== null){ F.desc = null; F.draftDesc = null; }
   else if (c.t === 'img' && F.photo){
     c.src = F.wasSrc || null;
     c.fit = F.wasFit ? {...F.wasFit} : null;      /* a copy: the snapshot has to survive the next drag */
