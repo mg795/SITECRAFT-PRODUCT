@@ -584,7 +584,12 @@ const isBoosted = id => S.boosts.some(b=>b.id===id);
 const canBoost = c => !!(c.up && c.price);
 const paidTotal = () => S.receipts.reduce((t,r)=>t+r.amt,0);
 const pageSpend = p => S.boosts.filter(b=>b.page===p).reduce((t,b)=>t+b.price,0);
-const esc = s => String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+/* A src from a cloned site can carry quotes and parentheses. Quoted and escaped,
+   it cannot break out of the style attribute it is written into. */
+/* ids come from the cloned page, so they are quoted before they reach a selector */
+const byId = id => document.querySelector('[data-id="' + String(id).replace(/["\\]/g, m => '\\' + m) + '"]');
+const bgUrl = s => esc('url("' + String(s).replace(/[\\"]/g, m => '\\' + m).replace(/[\r\n]/g, '') + '")');
 const avg = a => a.reduce((x,y)=>x+y,0)/a.length;
 /* A description and their own tags move the numbers on their own merit. They
    never close the gap a boost closes, so there is always something left to buy. */
@@ -642,7 +647,7 @@ const uniq = a => [...new Set(a)];
    moves while a pointer is down repaints the single element it touches: a full
    rebuild re-parses every inlined image and turns a drag into a slideshow. */
 function paintComp(c){
-  const el = document.querySelector(`[data-id="${c.id}"]`);
+  const el = byId(c.id);
   if (!el || c.t !== 'img' || !c.src) return;
   const f = c.fit || {x:50, y:50, z:100};
   el.style.backgroundSize = f.z + '%';
@@ -658,7 +663,7 @@ function draw(){
     const pin = nn?`<span class="npin">${nn}</span>`:'';
     const at = canBoost(c)?' data-boost="1"':'';
     if (c.t==='img') return c.src
-      ? `<div class="c" data-id="${c.id}"${at} role="img" aria-label="${esc(c.alt||'')}" style="position:relative;margin:0 0 1.2rem;border-radius:4px;aspect-ratio:1200/630;background-image:url(${c.src});background-repeat:no-repeat;background-size:${(c.fit||{}).z||100}%;background-position:${(c.fit||{}).x??50}% ${(c.fit||{}).y??50}%">${pin}${tag}</div>`
+      ? `<div class="c" data-id="${c.id}"${at} role="img" aria-label="${esc(c.alt||'')}" style="position:relative;margin:0 0 1.2rem;border-radius:4px;aspect-ratio:1200/630;background-image:${bgUrl(c.src)};background-repeat:no-repeat;background-size:${(c.fit||{}).z||100}%;background-position:${(c.fit||{}).x??50}% ${(c.fit||{}).y??50}%">${pin}${tag}</div>`
       : `<div class="img c" data-id="${c.id}"${at}>${pin}${tag}${esc(c.text)}</div>`;
     if (c.t==='kick') return `<p class="kick c" data-id="${c.id}"${at}>${pin}${tag}${esc(c.text)}</p>`;
     if (c.t==='band') return `<div class="band c" data-id="${c.id}"${at}>${pin}${tag}${esc(c.text)}</div>`;
@@ -674,7 +679,7 @@ function draw(){
   /* redrawing the page rebuilds its markup, so anything the state still holds
      has to be put back: the selection ring belongs to the state, not the markup */
   if (S.sel){
-    const el = document.querySelector(`[data-id="${S.sel}"]`);
+    const el = byId(S.sel);
     if (el) el.classList.add('sel');
   }
   bdg();
@@ -834,11 +839,11 @@ function done(){
 function pick(id){
   S.sel = id;
   document.querySelectorAll('.c.sel').forEach(e=>e.classList.remove('sel'));
-  const el = document.querySelector(`[data-id="${id}"]`); el&&el.classList.add('sel');
+  const el = byId(id); el&&el.classList.add('sel');
   S.mode==='comment' ? noteP(id) : editP(id);
 }
 function flash(id){
-  const el = document.querySelector(`[data-id="${id}"]`); if(!el) return;
+  const el = byId(id); if(!el) return;
   el.classList.remove('fl'); void el.offsetWidth; el.classList.add('fl');
   el.scrollIntoView({behavior:'smooth', block:'center'});
 }
@@ -1037,7 +1042,7 @@ function flow(){
     const f = c.fit || (c.fit = {x:50, y:50, z:100});
     const onOriginal = F.wasSrc && c.src === F.wasSrc;
     if (photoOpen) parts.push(`<div class="stage">
-      <div class="crop" id="crop" style="background-image:url(${c.src});background-size:${f.z}%;background-position:${f.x}% ${f.y}%">
+      <div class="crop" id="crop" style="background-image:${bgUrl(c.src)};background-size:${f.z}%;background-position:${f.x}% ${f.y}%">
         <span class="hint">Drag to reposition</span></div>
       <div class="zoomrow"><input type="range" id="zoom" min="100" max="260" value="${f.z}">
         <button class="reset" id="rep">Replace</button>
@@ -1047,7 +1052,7 @@ function flow(){
     </div>`);
   } else if (img){
     parts.push(`<div class="stage">
-      <div class="drop${c.src ? ' onphoto' : ''}" id="dz"${c.src ? ` style="background-image:url(${c.src})"` : ''}><b>Drag a New Photo Here</b><span>or Click to Choose One</span><em>Any size, you position it next (now ${c.dim ? c.dim.w + ' × ' + c.dim.h : '1200 × 630'})</em></div>
+      <div class="drop${c.src ? ' onphoto' : ''}" id="dz"${c.src ? ` style="background-image:${bgUrl(c.src)}"` : ''}><b>Drag a New Photo Here</b><span>or Click to Choose One</span><em>Any size, you position it next (now ${c.dim ? c.dim.w + ' × ' + c.dim.h : '1200 × 630'})</em></div>
       <input type="file" id="fi" accept="image/*" hidden>
     </div>`);
   }
@@ -1288,9 +1293,14 @@ function commitDesc(){
    it had: same width, same number of lines. Measured on a hidden twin of the real
    element, so it is the page's own typography answering, not a word count. */
 function boxFit(c, text){
-  const el = document.querySelector(`[data-id="${c.id}"]`);
+  const el = byId(c.id);
   if (!el || !el.parentNode) return null;
   const w = el.getBoundingClientRect().width;
+  /* the same string at the same width always measures the same, and this runs on
+     every keystroke, so the answer is kept. The key carries the width, so a resize
+     asks again, and the store is bounded so a long session cannot grow it. */
+  const key = c.id + '|' + Math.round(w) + '|' + text;
+  if (boxFit._memo.has(key)) return boxFit._memo.get(key);
   const m = el.cloneNode(false);
   m.removeAttribute('data-id'); m.removeAttribute('data-boost');
   m.style.cssText += `;position:absolute;visibility:hidden;left:-99999px;top:0;width:${w}px;height:auto;min-height:0`;
@@ -1306,8 +1316,12 @@ function boxFit(c, text){
   m.style.width = 'auto'; m.style.whiteSpace = 'nowrap';
   const run = m.getBoundingClientRect().width;
   m.remove();
-  return {lines, run};
+  const out = {lines, run};
+  if (boxFit._memo.size > 300) boxFit._memo.clear();
+  boxFit._memo.set(key, out);
+  return out;
 }
+boxFit._memo = new Map();
 /* same number of lines, and never gutted: the block keeps the shape it had */
 function fitsBox(c, was, now){
   const a = boxFit(c, was), b = boxFit(c, now);
