@@ -1820,7 +1820,16 @@ function guide(){
  * reachable, the same crawler run from a command line writes the model to a file
  * and it can be pasted in instead, which is the whole of the difference.
  */
-const ADMIN = /(^|[?&])admin(=|&|$)/.test(location.search);
+/* The door: ?admin, or #admin where a host keeps the query to itself. Once it has
+   been opened on a machine it stays open, so an administrator does not have to
+   carry the address around. A client who never types it never sees any of this. */
+const ADMIN = (() => {
+  const asked = /(^|[?&#])admin(=|&|$)/.test(location.search + location.hash);
+  try {
+    if (asked) localStorage.setItem('sitecraft.admin', '1');
+    return asked || localStorage.getItem('sitecraft.admin') === '1';
+  } catch { return asked; }              /* storage can be off; the address still works */
+})();
 const IMPORT_API = '/api/import';
 const COMP_TYPES = new Set(['h1','h2','p','kick','band','img']);
 

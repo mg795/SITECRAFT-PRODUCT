@@ -43,7 +43,7 @@ It needs Playwright to render with: `npm i playwright`, or `PLAYWRIGHT_PATH` and
 
 ## Loading it into the editor
 
-Open the junior editor with `?admin`, go to **Your Account → Import a Client
+Open the junior editor with `?admin` (or `#admin`, where the host keeps the query to itself; either one is remembered on that browser afterwards), go to **Your Account → Import a Client
 Site**, and give it the address. It asks the import server at `/api/import?url=`.
 Where that server is not reachable, it says so and takes the JSON this package
 writes instead, which is the same model by the same route.

@@ -27,20 +27,39 @@ const ok = (name, cond, detail) => {
                             { settleMs: 80, as: 'https://harbourlight.test/' });
   const json = JSON.stringify({ site: model.site, report: model.report });
 
-  const page = await b.newPage({ viewport: { width: 1280, height: 900 } });
+  console.log('\nthe admin door');
+  /* each door is checked on its own machine: the flag is remembered per browser */
+  const fresh = async where => {
+    const c = await b.newContext({ viewport: { width: 1280, height: 900 } });
+    const p = await c.newPage();
+    await p.goto('file://' + APP + (where || ''));
+    return { c, p };
+  };
+  const client = await fresh();
+  await client.p.click('[data-mode="account"]');
+  ok('a client never sees the importer', await client.p.locator('#imp').count() === 0);
+  await client.c.close();
+
+  for (const door of ['?admin', '#admin']){
+    const a = await fresh(door);
+    await a.p.click('[data-mode="account"]');
+    await a.p.click('[data-t="a5"]');
+    ok('an administrator does, with ' + door, await a.p.locator('#imp').isVisible());
+    /* and does not have to carry the address around after the first time */
+    await a.p.goto('file://' + APP);
+    await a.p.click('[data-mode="account"]');
+    ok('and still does on the next visit, without ' + door,
+       await a.p.locator('[data-t="a5"]').count() === 1);
+    await a.c.close();
+  }
+
+  const ctx = await b.newContext({ viewport: { width: 1280, height: 900 } });
+  const page = await ctx.newPage();
   const errs = [];
   page.on('pageerror', e => errs.push(e.message));
-
-  console.log('\nthe admin door');
-  await page.goto('file://' + APP);
-  await page.click('[data-mode="account"]');
-  ok('a client never sees the importer', await page.locator('#imp').count() === 0);
-  await page.click('#p-x');
-
   await page.goto('file://' + APP + '?admin');
   await page.click('[data-mode="account"]');
   await page.click('[data-t="a5"]');
-  ok('an administrator does', await page.locator('#imp').isVisible());
 
   console.log('\nimporting');
   await page.click('#imp');
