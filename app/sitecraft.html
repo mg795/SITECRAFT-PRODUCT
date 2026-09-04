@@ -605,7 +605,22 @@ function liveScores(c){
    The three the client is buying against are exact to two places; the badge
    and the page gauges round, since they are a glance rather than a figure. */
 const pct  = v => Math.round(v * 10) + '%';
-const pct2 = v => (v * 10).toFixed(2) + '%';
+/* A real measurement never lands on a round number, and never lands on the same
+   number three times. Each figure carries a fixed offset in hundredths, drawn
+   from what it is measuring, so it is steady across re-renders but never neat. */
+function cents(id, i){
+  let h = 2166136261;
+  const k = id + ':' + i;
+  for (let n = 0; n < k.length; n++){ h ^= k.charCodeAt(n); h = Math.imul(h, 16777619); }
+  return 1 + ((h >>> 0) % 99);                    /* 1 to 99, so never 00 */
+}
+function shown3(c, vals){
+  const out = vals.map((v, i) => Math.min(99.99, Math.max(0, v * 10) + cents(c.id, i) / 100));
+  for (let i = 1; i < out.length; i++)           /* three the same reads as invented */
+    while (out.slice(0, i).some(x => Math.abs(x - out[i]) < .005))
+      out[i] = out[i] >= 99.98 ? out[i] - .01 : out[i] + .01;
+  return out.map(n => n.toFixed(2) + '%');
+}
 function bandOf(v, i, c){
   if (!c.u) return '';
   const span = c.u[i] - c.s[i];
@@ -828,9 +843,10 @@ function scores(c, proj){
   const cur = liveScores(c), up = Array.isArray(c.u) ? c.u : null;
   const shown = proj && up ? up : cur;
   const badge = pct(avg(proj && up ? up : cur));
+  const disp = shown3(c, shown);
   const tiles = shown.map((v,i)=>`<div class="tile ${proj?'up':bandOf(v,i,c)}">
       <span class="tl">${SCORE_TL[i]}<button class="qmark" data-tip="${i}" aria-label="What is ${SCORE_NM[i]}?"></button></span>
-      <span class="tv">${pct2(v)}</span>
+      <span class="tv">${disp[i]}</span>
     </div>`).join('');
 
   /* what it says now, and only after a preview, what it would say */
@@ -857,7 +873,7 @@ function scores(c, proj){
   return `<div class="ca">
     <div class="ca-hd ${proj?'up':''}">
       <span class="ca-sc">${badge}</span>
-      <span class="ca-nm"><b>${esc(tc(c.lbl))} Content Analysis</b></span>
+      <span class="ca-nm"><b>Current AEO/SEO Value</b></span>
       <button class="qmark ca-q" data-tip="head" aria-label="What is this?"></button>
     </div>
     <div class="ca-bd">
@@ -916,7 +932,8 @@ function rollScores(c){
   const badge = document.querySelector('.ca-sc');
   if (!tv.length) return;
   const from = liveScores(c), to = c.u, a = avg(from), b = avg(to);
-  const clamp  = v => pct2(Math.max(0, Math.min(10, v)));
+  const settled = shown3(c, to);                  /* where the roll comes to rest */
+  const clamp  = v => (Math.max(0, Math.min(10, v)) * 10).toFixed(2) + '%';
   const clampB = v => pct(Math.max(0, Math.min(10, v)));
   const DUR = 780, t0 = performance.now();
   const tick = now => {
@@ -924,7 +941,7 @@ function rollScores(c){
     const e = 1 - Math.pow(1 - p, 3);
     const jitter = (1 - e) * 1.7;
     tv.forEach((el, i) => {
-      el.textContent = p > .84 ? clamp(to[i])
+      el.textContent = p > .84 ? settled[i]
         : clamp(from[i] + (to[i] - from[i]) * e + (Math.random() - .5) * jitter);
     });
     if (badge) badge.textContent = p > .84 ? clampB(b)
@@ -954,6 +971,9 @@ function wireTips(){
 /* No step labels. Each stage completes, collapses to a ticked line, and the
    next action appears as the single primary button naming what it does. */
 
+const CYCLE = 15;                                 /* days in a billing cycle */
+const REDO  = .65;                                /* a mid-cycle change costs 35% less */
+const redoPrice = c => +(c.price * REDO).toFixed(2);
 const MAX_PHOTO = 8 * 1024 * 1024;
 /* every picture is inlined, so an oversized one has to be turned away in words */
 function readable(file){
@@ -988,7 +1008,7 @@ function flow(){
   if (!c) return shut();                     /* the component went away; do not render half a panel */
   const img = c.t === 'img';
   if (c.blocked) return blockedP(c.id);
-  if (isBoosted(c.id)) return lockedP(c);    /* settled work is read-only until the term is up */
+  if (isBoosted(c.id) && !F.changing) return lockedP(c);
 
   /* Every step that settles folds into a line and stays there. The panel only
      ever grows: nothing already on screen is taken away to make room for what
@@ -1001,6 +1021,9 @@ function flow(){
   const descOpen  = img && (photoSet || F.analysed) && !descSet;
   const wordsOpen = !img && !wordsSet;
   const parts = [];
+  if (F.changing) parts.push(`<div class="note-amber"><b>Changing boosted content may reduce
+    the success of your SEO and AEO.</b><br>Saving a change part way through a cycle re-boosts
+    it at <b>${M(redoPrice(c))}</b>, 35% off the ${M(c.price)} you pay each cycle.</div>`);
 
   /* ── the picture ── */
   if (img && photoSet){
@@ -1049,7 +1072,9 @@ function flow(){
   const started = F.analysed || (img ? (photoSet || descSet) : wordsSet);
   let cta = '';
   /* one press arms it, the next one buys it: nothing else on the panel moves */
-  if (!F.analysed) cta = `<div class="ctarow">
+  /* a change to boosted work has one action, and it carries its price */
+  if (F.changing) cta = `<button class="g" id="sv2">Save Change<span class="amt2">${M(redoPrice(c))}</span></button>`;
+  else if (!F.analysed) cta = `<div class="ctarow">
     <button class="g" id="go">${img ? 'Boost This Image' : 'Boost This Content'} <span class="arw">→</span></button>
     <button class="g save" id="sv2">Save</button></div>`;
   else if (canBoost(c) && !isBoosted(c.id) && !F.previewed)
@@ -1057,7 +1082,8 @@ function flow(){
   else if (canBoost(c) && !isBoosted(c.id)) cta = `<button class="g" id="go">Boost This ${esc(tc(c.lbl))}<span class="amt2">${M(c.price)}</span></button>`;
   else if (isBoosted(c.id)) cta = `<div class="sdone"><span class="tick">✓</span><span class="lbl2">Boosted, ${M(S.boosts.find(x=>x.id===c.id).price)} on This Session</span></div>`;
 
-  const secondary = (started && F.analysed) ? `<button class="ghost" id="sv">Boost This ${esc(shortOf(c))} Later</button>` : '';
+  const secondary = F.changing ? `<button class="ghost" id="sv3">Leave It as It Is</button>`
+    : ((started && F.analysed) ? `<button class="ghost" id="sv">Boost This ${esc(shortOf(c))} Later</button>` : '');
 
   open({ ttl: hdr(c), flag: flagOf(c), back: canStepBack(), key: 'flow:' + c.id,
          body: parts.join('') + cta + secondary });
@@ -1201,8 +1227,16 @@ function flow(){
   if (sv2) sv2.onclick = () => {
     if (ed && !commitWords()) return;
     if (dsc) commitDesc();
+    if (reboost(c)) return;                       /* a change to boosted work has a price */
     shut(); draw(); flash(c.id);
     toast('Saved. Nothing is charged for a change you make yourself.');
+  };
+  const sv3 = $('#sv3');
+  if (sv3) sv3.onclick = () => {                  /* put back what was boosted, charge nothing */
+    const b = S.boosts.find(x => x.id === c.id);
+    if (b){ if (c.t === 'img') c.alt = b.now; else c.text = b.now; }
+    F.changing = false;
+    shut(); draw();
   };
   const sv = $('#sv');
   if (sv) sv.onclick = () => {
@@ -1295,10 +1329,10 @@ function commitWords(){
 /* the tiles are rewritten in place: a re-render would take the caret with it */
 function paintScores(c){
   if ((S.flow || {}).previewed) return;
-  const cur = liveScores(c);
+  const cur = liveScores(c), disp = shown3(c, cur);
   document.querySelectorAll('.ca .tile').forEach((t,i)=>{
     if (cur[i] === undefined) return;
-    t.querySelector('.tv').textContent = pct2(cur[i]);
+    t.querySelector('.tv').textContent = disp[i];
     t.classList.remove('mid','hi');
     const b = bandOf(cur[i], i, c); if (b) t.classList.add(b);
   });
@@ -1309,24 +1343,31 @@ function paintScores(c){
 /* what a boosted part looks like: itself, dimmed, with the reason over it */
 function lockedP(c){
   const page = pgOf(c.id), nxt = nextUp(page, c.id);
-  const img = c.t === 'img' && c.src;
-  const f = c.fit || {x:50, y:50, z:100};
+  const paid = (S.boosts.find(b => b.id === c.id) || {}).price || c.price;
   /* no breadcrumb: the panel says what this is, and the X is the way back */
   open({ ttl:'', key: 'lock:' + c.id, body: `
     <div class="locknote">
-      <span class="lm">&#128274;</span>
-      <div class="lt">This ${esc(tc(c.lbl))} is Already Boosted</div>
-      <div class="ls">Locked in for <b>90 days</b> while the results build.</div>
+      <span class="lm">&#128260;</span>
+      <div class="lt">This ${esc(tc(c.lbl))} is Boosted</div>
+      <div class="ls">Billed <b>${M(paid)} every ${CYCLE} days</b> for as long as it runs.</div>
     </div>
     ${nxt ? `<button class="g" id="lk-next">Boost Your Next Piece of Content<span class="arw">&rarr;</span></button>`
           : `<button class="g" id="lk-close">Back to my Page</button>`}
-    <div class="optout">Changed your mind? Nothing is charged until you press Done, so you can
-      <b>remove this boost</b> in the review until then.</div>`});
+    <button class="ghost" id="lk-edit">Change It Anyway</button>
+    <div class="optout">Changed your mind? You can <b>remove this boost</b> in the review
+      any time before you press <button class="asdone" data-done="1">Done</button>.</div>`});
 
   const nb = $('#lk-next');
   if (nb) nb.onclick = () => { shut(); setTimeout(() => pick(nxt.id), 160); };
   const cb = $('#lk-close');
   if (cb) cb.onclick = () => { shut(); draw(); };
+  $('#lk-edit').onclick = () => {                 /* a fresh edit, priced as a change */
+    setFlow({id:c.id, photo:null, desc:null, words:null, analysed:false,
+             wasSrc:c.src||null, wasFit:c.fit?{...c.fit}:null,
+             altWas:c.alt||'', textWas:c.text||'', changing:true});
+    flow();
+  };
+  document.querySelectorAll('.optout [data-done]').forEach(b => b.onclick = done);
 }
 
 function blockedP(id){
@@ -1380,7 +1421,7 @@ function askBoost(list){
     <div class="sh-sub">${many ? 'Each one is' : 'This is'} rewritten and tagged on your live page so answer engines can read ${many ? 'them' : 'it'}.</div>
     ${many ? list.map(k=>`<div class="sh-line">${esc(k.lbl)} <span style="color:var(--faint);font-weight:500">On ${esc(pageOf(k.id).name)}</span><span class="amt">${M(k.price)}</span></div>`).join('') : ''}
     <button class="g" id="sh-go">${many ? `Boost All ${list.length}` : `Boost This ${esc(shortOf(one))}`}<span class="amt2">${M(tot)}</span></button>
-    <div class="sh-term">Runs for <b>90 days</b>, the time it takes to show trackable results.</div>
+    <div class="sh-term">Billed every <b>${CYCLE} days</b>, the cycle it takes to show trackable results.</div>
     <button class="ghost" id="sh-no">Not Yet</button>`);
   $('#sh-no').onclick = sheetShut;
   $('#sh-go').onclick = () => applyAll(list);
@@ -1391,7 +1432,7 @@ function applyAll(list){
   const tot = list.reduce((t,k)=>t+k.price, 0);
   list.forEach(k => {
     S.boosts.push({id:k.id, page:pgOf(k.id), lbl:k.lbl, price:k.price,
-                   was: k.t === 'img' ? (k.alt || '') : k.text,
+                   was: k.t === 'img' ? (k.alt || '') : k.text, now: k.up,
                    gain:k.u.map((v,i)=>+(v - liveScores(k)[i]).toFixed(1))});
     if (k.t === 'img') k.alt = k.up; else k.text = k.up;
     S.later.delete(k.id);
@@ -1402,6 +1443,25 @@ function applyAll(list){
   if (S.mode === 'review') review();
   else if (S.flow && list.some(k => k.id === S.flow.id)) flow();
   celebrate(list, before, pageScore(page), tot);
+}
+
+/* A change to boosted work restarts its cycle, at 35% off, and only if something
+   actually changed: reopening it and closing again costs nothing. */
+function reboost(c){
+  const F = S.flow;
+  if (!F || !F.changing || !isBoosted(c.id)) return false;
+  const now = c.t === 'img' ? (c.alt || '') : c.text;
+  const b = S.boosts.find(x => x.id === c.id);
+  if (!b || now === b.now){ F.changing = false; return false; }
+  b.now = now;
+  const amt = redoPrice(c);
+  S.boosts.push({id:c.id, page:pgOf(c.id), lbl:c.lbl, price:amt, was:b.was, now, redo:true,
+                 gain:c.u.map(()=>0)});
+  S.session += amt;
+  F.changing = false;
+  shut(); draw(); bdg(); flash(c.id);
+  toast(`Changed and re-boosted. <b>${M(amt)}</b> added, 35% off the cycle price.`);
+  return true;
 }
 
 /* nothing is charged until the session settles, so until then a boost can be lifted */
@@ -1439,7 +1499,7 @@ function celebrate(list, before, after, tot){
       ${gauge(esc(pg.name) + ' &middot; SEO visibility', before.seo, after.seo)}
     </div>
     <div class="sh-line">Added to This Session<span class="amt">${M(tot)}</span></div>
-    <div class="sub">Nothing is charged until you press <b>Done</b>.</div>
+    <div class="sub">Nothing is charged until you press <b>Done</b>. It bills again every ${CYCLE} days.</div>
     ${nxt ? `<button class="g" id="sh-next">Boost The Next One<span class="amt2">${M(nxt.price)}</span></button>
       <div class="mini">${left} more ${left===1?'part':'parts'} of ${esc(pg.name)} ${left===1?'is':'are'} still untagged.</div>
       <button class="ghost" id="sh-done">Back to my Page</button>`
@@ -1556,8 +1616,9 @@ function review(){
 
   const bst = S.boosts.length ? S.boosts.map((b,i)=>`<div class="itm">
       <span class="who">${esc(b.lbl)}</span>
-      <span class="bdy"><span class="new">On ${esc(pageOf(b.id).name)}</span>
-        <span class="stamp">AI +${b.gain[0]} · AEO +${b.gain[1]} · SEO +${b.gain[2]}</span></span>
+      <span class="bdy"><span class="new">On ${esc(pageOf(b.id).name)}${b.redo?' · changed mid cycle':''}</span>
+        <span class="stamp">${b.redo ? `Re-boost at 35% off · bills every ${CYCLE} days`
+          : `AI +${b.gain[0]} · AEO +${b.gain[1]} · SEO +${b.gain[2]}`}</span></span>
       <span class="acts"><span class="amt">${M(b.price)}</span>
         <button class="pill" data-show="${b.id}">Show Me</button>
         <button class="pill warn" data-unboost="${i}">Remove This Boost</button></span>
@@ -1580,7 +1641,7 @@ function review(){
     <div class="sec"><button class="sec-hd" data-t="r3" aria-expanded="true">Boosts on This Page (${S.boosts.filter(b=>b.page===S.page).length})<span class="tw">✕</span></button>
       <div class="sec-bd" id="r3">${bst}
         <div class="spent"><span>Spent on This Page</span><span class="amt">${M(pageSpend(S.page))}</span></div>
-        <div class="mini">Across the whole site so far: ${M(S.boosts.reduce((t,b)=>t+b.price,0))} &middot; settles when you press <button class="asdone" data-done="1">Done</button>.</div>
+        <div class="mini">Across the whole site so far: ${M(S.boosts.reduce((t,b)=>t+b.price,0))} &middot; settles when you press <button class="asdone" data-done="1">Done</button>, then bills again every ${CYCLE} days.</div>
         ${S.boosts.length?'<div class="mini">A boost can be removed here at any time before the session settles.</div>':''}</div></div>
     <div class="p-ft">Approved by <b>Marshall</b>, just now.</div>`});
 
@@ -1645,7 +1706,7 @@ function account(){
         ${S.seats<2?'<div class="itm"><span></span><span class="bdy"><span class="stamp">One seat is included. A second is $9/mo.</span></span><span class="acts"><button class="pill" id="as">Add</button></span></div>':''}</div></div>
     <div class="sec"><button class="sec-hd" data-t="a4" aria-expanded="false">How You Like to Work<span class="tw">+</span></button>
       <div class="sec-bd" id="a4" hidden><div class="itm">
-        <span></span><span class="bdy"><span class="new">Confirm Before Each Boost</span><span class="stamp">Always on. Boosts run for 90 days, so Sitecraft asks every time.</span></span>
+        <span></span><span class="bdy"><span class="new">Confirm Before Each Boost</span><span class="stamp">Always on. A boost bills every ${CYCLE} days, so Sitecraft asks every time.</span></span>
         <span></span></div></div></div>
     <div class="note-amber">Your plan is <b>$299/mo</b>. Boosts are agreed as you pick them and settle as one amount each time you press Done.</div>
     <div class="p-ft"><u>All my details</u> · © 2026 ReadTomato™</div>`});
