@@ -461,7 +461,7 @@ const THP = {"logo": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAVQAAAA0CAYA
 /* Real Estate Excellence Podcast, Tracy Hayes.
    Artwork and structure are the real ones from the THP rebuild repo.
    The words are placeholder: the live site could not be reached to clone them. */
-const SITE = {
+let SITE = {
   home:{ name:'Home', value:3, comps:[
     {id:'h-k', lbl:'Eyebrow', t:'kick', hero:1, price:0.99, text:'Jacksonville · Northeast Florida',
       up:'Real Estate Podcast · Jacksonville, Florida', s:[2.0,1.5,2.5], u:[6.5,7.0,7.5],
@@ -680,7 +680,7 @@ function draw(){
   };
   $('#hero').innerHTML = `<div class="in">${pg.comps.filter(c=>c.hero).map(one).join('')}</div>`;
   $('#page').innerHTML = pg.comps.filter(c=>!c.hero).map(one).join('');
-  document.querySelectorAll('nav.site a').forEach(a=>a.classList.toggle('on', a.dataset.go===S.page));
+  document.querySelectorAll('nav.site a[data-go]').forEach(a=>a.classList.toggle('on', a.dataset.go===S.page));
   document.querySelectorAll('.c').forEach(el=>el.onclick = e => {
     if (!document.body.classList.contains('pick')) return;
     e.preventDefault(); e.stopPropagation(); pick(el.dataset.id);
@@ -833,15 +833,21 @@ function arm(){
   $('#sc-lock').hidden = false;
   document.querySelector('.done').classList.add('armed');
 }
+/* the other half of arm: the session is over and the pages are open again */
+function unlock(){
+  S.editing = false;
+  document.body.classList.remove('editing');
+  $('#sc-lock').hidden = true;
+  document.querySelector('.done').classList.remove('armed');
+}
 function done(){
   if (!S.editing){ toast("You're already unlocked. Pick a page."); return; }
   const amt = S.session;
   if (amt){ S.receipts.push({when:'now', site:'Real Estate Excellence', n:S.boosts.length, amt}); S.session = 0; }
-  S.editing = false; S.mode = null; S.flows = {};
-  document.body.classList.remove('editing','pick','ident');
-  $('#sc-lock').hidden = true;
+  unlock();
+  S.mode = null; S.flows = {};
+  document.body.classList.remove('pick','ident');
   document.querySelectorAll('.bar [data-mode]').forEach(b=>b.classList.remove('on'));
-  document.querySelector('.done').classList.remove('armed');
   shut(); bdg();
   toast(amt ? `Session closed. <b>${M(amt)}</b> settled as one amount. The other pages are unlocked.`
             : 'Saved and locked. The other pages are unlocked.');
@@ -1740,6 +1746,12 @@ function account(){
         <span class="bdy"><span class="stamp">L2 Constrained Copy Edit · you are owner</span>
           <span class="chips" style="margin-top:.25rem"><span class="chip">${S.changes.length} of 3 Change Rounds Used</span><span class="chip ${S.seats>1?'am':''}">${S.seats} of 2 Reviewer Seats</span></span></span>
         <span class="amt">${M(S.boosts.reduce((t,b)=>t+b.price,0))}</span></div></div></div>
+    ${ADMIN ? `<div class="sec"><button class="sec-hd" data-t="a5" aria-expanded="false">Import a Client Site<span class="tw">+</span></button>
+      <div class="sec-bd" id="a5" hidden><div class="itm">
+        <span class="who"><i>Admin</i></span>
+        <span class="bdy"><span class="new">Bring a Site Across</span>
+          <span class="stamp">Give Sitecraft the client's address. It opens every page, reads the content and loads it here to work on.</span></span>
+        <span class="acts"><button class="pill" id="imp">Start</button></span></div></div></div>` : ''}
     <div class="sec"><button class="sec-hd" data-t="a2" aria-expanded="false">Receipts (${S.receipts.length})<span class="tw">+</span></button>
       <div class="sec-bd" id="a2" hidden>${S.receipts.map(r=>`<div class="itm">
           <span class="stamp">${esc(r.when)}</span><span class="bdy"><span class="new">${r.n} item${r.n>1?'s':''}</span></span><span class="amt">${M(r.amt)}</span></div>`).join('')}
@@ -1759,6 +1771,7 @@ function account(){
     <div class="note-amber">Your plan is <b>$299/mo</b>.${PRO ? ' Boosts are agreed as you pick them and settle as one amount each time you press Done.' : ' Your edits are yours to make, as often as you like.'}</div>
     <div class="p-ft"><u>All my details</u> · © 2026 ReadTomato™</div>`});
   const a = $('#as'); if (a) a.onclick = seats;
+  const i = $('#imp'); if (i) i.onclick = importP;
 }
 
 /* ═══════════ the ? guide ═══════════ */
@@ -1794,6 +1807,202 @@ function guide(){
       S.session -= tot; S.boostCount -= left.length; draw(); bdg();
     });
   };
+}
+
+/* ═══════════ import a client's site ═══════════ */
+/*
+ * An administrator is handed a client's address and brings their site across.
+ *
+ * The fetch itself cannot happen in here. A page may not read another origin, and
+ * a site built on Squarespace, Wix or a WordPress page builder has to be rendered
+ * before there is anything to read at all. So the crawler runs on a server, in
+ * packages/site-import, and this asks it for the model. Where that server is not
+ * reachable, the same crawler run from a command line writes the model to a file
+ * and it can be pasted in instead, which is the whole of the difference.
+ */
+const ADMIN = /(^|[?&])admin(=|&|$)/.test(location.search);
+const IMPORT_API = '/api/import';
+const COMP_TYPES = new Set(['h1','h2','p','kick','band','img']);
+
+/* An import is somebody else's HTML. Nothing off it reaches the page until it has
+   been through here: an unknown type would be written into the page as a tag. */
+const safeSrc = v => /^(https?:\/\/|\/|data:image\/)/i.test(String(v || '')) ? String(v) : '';
+function readModel(raw){
+  const src = raw && raw.site ? raw.site : raw;
+  const site = {};
+  for (const k of Object.keys(src || {})){
+    const p = src[k];
+    if (!p || !Array.isArray(p.comps)) continue;
+    const comps = [];
+    for (const c of p.comps){
+      if (!c || !COMP_TYPES.has(c.t) || typeof c.text !== 'string') continue;
+      const out = { id: String(c.id || (k + '-' + (comps.length + 1))),
+                    lbl: String(c.lbl || 'Content'), t: c.t, text: c.text };
+      if (c.hero) out.hero = 1;
+      if (c.t === 'img'){
+        out.src = safeSrc(c.src);
+        out.alt = String(c.alt || '');
+        if (c.dim) out.dim = { w: +c.dim.w || 0, h: +c.dim.h || 0 };
+      }
+      comps.push(out);
+    }
+    if (comps.length) site[k] = {
+      name:  String(p.name || k).slice(0, 60),
+      value: [1,2,3].includes(+p.value) ? +p.value : 2,
+      url:   String(p.url || ''),
+      comps };
+  }
+  if (!Object.keys(site).length) throw new Error('There are no pages Sitecraft can read in that.');
+  return { site, report: raw && raw.report ? raw.report : null };
+}
+function readText(text){
+  let raw;
+  try { raw = JSON.parse(text); } catch { throw new Error("That isn't valid JSON."); }
+  return readModel(raw);
+}
+/* What to tell the administrator, when the crawler did not say it itself. */
+function tally(site){
+  const all = Object.values(site).reduce((a, p) => a.concat(p.comps), []);
+  return { pages: Object.keys(site).length, components: all.length,
+           photos:   all.filter(c => c.t === 'img').length,
+           headings: all.filter(c => /^h[12]$/.test(c.t)).length,
+           words:    all.reduce((n, c) => n + (c.t === 'img' ? 0 : W(c.text)), 0),
+           untitled: all.filter(c => c.t === 'img' && !c.alt).length };
+}
+function normUrl(v){
+  const t = String(v || '').trim();
+  if (!t) return '';
+  try {
+    const u = new URL(/^https?:\/\//i.test(t) ? t : 'https://' + t);
+    return u.hostname.includes('.') ? u.href : '';
+  } catch { return ''; }
+}
+async function fetchSite(url){
+  const r = await fetch(IMPORT_API + '?url=' + encodeURIComponent(url), { headers:{ accept:'application/json' } });
+  if (!r.ok) throw new Error('The importer answered ' + r.status + '.');
+  return readModel(await r.json());
+}
+
+function bindNav(){
+  document.querySelectorAll('nav.site a[data-go]').forEach(a => a.onclick = e => {
+    e.preventDefault();
+    if (S.editing) return toast('Press <b>Done</b> to settle up and unlock the other pages.');
+    S.sel = null;                       /* the ring belongs to the page you left */
+    S.page = a.dataset.go; draw(); window.scrollTo({top:0,behavior:'smooth'});
+  });
+}
+
+/* Swap the site under the editor: the client's pages, under the client's own
+   names, with nothing left behind by whoever was here before. */
+function loadSite(site, name){
+  const keys = Object.keys(site);
+  if (!keys.length) return;
+  for (const k of Object.keys(SITE)) delete SITE[k];
+  keys.forEach(k => { SITE[k] = site[k]; });
+
+  const nav = document.querySelector('nav.site');
+  nav.querySelectorAll('a[data-go]').forEach(a => a.remove());
+  keys.forEach(k => {
+    const a = document.createElement('a');
+    a.href = '#'; a.dataset.go = k; a.textContent = SITE[k].name;
+    nav.appendChild(a);
+  });
+  if (name){
+    const lg = document.querySelector('nav.site .lg');
+    lg.textContent = name;                                  /* text, so no image has to load */
+  }
+  bindNav();
+
+  /* a new site is a new session: nothing owed, nothing pending, nothing selected */
+  S.page = keys[0]; S.sel = null; S.flow = null; S.flows = {};
+  S.changes = []; S.notes = []; S.boosts = []; S.later.clear(); S.picked.clear();
+  S.session = 0; S.boostCount = 0;
+  shut(); draw(); bdg();
+  /* the tool they came here to use, but nothing to settle yet: a site nobody has
+     touched should open on every page, not hold them on the first one */
+  setMode('edit');
+  unlock();
+  window.scrollTo({ top:0 });
+}
+
+/* The panel builds the same way every other one does: each step that settles
+   folds to a line and stays there, and the next action is the one green button. */
+function importP(){
+  const F = S.imp || (S.imp = { url:'', stage:'ask', site:null, report:null, name:'', why:'' });
+  const parts = [];
+
+  if (F.stage === 'ask') parts.push(`<div class="stage">
+    <div class="ask">Which site are we bringing across?</div>
+    <input class="fld" id="iu" placeholder="northgate-dental.com" value="${esc(F.url)}" autocomplete="off" spellcheck="false">
+    <div class="help">Sitecraft opens every page of it, reads what is on each one and loads the content here. The client's own site isn't touched.</div>
+  </div>`);
+  else parts.push(`<div class="sdone sflat"><span class="tick">✓</span><span class="lbl2">${esc(F.url)}</span></div>`);
+
+  if (F.stage === 'busy') parts.push(`<div class="stage">
+    <div class="ask">Reading the pages</div>
+    <div class="help">Each page is opened and rendered before it is read, so a site built on a page builder comes across the same as a plain one.</div>
+  </div>`);
+
+  if (F.stage === 'paste') parts.push(`<div class="stage">
+    <div class="ask">Sitecraft couldn't reach that site from here</div>
+    <div class="note-amber"><b>${esc(F.why)}</b><br>Run the importer from a command line and paste what it writes:
+      <br><code>node packages/site-import/bin/import.js ${esc(F.url)}</code></div>
+    <textarea class="fld grow" id="ijson" rows="4" placeholder="Paste the site model here"></textarea>
+  </div>`);
+
+  if (F.stage === 'ready'){
+    const r = F.report;
+    const line = (k, v, note) => `<div class="itm"><span class="who"><i>${k}</i></span>
+      <span class="bdy"><span class="new">${v}</span>${note ? `<span class="stamp">${note}</span>` : ''}</span><span></span></div>`;
+    parts.push(`<div class="stage">
+      <div class="ask">${esc(F.name)} is ready to load</div>
+      <div class="sec-bd">
+        ${line('Pages', r.pages, Object.values(F.site).map(p => p.name).join(', '))}
+        ${line('Things To Edit', r.components, r.headings + ' headings, ' + r.photos + ' photos')}
+        ${line('Words', r.words)}
+      </div>
+      ${r.untitled ? `<div class="note-amber"><b>${r.untitled} of the ${r.photos} photos have no description.</b><br>Search engines and screen readers can't see a picture, so that is the first thing worth fixing.</div>` : ''}
+    </div>`);
+  }
+
+  const cta = F.stage === 'ask'   ? `<button class="g" id="ig">Fetch This Site <span class="arw">→</span></button>`
+            : F.stage === 'busy'  ? `<button class="g" disabled>Opening the Pages…</button>`
+            : F.stage === 'paste' ? `<button class="g" id="ip">Load This Site</button>`
+            :                       `<button class="g" id="io">Open ${esc(F.name)} <span class="arw">→</span></button>`;
+  const secondary = F.stage === 'ask' || F.stage === 'busy' ? ''
+            : `<button class="ghost" id="ir">Start Again With Another Address</button>`;
+
+  open({ ttl:'<b>Import a Client Site</b>', body: parts.join('') + cta + secondary, key:'import' });
+
+  const u = $('#iu');
+  if (u){
+    u.oninput  = () => { F.url = u.value; };
+    u.onkeydown = e => { if (e.key === 'Enter'){ e.preventDefault(); const g = $('#ig'); if (g) g.click(); } };
+    u.focus();
+  }
+  const settle = m => {
+    F.site = m.site; F.report = m.report || tally(m.site);
+    F.name = Object.values(m.site)[0].name; F.stage = 'ready'; importP();
+  };
+  const g = $('#ig');
+  if (g) g.onclick = async () => {
+    const url = normUrl(F.url);
+    if (!url) return toast("That doesn't look like a website address.");
+    F.url = url; F.stage = 'busy'; importP();
+    try { settle(await fetchSite(url)); }
+    catch (e){ F.why = e.message || 'The importer could not be reached.'; F.stage = 'paste'; importP(); }
+  };
+  const p = $('#ip');
+  if (p) p.onclick = () => { try { settle(readText($('#ijson').value)); } catch (e){ toast(esc(e.message)); } };
+  const o = $('#io');
+  if (o) o.onclick = () => {
+    const name = F.name;
+    loadSite(F.site, name);
+    S.imp = null;
+    toast(`<b>${esc(name)}</b> is loaded. Every page is yours to edit.`);
+  };
+  const r = $('#ir');
+  if (r) r.onclick = () => { S.imp = null; importP(); };
 }
 
 /* ═══════════ wiring ═══════════ */
@@ -1859,12 +2068,7 @@ $('#p-x').onclick = () => {
 };
 $('#scrim').onclick = ()=>$('#p-x').click();
 document.addEventListener('keydown', e=>{ if (e.key==='Escape') $('#p-x').click(); });
-document.querySelectorAll('nav.site a').forEach(a=>a.onclick=e=>{
-  e.preventDefault();
-  if (S.editing) return toast('Press <b>Done</b> to settle up and unlock the other pages.');
-  S.sel = null;                       /* the ring belongs to the page you left */
-  S.page = a.dataset.go; draw(); window.scrollTo({top:0,behavior:'smooth'});
-});
+bindNav();
 document.getElementById('thp-logo').src = THP.logo;
 draw();
 setMode('edit');            /* they came here to work on the page, so the tool is live */
